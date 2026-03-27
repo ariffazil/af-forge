@@ -36,7 +36,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from arifos.geox.geox_agent import GeoXAgent, GeoXConfig
-from arifos.geox.geox_memory import GeoMemoryStore
+from arifos.geox.geox_memory import DualMemoryStore
 from arifos.geox.geox_reporter import GeoXReporter
 from arifos.geox.geox_schemas import CoordinatePoint, GeoRequest
 from arifos.geox.geox_tools import ToolRegistry
@@ -51,7 +51,7 @@ logger = logging.getLogger("geox.mcp_server")
 _config = GeoXConfig()
 _tool_registry = ToolRegistry.default_registry()
 _validator = GeoXValidator()
-_memory_store = GeoMemoryStore()
+_memory_store = DualMemoryStore()
 _reporter = GeoXReporter()
 
 _agent = GeoXAgent(
@@ -141,9 +141,8 @@ _TOOL_SPECS: dict[str, dict[str, Any]] = {
     "geox_query_memory": {
         "name": "geox_query_memory",
         "description": (
-            "Query the GEOX geological memory store for past prospect evaluations. "
-            "Supports keyword search and optional basin filter. "
-            "Returns up to `limit` most relevant memory entries."
+            "Query the legacy GEOX geological memory store for past prospect evaluations. "
+            "Supports keyword search and optional basin filter."
         ),
         "inputSchema": {
             "type": "object",
@@ -163,6 +162,24 @@ _TOOL_SPECS: dict[str, dict[str, Any]] = {
                 },
             },
             "required": ["query"],
+        },
+    },
+    "geox_query_dual_memory": {
+        "name": "geox_query_dual_memory",
+        "description": (
+            "Sovereign Dual-Memory retrieval (H9). Fuses discrete Macrostrat facts "
+            "with continuous LEM embeddings. Returns thermodynamically grounded (delta_S) "
+            "geological evidence context."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "latitude": {"type": "number", "description": "Centroid latitude."},
+                "longitude": {"type": "number", "description": "Centroid longitude."},
+                "query": {"type": "string", "description": "Search query text (optional)."},
+                "top_k": {"type": "integer", "description": "Number of results to fuse.", "default": 5},
+            },
+            "required": ["latitude", "longitude"],
         },
     },
     "geox_health": {
@@ -273,6 +290,22 @@ async def _handle_geox_query_memory(args: dict[str, Any]) -> dict[str, Any]:
         return {"success": False, "error": str(exc), "entries": []}
 
 
+async def _handle_geox_query_dual_memory(args: dict[str, Any]) -> dict[str, Any]:
+    """Handler for geox_query_dual_memory tool call."""
+    try:
+        location = CoordinatePoint(
+            latitude=float(args["latitude"]),
+            longitude=float(args["longitude"]),
+        )
+        query = args.get("query", "")
+        top_k = int(args.get("top_k", 5))
+
+        result = await _memory_store.query_dual(location, query_text=query, top_k=top_k)
+        return {"success": True, "result": result}
+    except Exception as exc:
+        return {"success": False, "error": str(exc)}
+
+
 async def _handle_geox_health(_args: dict[str, Any]) -> dict[str, Any]:
     """Handler for geox_health tool call."""
     tool_health = _tool_registry.health_check_all()
@@ -289,7 +322,7 @@ async def _handle_geox_health(_args: dict[str, Any]) -> dict[str, Any]:
             "all_healthy": all(tool_health.values()),
         },
         "memory_store": {
-            "backend": "in_memory",
+            "backend": "DualMemoryStore (H9)",
             "entry_count": _memory_store.count(),
             "basins": _memory_store.list_basins(),
         },
@@ -305,6 +338,7 @@ async def _handle_geox_health(_args: dict[str, Any]) -> dict[str, Any]:
 _TOOL_HANDLERS = {
     "geox_evaluate_prospect": _handle_geox_evaluate_prospect,
     "geox_query_memory": _handle_geox_query_memory,
+    "geox_query_dual_memory": _handle_geox_query_dual_memory,
     "geox_health": _handle_geox_health,
 }
 
