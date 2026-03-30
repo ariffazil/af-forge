@@ -13,26 +13,52 @@ import logging
 import os
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Optional
 
-from arifos.geox.geox_tools import ToolRegistry, GeoToolResult
+from arifos.geox.geox_tools import GeoToolResult, ToolRegistry
+from arifos.geox.governance import calculate_indices, get_verdict_advice
 
-# Sovereign Path Injection for arifOS alignment
-ARIFOS_PATH = r"C:\ariffazil\arifOS"
-ARIFOSMCP_PATH = os.path.join(ARIFOS_PATH, "arifosmcp")
-ARIFOS_SITES = os.path.join(ARIFOSMCP_PATH, "sites")
+def _candidate_arifos_paths() -> list[Path]:
+    roots: list[Path] = []
+    env_root = os.getenv("ARIFOS_ROOT")
+    if env_root:
+        roots.append(Path(env_root))
 
-if ARIFOS_SITES not in sys.path:
-    sys.path.append(ARIFOS_SITES)
-if ARIFOSMCP_PATH not in sys.path:
-    sys.path.append(ARIFOS_PATH)
-    sys.path.append(ARIFOSMCP_PATH)
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        sibling = parent / "arifOS"
+        if sibling.exists():
+            roots.append(sibling)
+        if (parent / "arifosmcp").exists():
+            roots.append(parent)
+
+    unique: list[Path] = []
+    seen: set[str] = set()
+    for path in roots:
+        key = str(path)
+        if key not in seen:
+            seen.add(key)
+            unique.append(path)
+    return unique
+
+
+def _bootstrap_arifos_path() -> None:
+    for root in _candidate_arifos_paths():
+        candidates = [root, root / "arifosmcp", root / "arifosmcp" / "sites"]
+        for candidate in candidates:
+            candidate_str = str(candidate)
+            if candidate.exists() and candidate_str not in sys.path:
+                sys.path.append(candidate_str)
+
+
+_bootstrap_arifos_path()
 
 logger = logging.getLogger("geox.hardened")
 
 try:
-    from arifosmcp.core.shared.physics import delta_S, genius_score, humility_band
     from arifosmcp.core.governance import get_governance_kernel
+    from arifosmcp.core.shared.physics import delta_S, genius_score, humility_band
 except ImportError:
     # Fallback/Shim if arifOS is genuinely missing (F9 Anti-Hantu warning)
     logger.warning("arifosmcp.core.shared.physics or governance not found. Using shims.")
@@ -47,7 +73,6 @@ except ImportError:
     def get_governance_kernel(sid: str) -> Any:
         return None
 
-from arifos.geox.governance import calculate_indices, get_verdict_advice
 
 class HardenedGeoxAgent:
     """The hardened Geological Intelligence Agent for the arifOS Trinity."""
@@ -59,17 +84,18 @@ class HardenedGeoxAgent:
         logger.info(f"HardenedGeoxAgent initialized [ID: {session_id}]")
 
     async def execute_tool(
-        self, 
-        tool_name: str, 
-        params: dict[str, Any], 
-        context: Optional[dict[str, Any]] = None
+        self,
+        tool_name: str,
+        params: dict[str, Any],
+        context: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """Execute a geological tool with arifOS hardening."""
         start_time = datetime.now(timezone.utc)
-        
-        # 1. Fetch Tool
-        tool = self.registry.get_tool(tool_name)
-        if not tool:
+
+        # 1. Fetch Tool (Aligned with ToolRegistry.get)
+        try:
+            tool = self.registry.get(tool_name)
+        except (KeyError, AttributeError):
             return {
                 "tool": tool_name,
                 "payload": {"error": f"Tool {tool_name} not found in GEOX registry."},
@@ -77,11 +103,11 @@ class HardenedGeoxAgent:
                 "risk_tier": "low"
             }
 
-        # 2. Execution (The 'FORGE' step)
+        # 2. Execution (The 'FORGE' step - Aligned with BaseTool.run)
         try:
-            result: GeoToolResult = await tool.execute(**params)
-            payload = result.data
-            notes = result.explanation
+            result: GeoToolResult = await tool.run(params)
+            payload = result.raw_output
+            notes = result.metadata.get("explanation", "No explanation provided.")
             verdict = "OK" if result.success else "VOID"
         except Exception as e:
             logger.exception(f"Tool {tool_name} failed execution.")
@@ -93,7 +119,7 @@ class HardenedGeoxAgent:
         input_str = json.dumps(params, sort_keys=True, default=str)
         output_str = json.dumps(payload, sort_keys=True, default=str)
         ds = delta_S(input_str, output_str)
-        
+
         # Update Kernel State if available
         indices = {}
         verdict_advice = "No kernel feedback"
@@ -113,7 +139,7 @@ class HardenedGeoxAgent:
         # 5. Geox Eureka: Goldilocks & Godellock (The Paradox Eureka)
         omega_obj = humility_band(0.9)
         omega = omega_obj.omega_0 if hasattr(omega_obj, "omega_0") else 0.032
-        
+
         # Determine Habitability
         is_goldilocks = (ds <= 0) and (0.03 <= omega <= 0.05)
         is_godellock = (omega < 0.03)

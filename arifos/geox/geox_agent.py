@@ -28,10 +28,10 @@ import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Awaitable, Callable
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from arifos.geox.geox_schemas import (
-    CoordinatePoint,
     GeoInsight,
     GeoPrediction,
     GeoQuantity,
@@ -669,7 +669,7 @@ class GeoXAgent:
         text = (
             f"Multi-tool geophysical assessment for '{request.prospect_name}' "
             f"({request.basin}): {len(quantities)} geophysical measurements "
-            f"acquired across {len(set(q.quantity_type for q in quantities))} "
+            f"acquired across {len({q.quantity_type for q in quantities})} "
             f"parameter types. Detailed reservoir characterisation requires "
             f"additional data integration and expert review."
         )
@@ -705,7 +705,12 @@ class GeoXAgent:
     # validate()
     # ------------------------------------------------------------------
 
-    async def validate(self, insights: list[GeoInsight]) -> AggregateVerdict:
+    async def validate(
+        self,
+        insights: list[GeoInsight],
+        results: list[GeoToolResult],
+        request: GeoRequest,
+    ) -> AggregateVerdict:
         """
         Validate all insights via the GeoXValidator (777 REASON + 888 AUDIT).
 
@@ -753,6 +758,7 @@ class GeoXAgent:
         request: GeoRequest,
         insights: list[GeoInsight],
         verdict: AggregateVerdict,
+        results: list[GeoToolResult],
     ) -> GeoResponse:
         """
         Assemble the final GeoResponse (999 SEAL stage).
@@ -786,6 +792,12 @@ class GeoXAgent:
                     if sid not in prov_seen:
                         prov_chain.append(qty.provenance)
                         prov_seen.add(sid)
+
+        # Aggregate tool metadata
+        metadata: dict[str, Any] = {}
+        for res in results:
+            if res.metadata:
+                metadata.update(res.metadata)
 
         # arifOS telemetry block
         arifos_telemetry: dict[str, Any] = {
@@ -823,6 +835,7 @@ class GeoXAgent:
             audit_log=list(self._audit_log),
             human_signoff_required=human_required,
             arifos_telemetry=arifos_telemetry,
+            metadata=metadata,
         )
 
         await self._emit_audit({
@@ -883,10 +896,10 @@ class GeoXAgent:
         insights = await self.synthesise(results, request)
 
         # 777 REASON + 888 AUDIT
-        verdict = await self.validate(insights)
+        verdict = await self.validate(insights, results, request)
 
         # 999 SEAL
-        response = await self.summarise(request, insights, verdict)
+        response = await self.summarise(request, insights, verdict, results)
 
         # 888 HOLD — log and return (do NOT block; caller handles routing)
         if response.human_signoff_required:

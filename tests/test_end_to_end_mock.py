@@ -243,6 +243,38 @@ async def test_memory_entry_has_metadata(geo_request: GeoRequest, mock_agent: Ge
     assert entry.metadata["response_id"] == response.response_id
 
 
+@pytest.mark.asyncio
+async def test_memory_location_only_retrieval_prefers_nearby_entries(
+    geo_request: GeoRequest, mock_agent: GeoXAgent
+):
+    """Location-only retrieval should not surface unrelated freshest memories."""
+    response = await mock_agent.evaluate_prospect(geo_request)
+    memory: GeoMemoryStore = mock_agent.memory_store  # type: ignore[assignment]
+
+    await memory.store(response, geo_request)
+
+    far_request = geo_request.model_copy(
+        update={
+            "request_id": str(uuid.uuid4()),
+            "prospect_name": "Far Basin Lead",
+            "location": CoordinatePoint(latitude=18.0, longitude=121.0, depth_m=1800.0),
+        }
+    )
+    far_response = response.model_copy(
+        update={
+            "response_id": str(uuid.uuid4()),
+            "request_id": far_request.request_id,
+        }
+    )
+    await memory.store(far_response, far_request)
+
+    results = await memory.retrieve("", location=geo_request.location, limit=5)
+
+    assert results, "Expected nearby memory results for location-only retrieval"
+    assert results[0].prospect_name == geo_request.prospect_name
+    assert all(entry.prospect_name != "Far Basin Lead" for entry in results[:1])
+
+
 # ---------------------------------------------------------------------------
 # test_reporter_markdown
 # ---------------------------------------------------------------------------

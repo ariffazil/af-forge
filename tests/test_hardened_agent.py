@@ -1,10 +1,5 @@
 import asyncio
-import sys
-import os
-
-# Add geox and arifosmcp to path
-sys.path.append(r"c:\ariffazil\GEOX")
-sys.path.append(r"C:\arifosmcp")
+from typing import Any
 
 from arifos.geox.geox_hardened import HardenedGeoxAgent
 
@@ -23,11 +18,11 @@ async def test_hardened_agent():
         name = "hello_earth"
         description = "A simple welcome tool for geological intelligence."
         
-        async def execute(self, **kwargs) -> GeoToolResult:
+        async def run(self, inputs: dict[str, Any]) -> GeoToolResult:
             return GeoToolResult(
                 success=True,
-                data={"message": "Welcome to the Malay Basin Forge, arif."},
-                explanation="Initial grounding check completed."
+                raw_output={"message": "Welcome to the Malay Basin Forge, arif."},
+                metadata={"explanation": "Initial grounding check completed."}
             )
             
     agent.registry.register(HelloEarthTool())

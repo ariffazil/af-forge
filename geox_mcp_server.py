@@ -7,7 +7,6 @@ arifOS Trinity sovereignty model (F1-F13).
 
 import asyncio
 import logging
-import sys
 from typing import List
 
 from mcp.server import Server
@@ -17,8 +16,6 @@ from mcp.server.types import (
 )
 from mcp.server.stdio import stdio_server
 
-# arifOS alignment
-sys.path.append(r"c:\ariffazil\GEOX")
 from arifos.geox.geox_hardened import HardenedGeoxAgent
 from arifos.geox.geox_init import GEOXFoundation
 

@@ -13,9 +13,49 @@ import os
 import platform
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger("geox.init")
+
+
+def _candidate_arifos_paths() -> list[Path]:
+    roots: list[Path] = []
+    env_root = os.getenv("ARIFOS_ROOT")
+    if env_root:
+        roots.append(Path(env_root))
+
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        sibling = parent / "arifOS"
+        if sibling.exists():
+            roots.append(sibling)
+        if (parent / "arifosmcp").exists():
+            roots.append(parent)
+
+    unique: list[Path] = []
+    seen: set[str] = set()
+    for path in roots:
+        key = str(path)
+        if key not in seen:
+            seen.add(key)
+            unique.append(path)
+    return unique
+
+
+def _bootstrap_arifosmcp_path() -> bool:
+    for root in _candidate_arifos_paths():
+        candidates = [root, root / "arifosmcp", root / "arifosmcp" / "sites"]
+        for candidate in candidates:
+            candidate_str = str(candidate)
+            if candidate.exists() and candidate_str not in sys.path:
+                sys.path.append(candidate_str)
+        try:
+            __import__("arifosmcp")
+            return True
+        except ImportError:
+            continue
+    return False
 
 class GEOXFoundation:
     """Hardened foundation for GEOX intelligence."""
@@ -52,10 +92,8 @@ class GEOXFoundation:
         missing_deps = []
         for dep in essential_deps:
             try:
-                # Add specific path for arifosmcp if not in sys.path
-                if dep == "arifosmcp" and r"C:\ariffazil\arifOS\arifosmcp\sites" not in sys.path:
-                    sys.path.append(r"C:\ariffazil\arifOS\arifosmcp\sites")
-                    sys.path.append(r"C:\ariffazil\arifOS\arifosmcp")
+                if dep == "arifosmcp" and not _bootstrap_arifosmcp_path():
+                    raise ImportError("arifosmcp import path bootstrap failed")
                 __import__(dep)
             except ImportError:
                 missing_deps.append(dep)

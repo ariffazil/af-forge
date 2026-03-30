@@ -18,11 +18,10 @@ Floor references embedded in validation:
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
-from enum import Enum
+from datetime import datetime, timezone
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, model_validator, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 # ---------------------------------------------------------------------------
@@ -610,8 +609,12 @@ class GeoResponse(BaseModel):
             "seal": "DITEMPA BUKAN DIBERI",
         }],
     )
+    metadata: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Aggregate metadata from all tool results used in the pipeline.",
+    )
     timestamp: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(timezone.utc),
         description="UTC timestamp when the response was generated.",
     )
 
