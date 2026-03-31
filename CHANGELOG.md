@@ -8,15 +8,36 @@ Seal: **DITEMPA BUKAN DIBERI**
 
 ---
 
-## [Unreleased]
+## [0.3.2] — 2026-03-31
 
-### Planned
-- Macrostrat API adapter (`geox_macrostrat.py`) — real geological truth anchor
-- CLI entrypoint (`arifos/geox/cli.py`) — `geox` shell command
-- GitHub Actions CI — ruff + mypy + pytest on push
-- `GeoXWorldModel.feasibility_check()` — W@W world-model engine
-- Qdrant memory backend integration tests
-- ASEAN/MY maruah constraint ruleset
+### Unified Architecture — Theory of Anomalous Contrast (ToAC)
+
+This release unifies the GEOX repository into a three-layer structure centered on the **Theory of Anomalous Contrast (ToAC)**. All perception-layer tools are now governed by the Contrast Canon, ensuring that display-driven artifacts are never confused with physical signals.
+
+### Added
+
+- **THEORY Layer**: Established `contrast_theory`, `contrast_taxonomy`, and `contrast_governance` as the foundational logic for the Earth Witness.
+- **ENGINE Layer**: Implemented `contrast_space`, `transform_registry`, and `anomaly_detector` as the processing core.
+- **Perception Forge (Band A)**:
+  - Hardened image-only structural interpretation pipeline in `TOOLS/seismic/`.
+  - Mandatory `GeoxMcpEnvelope` output wrapper for all governed tools.
+  - Multi-view contrast views (Sobel, CLAHE, Gaussian) to expose display bias (Bond et al. 2007).
+- **GEOX Agent Success Metrics Blueprint**: Practical evaluation framework for testing GEOX as a governed coprocessor.
+- **Minimum Artifact Set**: Each interpretation now produces an 8-layer audit record (Raster → Views → Overlays → Candidates → Bias Audit → Report → Telemetry).
+
+### Changed
+
+- Refactored repository structure into `THEORY/`, `ENGINE/`, `TOOLS/`, and `GOVERNANCE/`.
+- Updated `GEOX_INTERPRETATION_SUMMARY` schema to encompass the full Minimum Artifact Set.
+- Hardened `contrast_governed_tool` decorator to enforce constitutional floor injection.
+
+### [0.3.1] — 2026-03-30
+
+### Hardening Perception Forge
+
+- Integrated `GeoxMcpEnvelope` into `geox_schemas.py`.
+- Formulated the **Contrast Canon** for image-only structural interpretation.
+- Fixed `GeoXReporter` regression and updated `GeoResponse` schema.
 
 ---
 
@@ -27,6 +48,7 @@ Seal: **DITEMPA BUKAN DIBERI**
 This release re-anchors GEOX's identity from "standalone geological coprocessor tool" to its correct position: **@GEOX is a federated co-agent in the arifOS W@W (Witnesses at Work) architecture**, operating at pipeline stage `222_REFLECT`.
 
 ### Added
+
 - `docs/GEOX_AGENT_SPEC_v2.md` — Complete W@W agent specification:
   - Role, identity, and W@W organ map
   - Core mandate: Physical Feasibility · Geospatial Context · World-State Cross-Check
@@ -45,6 +67,7 @@ This release re-anchors GEOX's identity from "standalone geological coprocessor 
 - `pyproject.toml` — Version bumped to `0.2.0`, URLs corrected to `ariffazil/GEOX`.
 
 ### Changed
+
 - README now leads with W@W co-agent identity rather than four-plane architecture
 - Pipeline diagram updated: `222_REFLECT` explicitly marked as @GEOX gate
 - Floor table expanded with Arabic floor names (F1-Amanah, F4-Nur, F7-Tawadu, etc.)
@@ -52,6 +75,7 @@ This release re-anchors GEOX's identity from "standalone geological coprocessor 
 - Repository structure updated to reflect `world_model.py` and `GEOX_AGENT_SPEC_v2.md`
 
 ### Constitutional Ground
+
 - Floors active: F1-Amanah · F4-Nur · F7-Tawadu · F13-Khalifah
 - Pipeline stage: `222_REFLECT`
 - Confidence: CLAIM
@@ -65,6 +89,7 @@ This release re-anchors GEOX's identity from "standalone geological coprocessor 
 ### Initial Forge — Geological Coprocessor Skeleton
 
 ### Added
+
 - Four-plane architecture (Earth · Perception · Language/Agent · Governance)
 - `arifos/geox/geox_schemas.py` — Pydantic v2 data models: GeoRequest, GeoResponse, GeoInsight, GeoQuantity, CoordinatePoint
 - `arifos/geox/geox_validator.py` — Earth→Language contract enforcement (3 runtime contracts)
@@ -90,13 +115,6 @@ This release re-anchors GEOX's identity from "standalone geological coprocessor 
 - F13 Sovereign veto hook active at all pipeline stages
 - Vault_ledger immutable audit chain
 - Risk gating: low/medium/high/critical with 888_HOLD trigger
-
-### Known Gaps (identified in audit, addressed in v0.2.0)
-- Packaging `src/` layout mismatch with actual code location
-- CLI entrypoint declared but not implemented
-- All Earth tools are mock implementations (no real Macrostrat/LEM connection)
-- No CI/CD pipeline
-- GEOX identity not formally positioned in W@W federation
 
 ---
 

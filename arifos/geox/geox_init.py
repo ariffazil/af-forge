@@ -59,10 +59,10 @@ def _bootstrap_arifosmcp_path() -> bool:
 
 class GEOXFoundation:
     """Hardened foundation for GEOX intelligence."""
-    
+
     VERSION = "0.1.0-hardened"
     REQUIRED_PY_VERSION = (3, 10)
-    
+
     @classmethod
     def ignite(cls) -> dict[str, Any]:
         """
@@ -78,7 +78,7 @@ class GEOXFoundation:
             "checks": {},
             "verdict": "CLEAR"
         }
-        
+
         # 1. Python Version Check (F9 Anti-Hantu)
         if sys.version_info < cls.REQUIRED_PY_VERSION:
             status["checks"]["python_version"] = "FAIL"
@@ -86,7 +86,7 @@ class GEOXFoundation:
             logger.error(f"Python {cls.REQUIRED_PY_VERSION} required, found {sys.version}")
         else:
             status["checks"]["python_version"] = "OK"
-            
+
         # 2. Dependency Verification (F9 Anti-Hantu)
         essential_deps = ["pydantic", "httpx", "yaml", "arifosmcp"]
         missing_deps = []
@@ -97,7 +97,7 @@ class GEOXFoundation:
                 __import__(dep)
             except ImportError:
                 missing_deps.append(dep)
-        
+
         if missing_deps:
             status["checks"]["dependencies"] = f"FAIL (missing: {', '.join(missing_deps)})"
             # arifosmcp is not strictly mandatory for local tools but good for hardening
@@ -105,22 +105,22 @@ class GEOXFoundation:
                 status["verdict"] = "VOID"
         else:
             status["checks"]["dependencies"] = "OK"
-            
+
         # 3. arifOS Alignment (F11 Authority)
         # Check if running in the correct ariffazil directory
         path_norm = os.path.normpath(cwd).lower()
         is_ariffazil = "ariffazil" in path_norm
         status["arifos_aligned"] = is_ariffazil or os.environ.get("ARIFOS_KERNEL_VERSION") is not None
-        
+
         # 4. Workspace Integrity (F1 Amanah)
         has_git = os.path.isdir(os.path.join(cwd, ".git"))
         has_venv = os.path.exists(os.path.join(cwd, ".venv"))
         status["checks"]["workspace"] = "GIT_REPO" if has_git else "LOCAL_DIR"
         status["checks"]["venv"] = "VENV_LOCKED" if has_venv else "NATIVE"
-        
+
         if not has_git:
             status["verdict"] = "888_HOLD" # Warn if not a git repo
-        
+
         logger.info(f"GEOX Foundation Ignited: {status['verdict']}")
         return status
 

@@ -8,12 +8,14 @@ Enforces Contrast Canon and Plane 2 Perception Bridge floors.
 
 from __future__ import annotations
 
-from typing import Any, List, Literal, Optional
+import logging
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
 from .geox_schemas import ProvenanceRecord
 
+logger = logging.getLogger(__name__)
 
 class GEOX_SEISMIC_IMAGE_INPUT(BaseModel):
     """Input for a single seismic image line."""
@@ -21,58 +23,68 @@ class GEOX_SEISMIC_IMAGE_INPUT(BaseModel):
     line_id: str = Field(..., description="User-supplied identifier for the line")
     domain: Literal["time", "depth", "unknown"] = "unknown"
     polarity: Literal["normal", "reverse", "unknown"] = "unknown"
-    vertical_exaggeration: Optional[float] = Field(default=None, description="Visual scale exaggerated factor")
+    vertical_exaggeration: float | None = Field(default=None, description="Visual scale exaggerated factor")
     scale_known: bool = Field(default=False, description="Whether horizontal/vertical scale is verified")
-    notes: Optional[str] = None
+    play_type: Literal["structural", "stratigraphic", "hybrid"] = "structural"
+    notes: str | None = None
     provenance: ProvenanceRecord = Field(..., description="Mandatory audit trail for the input")
+
+
+class GEOX_SEISMIC_RASTER(BaseModel):
+    """Normalized 2D seismic raster data (Plane 2 Bridge)."""
+    line_id: str
+    raw_path: str
+    normalized_path: str
+    dimensions: list[int] = Field(..., description="[height, width]")
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class GEOX_SEISMIC_VIEW(BaseModel):
     """A processed view of a seismic image (contrast-governed)."""
     view_id: str
-    source_line_id: str
-    processing_chain: List[str] = Field(..., description="List of filters applied (e.g. ['CLAHE', 'Sobel'])")
-    display_params: dict[str, Any] = Field(default_factory=dict)
-    image_ref: str | None = Field(default=None, description="Path to the generated view image")
+    parent_raster_id: str
+    preset: str = Field(..., description="Filter preset used (e.g. 'sobel', 'clahe')")
+    image_ref: str | None = Field(default=None, description="Path to display image")
+    data_ref: str | None = Field(default=None, description="Path to numpy data")
+    data: list[list[float]] | None = None # For tool return if needed
+
+
+class GEOPROXY_LINEAMENT(BaseModel):
+    """Image-derived proxy (perceptual lineament). NOT geological truth."""
+    lineament_id: str
+    centroid_pixel: list[float]
+    confidence: float = Field(ge=0.0, le=1.0)
+    contrast_origin: str = Field(..., description="The preset this was extracted from")
 
 
 class GEOX_FEATURE_SET(BaseModel):
-    """Image-derived proxies (perceptual lineaments). NOT geological truth."""
+    """Collection of extracted lineaments and discontinuities."""
     view_id: str
-    lineaments: List[dict] = Field(default_factory=list, description="Extracted lines (x1, y1, x2, y2, strength)")
-    discontinuities: List[dict] = Field(default_factory=list, description="Potential breaks in reflectors")
-    dip_field: List[dict] = Field(default_factory=list, description="Local dip estimates from texture")
-    continuity_map_ref: Optional[str] = None
-    chaos_map_ref: Optional[str] = None
+    lineaments: list[GEOPROXY_LINEAMENT] = Field(default_factory=list)
+    discontinuities: list[Any] = Field(default_factory=list)
 
 
-class GEOX_STRUCTURAL_CANDIDATE(BaseModel):
-    """A potential structural interpretation candidate."""
+class STRUCT_CANDIDATE(BaseModel):
+    """A potential structural interpretation candidate (Stage 4)."""
     candidate_id: str
     family: Literal["normal_fault", "reverse_fault", "fold", "duplex", "stratigraphic", "flower", "other"]
-    faults: List[dict] = Field(default_factory=list, description="Polylines representing fault planes")
-    horizons: List[dict] = Field(default_factory=list, description="Polylines representing stratigraphy")
-    support_views: List[str] = Field(default_factory=list, description="IDs of views where this is visible")
-    geometry_score: float = Field(ge=0.0, le=1.0, description="Geometric consistency (length, spacing)")
     stability_score: float = Field(ge=0.0, le=1.0, description="Persistence across contrast views")
-    geology_score: float = Field(ge=0.0, le=1.0, description="Compliance with geological rules")
-    warnings: List[str] = Field(default_factory=list)
+    bias_risk: float = Field(ge=0.0, le=1.0, description="Risk that this is a display artifact")
+    uncertainty_floor: float = Field(default=0.15, ge=0.10)
+    plausibility_rule_failed: list[str] = Field(default_factory=list)
+    final_audit_passed: bool = False
 
 
-class GEOX_INTERPRETATION_RESULT(BaseModel):
-    """Final governed interpretation result for a single seismic line."""
+class GEOX_INTERPRETATION_SUMMARY(BaseModel):
+    """Final governed interpretation record (Minimum Artifact Set)."""
     line_id: str
-    best_candidate_id: str
-    alternatives: List[GEOX_STRUCTURAL_CANDIDATE]
-    confidence: float = Field(ge=0.03, le=0.15, description="F7 Humility (Perception floor)")
-    bias_audit: dict = Field(
-        default_factory=lambda: {"display_sensitivity": "medium", "notes": []},
-        description="Audit of how contrast/display affected the result"
-    )
-    missing_information: List[str] = Field(default_factory=list)
-    summary: str = Field("", description="Human-readable synthesis (LLM generated)")
-    verdict: Literal["PASS", "QUALIFY", "HOLD", "GEOX_BLOCK"] = "QUALIFY"
-    telemetry: dict = Field(
-        default_factory=dict,
-        description="GEOX pipeline metadata (seal, version, floors)"
-    )
+    input_raster: GEOX_SEISMIC_RASTER # Metric 1
+    contrast_views: list[GEOX_SEISMIC_VIEW] # Metric 2
+    feature_layers: list[GEOX_FEATURE_SET] # Metric 3
+    candidates: list[STRUCT_CANDIDATE] = Field(default_factory=list) # Metric 4 & 5
+    bias_audit: dict[str, Any] = Field(
+        default_factory=lambda: {"display_sensitivity": "medium", "audit_notes": []}
+    ) # Metric 6
+    human_report: str | None = None # Metric 7
+    provenance: ProvenanceRecord
+    verdict: Literal["PASS", "QUALIFY", "HOLD", "BLOCK"] = "QUALIFY"

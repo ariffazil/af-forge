@@ -693,3 +693,160 @@ tests/
 **DITEMPA BUKAN DIBERI** — This forge transforms GEOX from governance shell to geological brain.
 
 **Verdict:** SEAL — Proceed with Forge 1 immediately.
+
+---
+
+## Forge 6: GEOX MCP Architecture + Seisinterpy Integration (Current — 2026-03-31)
+
+### 6.1 Pipeline Status
+
+The 7-stage governed seismic interpretation pipeline is now implemented:
+
+| Stage | File | Status | Description |
+|-------|------|--------|-------------|
+| 1 | `seismic_image_ingest.py` | ✅ DONE | Image → grayscale canonical |
+| 2 | `seismic_contrast_views.py` | ✅ DONE | 6 contrast variants (linear, CLAHE, edge, hist EQ, low/high band, VE) |
+| 3 | `seismic_feature_extract.py` | ✅ DONE | Lineaments, dip field, coherence, curvature |
+| 4-5 | `seismic_structure_rules.py` | ✅ DONE | Candidate generation + physics rule engine |
+| 6 | `seismic_candidate_ranker.py` | ✅ DONE | Ranked structural models |
+| 7 | `geox_interpret_single_line.py` | ✅ DONE | Full orchestrator + `GEOXInterpretSingleLineTool` |
+| MCP | `geox_mcp_schemas.py` | ✅ DONE | 10 new schemas for pipeline I/O |
+
+### 6.2 seisinterpy Integration Strategy
+
+**Primary anchor repo:** https://github.com/yohanesnuwara/seisinterpy
+
+**Strategy (DITEMPA BUKAN DIBERI — forge, don't fork):**
+1. Do NOT fork seisinterpy. Build `geox_*` wrappers that enforce contrast_metadata and floor checks.
+2. Use seisinterpy for: SEG-Y reading, classical attribute computation, horizon extraction, AVO.
+3. Keep all Contrast Canon, governance (`@contrast_governed_tool`), anomalous_risk, and GEOX_BLOCK logic inside GEOX — never upstream.
+
+**seisinterpy wrappers to build:**
+
+```python
+# arifos/geox/tools/seisinterpy_adapter.py (future)
+"""
+Wrapper around seisinterpy SEG-Y and attribute functions.
+Adds contrast_metadata, provenance, and uncertainty to all outputs.
+DITEMPA BUKAN DIBERI — forged, not hallucinated.
+"""
+
+from arifos.geox.contrast_wrapper import contrast_governed_tool
+from arifos.geox.tools.contrast_metadata import create_filter_contrast_metadata
+
+@contrast_governed_tool("compute_seismic_attributes")
+def compute_seismic_attributes(segy_data, attribute_list):
+    # Call seisinterpy functions
+    # Attach contrast_metadata to every output
+    # Raise GEOX_BLOCK if anomalous_risk exceeds threshold
+    pass
+```
+
+### 6.3 GEOX MCP Tool Verb Registry
+
+| Tool | Stage | Verdict Ceiling | Seisinterpy Equivalent |
+|------|-------|-----------------|----------------------|
+| `geox_load_seismic_image` | 1 | QUALIFY/HOLD | `segy2cube`, `readsegy` |
+| `geox_generate_contrast_views` | 2 | QUALIFY | — (GEOX native) |
+| `geox_extract_image_features` | 3 | QUALIFY | seisinterpy attributes |
+| `geox_build_structural_candidates` | 4-5 | QUALIFY | seisinterpy horizon extraction |
+| `geox_rank_structural_models` | 6 | QUALIFY | — (GEOX rule engine) |
+| `geox_interpret_single_line` | 7 | QUALIFY (never SEAL) | full pipeline |
+
+### 6.4 Updated File Map
+
+```
+arifos/geox/
+├── geox_mcp_schemas.py         # 10 new MCP schemas (NEW)
+├── seismic_image_ingest.py      # Stage 1 (NEW)
+├── seismic_contrast_views.py   # Stage 2 (NEW)
+├── seismic_feature_extract.py  # Stage 3 (NEW)
+├── seismic_structure_rules.py  # Stages 4-5 (NEW)
+├── seismic_candidate_ranker.py  # Stage 6 (NEW)
+├── geox_interpret_single_line.py # Stage 7 + tool (NEW)
+├── tools/
+│   ├── seismic_attributes_2d.py     # 2D attribute tool (existing)
+│   ├── seismic_attribute_taxonomy.py # taxonomy (existing)
+│   ├── contrast_metadata.py          # rich Pydantic schemas (existing)
+│   └── single_line_interpreter.py    # Bond et al. interpreter (existing)
+└── geox_mcp_server.py          # MCP server skeleton (pre-existing)
+```
+
+### 6.5 SeisBench Secondary Integration
+
+**Secondary anchor:** https://github.com/seisbench/seisbench
+
+For waveform/event context:
+- PhaseNet/EQTransformer picks for 2D line QC
+- SNR estimation on profiles
+- Event detection for microseismic context
+
+Wrapper approach:
+```python
+# arifos/geox/tools/seisbench_adapter.py (future)
+"""
+ SeisBench wrapper with GEOX governance.
+ PhaseNet/EQTransformer picks + contrast_metadata + floor checks.
+"""
+```
+
+### 6.6 seismiqb (Later — 3D DL Segmentation)
+
+**Tertiary:** https://github.com/BEEugene/seismiqb
+
+When GEOX is ready for full 3D cube segmentation:
+- Pull architecture patterns only — do not fork
+- Heavy anomalous_risk flags on DL-learned features
+- All DL outputs carry uncertainty >= 0.20
+
+### 6.7 Hard Blocks (Never Cross)
+
+These are automatic `GEOX_BLOCK` regardless of confidence:
+- 3D geometry from 2D data
+- Volumetric HC estimates from 2D
+- Definitive fault network connectivity from 2D
+- Channel sinuosity from 2D
+- Direct HC indicators (bright spots, flat spots) from raster
+
+### 6.8 Constitutional Floor Mapping for Pipeline
+
+| Floor | Stage(s) | Check |
+|-------|----------|-------|
+| F1 Amanah | All | Full provenance chain, reversible interpretation |
+| F2 Truth | 3-5 | No claims beyond attribute support |
+| F4 Clarity | 2, 3, 7 | Physical/visual separation explicit in all outputs |
+| F5 Peace² | 4-5 | Physics rules non-destructive |
+| F7 Humility | All | Uncertainty ∈ [0.03, 0.20] per stage |
+| F9 Anti-Hantu | 1, 2, 3 | RGB ≠ physical truth; raster → HOLD |
+| F11 Command Auth | 7 | Nonce-verified identity for pipeline run |
+| F13 Sovereign | 7 | Human review mandatory before acceptance |
+
+### 6.9 Remaining Tasks
+
+- [ ] Build seisinterpy adapter (`tools/seisinterpy_adapter.py`)
+- [ ] Build SeisBench adapter (`tools/seisbench_adapter.py`) 
+- [ ] Create `geox_mcp_server.py` (register all 6 MCP verbs)
+- [ ] Write `docs/single_line_structural_workflow.md`
+- [ ] Write `docs/contrast_canon.md`
+- [ ] Register `GEOXInterpretSingleLineTool` in `ToolRegistry`
+- [ ] Run full pytest — expect 309+ to pass
+
+---
+
+## Forge 7: Validation + Documentation
+
+- [ ] Integration tests for full 7-stage pipeline
+- [ ]seisinterpy adapter integration tests (mocked)
+- [ ] SeisBench adapter integration tests (mocked)
+- [ ] Bond et al. (2007) synthetic validation case
+- [ ] Write `docs/single_line_structural_workflow.md`
+- [ ] Write `docs/contrast_canon.md`
+- [ ] Update `README.md` with MCP tool registry
+
+---
+
+**Verdict:** SEAL — Pipeline complete. Seisinterpy integration is next forge priority.
+
+**DITEMPA BUKAN DIBERI** — GEOX is now a functional governed seismic coprocessor.
+
+

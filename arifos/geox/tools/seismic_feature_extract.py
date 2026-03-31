@@ -1,29 +1,46 @@
 """
-GEOX Seismic Feature Extract — v0.3.1
+GEOX Subsurface Forge — Seismic Feature Extraction
 DITEMPA BUKAN DIBERI
 
-Extracts image-based features (lineaments, discontinuities, local dip).
-Uses classical computer vision (Canny, Hough, texture gradients).
-Labeled as image-derived proxies only.
+Implements perceptual lineament extraction from contrast views.
 """
 
 from __future__ import annotations
-from ..schemas.seismic_image import GEOX_FEATURE_SET, GEOX_SEISMIC_VIEW
 
-async def extract_image_features(view: GEOX_SEISMIC_VIEW) -> GEOX_FEATURE_SET:
-    """Extract image features from a specific contrast view."""
-    # Step 1: Detect lineaments (Canny + HoughLinesP or similar)
-    # Step 2: Compute reflector continuity
-    # Step 3: Local structural orientation field
-    
-    # Stub for MVP:
-    # Here we would use cv2.Canny + cv2.HoughLinesP
-    
-    return GEOX_FEATURE_SET(
-        view_id=view.view_id,
-        lineaments=[],  # x1, y1, x2, y2 + strength
-        discontinuities=[],
-        dip_field=[],
-        continuity_map_ref=None,
-        chaos_map_ref=None
-    )
+import logging
+
+import numpy as np
+from scipy.ndimage import center_of_mass, label
+
+from ..contrast_wrapper import contrast_governed_tool
+from ..schemas.seismic_image import GEOPROXY_LINEAMENT, GEOX_SEISMIC_VIEW
+
+logger = logging.getLogger(__name__)
+
+@contrast_governed_tool(physical_axes=["inline", "depth"])
+async def extract_lineaments(views: list[GEOX_SEISMIC_VIEW]) -> list[list[GEOPROXY_LINEAMENT]]:
+    """
+    Extract perceptual lineaments from a set of contrast views.
+    """
+    all_lineaments = []
+
+    for view in views:
+        view_lineaments = []
+        arr = np.array(view.data)
+
+        # Simple threshold-based "lineament" extraction (proxy)
+        mask = arr > 0.8
+        labeled_arr, num_features = label(mask)
+        centers = center_of_mass(mask, labeled_arr, range(1, num_features + 1))
+
+        for i, center in enumerate(centers):
+            view_lineaments.append(GEOPROXY_LINEAMENT(
+                lineament_id=f"{view.view_id}_feat_{i}",
+                centroid_pixel=list(center),
+                confidence=0.7,  # constant for proxy
+                contrast_origin=view.preset
+            ))
+
+        all_lineaments.append(view_lineaments)
+
+    return all_lineaments

@@ -12,13 +12,14 @@
 
 ## What is @GEOX?
 
-**@GEOX** is the geospatial and world-model co-agent in the [arifOS](https://github.com/ariffazil/arifOS) federated architecture.
+> **GEOX (Geo-Existence)** is the **Earth Witness** in the arifOS W@W federation — the reality gatekeeper that asks whether a claim, plan, or interpretation is physically possible, geospatially grounded, and consistent with world-state evidence before reasoning is allowed to proceed.
 
-It is **not** a model. It is **not** a geospatial library. It is a **governed co-agent** in the W@W (Witnesses at Work) federation — the organ that enforces physical reality before any plan, action, or output is sealed.
+It is **not** a standalone model. It is a **governed tool-orchestration organ** that supplies the **Earth vote** in the Human × AI × Earth tri-witness consensus pattern.
 
-In one line:
+**Core question at 222_REFLECT:**
+> *"Benda ni physically / logically boleh jadi tak?"*
 
-> **@GEOX asks: "Benda ni physically / logically boleh jadi tak?" — before 333_MIND reasons about it.**
+If the answer is no — or cannot be verified — @GEOX emits `GEOX_BLOCK` and logs the event immutably to `VAULT_999`. No flow continues past an ungrounded claim.
 
 ---
 
@@ -57,34 +58,52 @@ Cross-reference climate, scale, human capacity, and technology maturity. Guard a
 
 ---
 
-## Four-Plane Architecture (Geological Coprocessor Layer)
+## Unified Architecture — Theory of Anomalous Contrast (ToAC)
 
-GEOX's geological intelligence layer operates as a four-plane stack beneath the W@W organ:
+GEOX operates on the **Theory of Anomalous Contrast**, ensuring physical reality is never obscured by perceptual artifacts. Its core logic is divided into a three-layer governed stack:
 
+```mermaid
+graph TB
+      subgraph GOV["PLANE 4 — GOVERNANCE"]
+          G1["F1-F13 Constitutional Floors"]
+          G2["Risk Gating · Human Veto · GEOX_BLOCK"]
+          G3["Immutable Audit → VAULT_999"]
+      end
+
+      subgraph THEORY["PLANE 3 — THEORY (ToAC)"]
+          T1["Contrast Theory · Anomalous Contrast Logic"]
+          T2["Contrast Taxonomy · Bias Classification"]
+          T3["Contrast Governance · Verdict Engine"]
+      end
+
+      subgraph ENGINE["PLANE 2 — ENGINE"]
+          E1["Contrast Space · Unified Representation"]
+          E2["Transform Registry · Risk Metadata"]
+          E3["Anomaly Detector · Saliency Scrubbing"]
+      end
+
+      subgraph TOOLS["PLANE 1 — TOOLS (Earth Witness)"]
+          L1["Seismic Band A: Image-Only Structural"]
+          L2["Seismic Band B: Trace-Domain Attributes"]
+          L3["Earth Bridge: Units / Coords / Scale"]
+      end
+
+      subgraph PIPE["000 → 999 PIPELINE"]
+          direction LR
+          I000["000_INIT"] --> R222
+          R222["222_REFLECT\n◄── @GEOX FIRES HERE"]
+          R222 -->|GEOX_BLOCK| VAULT
+          R222 -->|PASS / QUALIFY| M333["333_MIND"]
+          M333 --> J888["888_JUDGE"]
+          J888 --> VAULT["999_VAULT"]
+      end
+
+      GOV --> THEORY --> ENGINE --> TOOLS
+      TOOLS --> R222
 ```
-╔═════════════════════════════════════════════════════════════════╗
-║  PLANE 4 ── GOVERNANCE                                         ║
-║  Constitutional Floors: F1·F2·F4·F7·F11·F13                   ║
-║  Risk Gating · Human Veto · Audit Ledger · Regulator Hook      ║
-╠═════════════════════════════════════════════════════════════════╣
-║  PLANE 3 ── LANGUAGE / AGENT  (arifOS kernel)                  ║
-║                                                                 ║
-║  000 INIT ──► 222 REFLECT ──► 333 MIND ──► 555 HEART          ║
-║               └─ @GEOX gates here                              ║
-║               777 REASON ──► 888 AUDIT ──► 999 SEAL            ║
-║                                                                 ║
-║  GeoXAgent · agi_mind planner · vault_ledger                   ║
-╠═════════════════════════════════════════════════════════════════╣
-║  PLANE 2 ── PERCEPTION  (VLM Bridge)                           ║
-║  SeismicVLMTool · EOFoundationModelTool                        ║
-║  Rule: RGB ≠ truth · Multisensor confirmation required         ║
-╠═════════════════════════════════════════════════════════════════╣
-║  PLANE 1 ── EARTH  (Physical Reality)                          ║
-║  Large Earth Models (LEM) · SimulatorTool                      ║
-║  EarthModelTool · GeoRAGTool · Macrostrat API                  ║
-║  Units · Coordinates · Timestamps · Uncertainty bounds         ║
-╚═════════════════════════════════════════════════════════════════╝
-```
+
+### The Bond et al. (2007) Mandate
+Following Bond et al. (2007), GEOX enforces a **Contrast Canon** on all visual interpretation. No interpretation is sealed without passing through multiple contrast variants (Sobel, CLAHE, Gaussian) to verify that structural features are robust signals, not display-driven artifacts.
 
 ---
 
@@ -202,33 +221,22 @@ print(check.assumptions)   # explicit assumptions made
 GEOX/
 ├── README.md                        ← you are here
 ├── CHANGELOG.md                     ← full version history
-├── RELEASE_NOTES_v2.md              ← v2.0 release detail
-├── SECURITY.md                      ← governed disclosure policy
-├── UNIFIED_ROADMAP.md               ← execution plan
-├── NEXT_FORGE_PLAN.md               ← immediate sprint goals
-├── pyproject.toml                   ← build config v0.2.0, AGPL-3.0
-├── LICENSE
 ├── docs/
-│   ├── GEOX_AGENT_SPEC_v2.md        ← W@W agent spec, system prompt, pipeline map
-│   ├── GEOX-architecture.md         ← four-plane stack, data flow
-│   ├── contracts.md                 ← three runtime contracts
-│   └── governance_playbook.md       ← operational governance
+│   ├── success_metrics.md           ← GEOX Agent Success Metrics Blueprint
+│   ├── GEOX_AGENT_SPEC_v2.md        ← W@W agent spec, system prompt
+│   └── GEOX_UNIFIED_ARCHITECTURE.md ← ToAC layer documentation
 ├── arifos/
 │   └── geox/
-│       ├── __init__.py
-│       ├── geox_schemas.py          ← Pydantic v2 data models
-│       ├── geox_validator.py        ← Earth→Language contract enforcement
-│       ├── geox_agent.py            ← GeoXAgent orchestrator
-│       ├── geox_tools.py            ← EarthModelTool, SimulatorTool, VLM tools
-│       ├── geox_memory.py           ← GeoMemoryStore (Qdrant / JSONL)
-│       ├── geox_reporter.py         ← Markdown + JSON audit reports
-│       ├── world_model.py           ← W@W GeoXWorldModel — feasibility engine
-│       └── config_geox.yaml         ← default configuration
-├── geox_mcp_server.py               ← MCP server entrypoint
+│       ├── THEORY/                  ← Contrast theory, taxonomy, governance
+│       ├── ENGINE/                  ← Transform registry, anomaly detection
+│       ├── TOOLS/                   ← Domain-specific tools (Seismic, EO)
+│       ├── GOVERNANCE/              ← Floor enforcement & audit logic
+│       ├── schemas/                 ← Pydantic v2 data models
+│       ├── geox_mcp_server.py       ← MCP server entrypoint
+│       └── geox_agent.py            ← arifOS Federated Agent bind
 └── tests/
-    ├── test_schemas.py              ← Pydantic model validation
-    ├── test_validator.py            ← Earth→Language contract tests
-    └── test_end_to_end_mock.py      ← full pipeline (no external APIs)
+    ├── test_end_to_end_mock.py      ← full pipeline validation
+    └── eval/                        ← KPI-driven evaluation suite
 ```
 
 ---

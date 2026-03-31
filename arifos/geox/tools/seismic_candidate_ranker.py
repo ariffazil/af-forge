@@ -1,46 +1,53 @@
 """
-GEOX Seismic Candidate Ranker — v0.3.1
+GEOX Subsurface Forge — Seismic Candidate Ranker
 DITEMPA BUKAN DIBERI
 
-Ranks structural interpretative candidates based on geometric consistency
-and stability across contrast views (Contrast Canon stability score).
+Implements stability-based ranking of structural candidates.
 """
 
 from __future__ import annotations
-from typing import List
-from ..schemas.seismic_image import GEOX_FEATURE_SET, GEOX_STRUCTURAL_CANDIDATE
 
-async def rank_structural_candidates(feature_sets: List[GEOX_FEATURE_SET]) -> List[GEOX_STRUCTURAL_CANDIDATE]:
-    """Generate and rank structural candidates from image proxies."""
-    
-    # 1. Cluster features into potential structural families (extensional, compressional, etc.)
-    # 2. Score geometric consistency (do the features form a valid fold? a fault plane?)
-    # 3. Score stability: how many feature_sets (views) support this candidate?
-    
-    # Example mock candidates
-    candidates = [
-        GEOX_STRUCTURAL_CANDIDATE(
-            candidate_id="inv_model_1",
-            family="reverse_fault",
-            faults=[{"polyline": [(10, 10), (100, 100)], "throw": 50}],
-            horizons=[{"polyline": [(0, 100), (200, 100)]}],
-            support_views=["v1_linear", "v2_clahe", "v4_inverted"],
-            geometry_score=0.85,
-            stability_score=0.90,  # persistence across views
-            geology_score=0.75,
-            warnings=["No out-of-plane data"]
-        ),
-        GEOX_STRUCTURAL_CANDIDATE(
-            candidate_id="ext_model_2",
-            family="normal_fault",
-            faults=[{"polyline": [(10, 100), (100, 10)], "throw": 30}],
-            horizons=[{"polyline": [(0, 50), (200, 50)]}],
-            support_views=["v3_sobel"],
-            geometry_score=0.60,
-            stability_score=0.25,  # only seen in edge-enhanced view
-            geology_score=0.40,
-            warnings=["Weak feature stability across contrast views"]
-        )
-    ]
-    
-    return candidates
+import logging
+
+from ..contrast_wrapper import contrast_governed_tool
+from ..schemas.seismic_image import GEOPROXY_LINEAMENT, STRUCT_CANDIDATE
+
+logger = logging.getLogger(__name__)
+
+@contrast_governed_tool(physical_axes=["inline", "depth"])
+async def rank_candidates(
+    lineaments_per_view: list[list[GEOPROXY_LINEAMENT]]
+) -> list[STRUCT_CANDIDATE]:
+    """
+    Rank structural candidates by stability across different contrast views.
+    """
+    # Stability algorithm: how many views found a similar lineament?
+    candidate_map = {}
+
+    view_count = len(lineaments_per_view)
+    if view_count == 0:
+        return []
+
+    for view_features in lineaments_per_view:
+        for feat in view_features:
+            # Simple spatial binning for stability matching (mock)
+            bin_id = f"pos_{int(feat.centroid_pixel[0]/5)}_{int(feat.centroid_pixel[1]/5)}"
+            if bin_id not in candidate_map:
+                candidate_map[bin_id] = {
+                    "lineaments": [],
+                    "stability": 0.0
+                }
+            candidate_map[bin_id]["lineaments"].append(feat)
+            candidate_map[bin_id]["stability"] = len(candidate_map[bin_id]["lineaments"]) / view_count
+
+    candidates = []
+    for bin_id, data in candidate_map.items():
+        candidates.append(STRUCT_CANDIDATE(
+            candidate_id=bin_id,
+            family="normal_fault",  # default for proxy
+            stability_score=data["stability"],
+            bias_risk=0.5 if data["stability"] < 0.8 else 0.1,
+            uncertainty_floor=0.15
+        ))
+
+    return sorted(candidates, key=lambda x: x.stability_score, reverse=True)

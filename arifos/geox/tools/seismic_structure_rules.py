@@ -1,38 +1,37 @@
 """
-GEOX Seismic Structure Rules — v0.3.1
+GEOX Subsurface Forge — Seismic Structure Rules
 DITEMPA BUKAN DIBERI
 
-Applies fundamental geological and structural physics rules (Plane 1 Earth).
-Eliminates physically impossible or logically inconsistent structural 
-interpretations derived from Plane 2 Perception.
+Implements geological rule checks on structural candidates.
 """
 
 from __future__ import annotations
-from typing import List
-from ..schemas.seismic_image import GEOX_SEISMIC_IMAGE_INPUT, GEOX_STRUCTURAL_CANDIDATE
 
-async def apply_geological_rules(
-    candidates: List[GEOX_STRUCTURAL_CANDIDATE], 
-    image_input: GEOX_SEISMIC_IMAGE_INPUT
-) -> List[GEOX_STRUCTURAL_CANDIDATE]:
-    """Applies structural rule-base to validate and re-score candidates."""
-    
-    # 1. Structural timing: Faults cross-cut horizons?
-    # 2. Geometric consistency: Fault dip vs throw (reverse/normal)?
-    # 3. Stratigraphical order (Superposition)?
-    # 4. Continuity check: Faults terminating at horizon?
-    
-    validated = []
-    # For MVP: Iterate and apply basic geological scores
-    # (e.g. check for vertical exaggeration effects, dip sign consistency)
-    
+import logging
+
+from ..contrast_wrapper import contrast_governed_tool
+from ..schemas.seismic_image import STRUCT_CANDIDATE
+
+logger = logging.getLogger(__name__)
+
+@contrast_governed_tool(physical_axes=["inline", "depth"])
+async def check_structure_rules(candidates: list[STRUCT_CANDIDATE]) -> list[STRUCT_CANDIDATE]:
+    """
+    Apply geological plausibility rules to filter structural candidates.
+    """
+    valid_candidates = []
+
     for cand in candidates:
-        # Example rule: Reverse faults with dips < 30 (thrusts)
-        # Should be consistent with the tectonic context (if provided in image_input)
-        
-        # update candidate score based on rule checks
-        cand.geology_score *= 0.95  # hypothetical slight penalty/boost
-        
-        validated.append(cand)
-        
-    return validated
+        # Rule 1: No fault can have stability_score of 0 (perceptual ghosts)
+        if cand.stability_score <= 0.05:
+            cand.plausibility_rule_failed = ["zero_stability"]
+            continue
+
+        # Rule 2: Minimum uncertainty floor check
+        if cand.uncertainty_floor < 0.1:
+            cand.uncertainty_floor = 0.15 # Fix violation
+
+        cand.final_audit_passed = True
+        valid_candidates.append(cand)
+
+    return valid_candidates

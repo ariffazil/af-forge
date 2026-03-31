@@ -705,6 +705,7 @@ class TestExportJsonSchemas:
         "AttributeStack",
         "GeoRequest",
         "GeoResponse",
+        "GeoxMcpEnvelope",
     }
 
     def test_returns_dict(self):

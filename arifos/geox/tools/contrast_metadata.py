@@ -24,8 +24,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator, model_validator
-
+from pydantic import BaseModel, Field, model_validator
 
 # ---------------------------------------------------------------------------
 # ContrastSourceDomain
@@ -170,7 +169,7 @@ class ConfidenceClass(BaseModel):
     risk_factors: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def interpretation_cannot_exceed_signal(self) -> "ConfidenceClass":
+    def interpretation_cannot_exceed_signal(self) -> ConfidenceClass:
         if self.interpretation_confidence > self.signal_confidence:
             raise ValueError(
                 f"interpretation_confidence ({self.interpretation_confidence}) "
@@ -250,7 +249,7 @@ class ContrastMetadata(BaseModel):
     )
 
     @model_validator(mode="after")
-    def validate_processing_chain_order(self) -> "ContrastMetadata":
+    def validate_processing_chain_order(self) -> ContrastMetadata:
         """Processing chain must be ordered by order_index."""
         indices = [t.order_index for t in self.processing_chain]
         if indices != sorted(indices):
@@ -258,7 +257,7 @@ class ContrastMetadata(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def validate_unknown_domain_confidence(self) -> "ContrastMetadata":
+    def validate_unknown_domain_confidence(self) -> ContrastMetadata:
         """F9: unknown source domain forces signal_confidence <= 0.5."""
         if self.source_domain.domain == "unknown":
             if self.confidence_class.signal_confidence > 0.5:
@@ -269,7 +268,7 @@ class ContrastMetadata(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def auto_set_confirmed_at(self) -> "ContrastMetadata":
+    def auto_set_confirmed_at(self) -> ContrastMetadata:
         """Auto-set confirmed_at when confirmed_by becomes non-empty."""
         if self.confirmed_by and self.confirmed_at is None:
             self.confirmed_at = datetime.now(timezone.utc)

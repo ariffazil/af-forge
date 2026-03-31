@@ -17,8 +17,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import time
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
@@ -33,10 +32,6 @@ from arifos.geox.base_tool import (
 from arifos.geox.geox_schemas import CoordinatePoint
 from arifos.geox.tools.contrast_metadata import (
     ContrastMetadata,
-    ContrastSourceDomain,
-    PhysicalProxy,
-    ConfidenceClass,
-    VisualTransform,
     create_filter_contrast_metadata,
     create_meta_attribute_contrast_metadata,
 )

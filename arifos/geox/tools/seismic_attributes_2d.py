@@ -25,7 +25,6 @@ import hashlib
 import logging
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 from enum import Enum
 from typing import Any
 
@@ -38,19 +37,10 @@ from arifos.geox.base_tool import (
     _make_quantity,
 )
 from arifos.geox.geox_schemas import CoordinatePoint
-from arifos.geox.tools.contrast_metadata import (
-    ContrastMetadata,
-    ContrastSourceDomain,
-    PhysicalProxy,
-    ConfidenceClass,
-    VisualTransform,
-    create_filter_contrast_metadata,
-)
 from arifos.geox.seismic_attribute_taxonomy import (
     SEISMIC_ATTRIBUTES,
     get_governance_flags,
     is_high_contrast_risk,
-    AttributeClass,
 )
 
 logger = logging.getLogger("geox.tools.seismic_attributes_2d")
@@ -111,7 +101,7 @@ def compute_instantaneous_attributes(
     Instantaneous attributes via Hilbert transform for a single trace.
     Returns: envelope, instantaneous_frequency, instantaneous_phase
     """
-    from numpy.fft import fft, ifft, fftfreq
+    from numpy.fft import fft, fftfreq, ifft
 
     n = len(trace)
     trace_f = trace.astype(np.float64)

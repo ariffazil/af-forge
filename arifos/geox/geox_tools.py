@@ -24,37 +24,29 @@ Constitutional notes:
 
 from __future__ import annotations
 
-import asyncio
 import hashlib
 import json
 import random
 import time
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Protocol
+from typing import Any
 
-from arifos.geox.geox_schemas import (
-    CoordinatePoint,
-    GeoQuantity,
-    ProvenanceRecord,
-    ContrastMetadata,
-    AttributeVolume,
-    AttributeStack,
-)
 from arifos.geox.base_tool import (
     BaseTool,
     GeoToolResult,
     _make_provenance,
     _make_quantity,
 )
-from arifos.geox.tools.macrostrat_tool import MacrostratTool
+from arifos.geox.geox_schemas import (
+    AttributeStack,
+    AttributeVolume,
+    ContrastMetadata,
+    CoordinatePoint,
+    GeoQuantity,
+)
 from arifos.geox.tools.lem_bridge import LEMBridgeTool
+from arifos.geox.tools.macrostrat_tool import MacrostratTool
 from arifos.geox.tools.seismic_visual_filter import SeismicVisualFilterTool
 from arifos.geox.tools.single_line_interpreter import SingleLineInterpreter
-
-
-
 
 # ---------------------------------------------------------------------------
 # EarthModelTool
@@ -824,7 +816,7 @@ class SeismicAttributesTool(BaseTool):
 
         # Deterministic seed from volume_ref
         seed = int(hashlib.sha256(volume_ref.encode()).hexdigest(), 16) % (2**31)
-        
+
         # Compute attributes
         attributes: dict[str, AttributeVolume] = {}
         has_meta = False
@@ -857,7 +849,7 @@ class SeismicAttributesTool(BaseTool):
 
             # Build ContrastMetadata
             anomalous_risk = self._generate_anomalous_risk(attr_name, is_meta, well_ties)
-            
+
             contrast = ContrastMetadata(
                 attribute_name=attr_name,
                 physical_axes=self._get_physical_axes(attr_name),
@@ -881,7 +873,7 @@ class SeismicAttributesTool(BaseTool):
                 uncertainty=uncertainty,
                 ground_truthing={"wells": well_ties or []},
             )
-            
+
             attributes[attr_name] = attr_vol
 
         # Determine verdict
@@ -913,7 +905,7 @@ class SeismicAttributesTool(BaseTool):
 
         # Build GeoToolResult
         latency_ms = (time.perf_counter() - start) * 1000
-        
+
         # Create a quantity for the stack itself
         location = CoordinatePoint(latitude=4.5, longitude=103.7)
         source_id = f"ATTR-STACK-{seed}"
@@ -961,7 +953,7 @@ class SeismicAttributesTool(BaseTool):
                     "Validate against known geology",
                 ]
             }
-        
+
         # Classical attributes
         return {
             "display_bias": "low",
@@ -973,10 +965,10 @@ class SeismicAttributesTool(BaseTool):
     def _get_processing_steps(self, attr_name: str, config: dict) -> list[str]:
         """Get processing chain for attribute."""
         steps = []
-        
+
         if config.get("dip_steered"):
             steps.append("dip_steered")
-        
+
         if "coherence" in attr_name.lower():
             window = config.get("coherence_window", "3x3x3")
             steps.append(f"semblance_{window}")
@@ -989,7 +981,7 @@ class SeismicAttributesTool(BaseTool):
         elif self._is_meta_attribute(attr_name):
             steps.append("cnn_inference")
             steps.append("fusion_postprocess")
-        
+
         return steps
 
     def _get_uncertainty_factors(self, name: str, is_meta: bool) -> list[str]:
@@ -999,7 +991,7 @@ class SeismicAttributesTool(BaseTool):
             "processing_noise",
             "velocity_model_uncertainty",
         ]
-        
+
         if "coherence" in name.lower():
             factors.extend(["spatial_window_size", "dip_estimation_error"])
         elif "curvature" in name.lower():
@@ -1011,7 +1003,7 @@ class SeismicAttributesTool(BaseTool):
                 "fusion_artifact_amplification",
                 "perceptual_conflation_risk",
             ])
-        
+
         return factors
 
     def _determine_verdict(
@@ -1036,26 +1028,26 @@ class SeismicAttributesTool(BaseTool):
                     "Provide well_ties to upgrade to QUALIFY."
                 ),
             )
-        
+
         # Check for any HOLD conditions
         ungrounded_meta = [
             name for name, vol in attributes.items()
             if vol.contrast.is_meta_attribute and not well_ties
         ]
-        
+
         if ungrounded_meta:
             return (
                 "HOLD",
                 f"Meta-attributes {ungrounded_meta} lack well tie validation. Review required.",
             )
-        
+
         # All clear
         if has_meta and well_ties:
             return (
                 "QUALIFY",
                 f"Meta-attributes present but grounded with {len(well_ties)} well ties. Proceed with QC.",
             )
-        
+
         return (
             "SEAL",
             "All classical attributes properly grounded. Standard QC applies.",
@@ -1122,7 +1114,7 @@ class ToolRegistry:
         return {name: tool.health_check() for name, tool in self._tools.items()}
 
     @classmethod
-    def default_registry(cls) -> "ToolRegistry":
+    def default_registry(cls) -> ToolRegistry:
         """
         Factory method that creates a ToolRegistry pre-populated
         with all standard GEOX tools.

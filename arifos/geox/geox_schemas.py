@@ -23,7 +23,6 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-
 # ---------------------------------------------------------------------------
 # CoordinatePoint
 # ---------------------------------------------------------------------------
@@ -176,7 +175,7 @@ class ContrastMetadata(BaseModel):
     Prevents the "anomalous risk" where perceptual contrast from
     visualization choices is mistaken for physical geological signal.
     """
-    
+
     attribute_name: str = Field(
         ...,
         description="Attribute identifier (e.g. coherence_semblance, curvature_max)",
@@ -532,7 +531,7 @@ class AttributeStack(BaseModel):
       F9: Anti-Hantu through anomalous_risk assessment
       F13: Human sign-off for high-risk meta-attributes
     """
-    
+
     stack_id: str = Field(
         default_factory=lambda: str(uuid.uuid4()),
         description="Unique identifier for this attribute stack",
@@ -598,6 +597,41 @@ class AttributeStack(BaseModel):
         return self
 
     model_config = {"json_schema_extra": {"title": "AttributeStack"}}
+
+
+# ---------------------------------------------------------------------------
+# MCP Envelope (Common Output Wrapper)
+# ---------------------------------------------------------------------------
+
+class GeoxUncertainty(BaseModel):
+    """
+    Standard uncertainty block for GEOX tools.
+    """
+    level: float = Field(..., ge=0.0, le=1.0, description="Confidence/Uncertainty level [0,1].")
+    type: str = Field(..., description="Type of interpretation/analysis domain.")
+    notes: list[str] = Field(default_factory=list, description="Specific uncertainty caveats.")
+
+class GeoxGovernance(BaseModel):
+    """
+    Standard governance/compliance block for GEOX tools.
+    """
+    floors_ok: list[str] = Field(default_factory=list, description="Verified constitutional floors.")
+    warnings: list[str] = Field(default_factory=list, description="Mandatory governance warnings.")
+
+class GeoxMcpEnvelope(BaseModel):
+    """
+    Mandatory common output wrapper for all GEOX MCP tools.
+    DITEMPA BUKAN DIBERI.
+    """
+    ok: bool = Field(True, description="Success flag.")
+    verdict: Literal["PASS", "FAIL", "PARTIAL", "VOID", "SABAR"] = Field("PASS", description="Tool-level verdict.")
+    source_domain: str = Field("geox-earth-witness", description="Tool execution domain.")
+    uncertainty: GeoxUncertainty = Field(..., description="Mandatory uncertainty reporting.")
+    contrast_metadata: ContrastMetadata | None = Field(None, description="Contrast/display bias tracking (mandatory for image tools).")
+    governance: GeoxGovernance = Field(..., description="Governance and floor verification.")
+    result: Any = Field(..., description="The actual tool-specific output.")
+
+    model_config = {"json_schema_extra": {"title": "GeoxMcpEnvelope"}}
 
 
 # ---------------------------------------------------------------------------
@@ -825,6 +859,7 @@ def export_json_schemas() -> dict[str, dict]:
         GeoInsight,
         AttributeVolume,
         AttributeStack,
+        GeoxMcpEnvelope,
         GeoRequest,
         GeoResponse,
     ]

@@ -1,35 +1,55 @@
 """
-GEOX Seismic Image Ingest — v0.3.1
+GEOX Seismic Image Ingest — Stage 1
 DITEMPA BUKAN DIBERI
 
-Normalization layer for seismic image files.
-Detects frame, crops axes, and prepares grayscale array for processing.
+Normalization and validation of raw image inputs.
+Ensures we work with consistently scaled grayscale arrays.
 """
 
 from __future__ import annotations
+
 import logging
-from ..schemas.seismic_image import GEOX_SEISMIC_IMAGE_INPUT
+import os
 
-logger = logging.getLogger("geox.tools.seismic_image_ingest")
+import numpy as np
+from PIL import Image
 
-async def ingest_seismic_image(input_data: GEOX_SEISMIC_IMAGE_INPUT) -> dict:
-    """Ingest and normalize seismic image slice."""
-    logger.info(f"Ingesting {input_data.image_path} (Line ID: {input_data.line_id})")
-    
-    # In a real implementation:
-    # 1. Load with PIL/OpenCV
-    # 2. Check for frame/axes (Bond et al. 2007 often uses synthetic blocks)
-    # 3. Apply standard cropping
-    # 4. Normalize pixel range [0, 255]
-    
-    # Stub implementation for MVP:
-    # Here we would normally use:
-    # import cv2
-    # img = cv2.imread(input_data.image_path, cv2.IMREAD_GRAYSCALE)
-    
+from ..contrast_wrapper import contrast_governed_tool
+from ..schemas.seismic_image import (
+    GEOX_SEISMIC_IMAGE_INPUT,
+    GEOX_SEISMIC_RASTER,
+)
+
+logger = logging.getLogger(__name__)
+
+@contrast_governed_tool(physical_axes=["inline", "depth"])
+async def ingest_seismic_image(inputs: GEOX_SEISMIC_IMAGE_INPUT) -> GEOX_SEISMIC_RASTER:
+    """
+    Load, normalize, and return the image as a numpy array with metadata.
+    """
+    if not os.path.exists(inputs.image_path):
+        raise FileNotFoundError(f"Seismic image not found: {inputs.image_path}")
+
+    with Image.open(inputs.image_path) as img:
+        # Convert to grayscale
+        gray = img.convert("L")
+        arr = np.array(gray).astype(np.float32)
+
+    # Normalize to [0, 1]
+    arr_min, arr_max = arr.min(), arr.max()
+    if arr_max > arr_min:
+        arr = (arr - arr_min) / (arr_max - arr_min)
+    else:
+        arr = np.zeros_like(arr)
+
+    # Cache normalized version (in production, use a dedicated cache dir)
+    cache_path = inputs.image_path + ".normalized.npy"
+    np.save(cache_path, arr)
+
     return {
-        "status": "normalized",
-        "image": None,  # In-memory image array
-        "metadata": input_data.model_dump(),
-        "notes": "Image ingestion successful (normalization stub active)."
+        "line_id": inputs.line_id,
+        "raw_path": inputs.image_path,
+        "normalized_path": cache_path,
+        "shape": arr.shape,
+        "metadata": inputs.model_dump()
     }

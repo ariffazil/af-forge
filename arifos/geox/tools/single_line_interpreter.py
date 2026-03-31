@@ -29,12 +29,8 @@ References:
 from __future__ import annotations
 
 import hashlib
-import json
-import random
-import re
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Literal
 
@@ -46,9 +42,7 @@ from arifos.geox.geox_schemas import (
     AttributeVolume,
     ContrastMetadata,
     CoordinatePoint,
-    ProvenanceRecord,
 )
-from arifos.geox.contrast_wrapper import compute_contrast_verdict
 
 
 class InputType(Enum):

@@ -15,7 +15,15 @@ Constitutional Floors Enforced:
 from __future__ import annotations
 
 import functools
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
+
+from .geox_schemas import (
+    ContrastMetadata,
+    GeoxGovernance,
+    GeoxMcpEnvelope,
+    GeoxUncertainty,
+)
 
 T = TypeVar("T")
 
@@ -34,21 +42,26 @@ def contrast_governed_tool(
     """
 
     def decorator(func: Callable) -> Callable:
-        # If physical_axes is None, we might be calling it as @contrast_governed_tool 
+        # If physical_axes is None, we might be calling it as @contrast_governed_tool
         # without parentheses, or just with defaults.
         axes = physical_axes or ["perceptual_lineaments"]
 
         @functools.wraps(func)
-        async def wrapper(*args: Any, **kwargs: Any) -> Any:
+        async def wrapper(*args: Any, **kwargs: Any) -> GeoxMcpEnvelope:
             result = await func(*args, **kwargs)
+
+            # If already wrapped, don't double wrap
+            if isinstance(result, GeoxMcpEnvelope):
+                return result
 
             attr_name = kwargs.get("attribute_name", func.__name__)
 
-            contrast_dict = {
-                "attribute_name": attr_name,
-                "physical_axes": axes,
-                "processing_steps": kwargs.get("processing_steps", ["default"]),
-                "visual_encoding": kwargs.get(
+            # 1. Build Contrast Metadata
+            contrast_dict = ContrastMetadata(
+                attribute_name=attr_name,
+                physical_axes=axes,
+                processing_steps=kwargs.get("processing_steps", ["default"]),
+                visual_encoding=kwargs.get(
                     "visual_encoding",
                     {
                         "colormap": "gray_inverted",
@@ -56,41 +69,45 @@ def contrast_governed_tool(
                         "gamma": 1.0,
                     },
                 ),
-                "anomalous_risk": _generate_anomalous_risk(attr_name, is_meta_attribute),
-                "equation_reference": equation_ref,
-                "uncertainty_factors": _generate_uncertainty_factors(attr_name),
-            }
+                anomalous_risk=_generate_anomalous_risk(attr_name, is_meta_attribute),
+                equation_reference=equation_ref,
+                uncertainty_factors=_generate_uncertainty_factors(attr_name),
+            )
 
-            # Handle Pydantic models
-            from pydantic import BaseModel
-            if isinstance(result, BaseModel):
-                # If the model has a telemetry or metadata field, inject there
-                if hasattr(result, "telemetry") and isinstance(result.telemetry, dict):
-                    result.telemetry["contrast_metadata"] = contrast_dict
-                    result.telemetry["is_meta_attribute"] = is_meta_attribute
-                    if is_meta_attribute:
-                        result.telemetry["uncertainty_floor"] = 0.12
-                elif hasattr(result, "metadata") and isinstance(result.metadata, dict):
-                     result.metadata["contrast_metadata"] = contrast_dict
-                
-            elif isinstance(result, dict):
-                result["_contrast_metadata"] = contrast_dict
-                result["_is_meta_attribute"] = is_meta_attribute
+            # 2. Build Governance Block
+            floors = ["F1", "F4", "F7"]
+            if is_meta_attribute:
+                floors.append("F9")
 
-                if is_meta_attribute:
-                    result["_uncertainty_floor"] = 0.12
+            warnings = []
+            if is_meta_attribute and not kwargs.get("well_ties"):
+                warnings.append(
+                    "Meta-attribute without well tie validation. "
+                    "Perceptual contrast may dominate physical signal."
+                )
 
-                if is_meta_attribute and not kwargs.get("well_ties"):
-                    result["_grounding_status"] = "UNGROUNDED"
-                    result["_warning"] = (
-                        "Meta-attribute without well tie validation. "
-                        "Perceptual contrast may dominate physical signal. "
-                        "F7 Humility enforced: uncertainty >= 0.12"
-                    )
-                else:
-                    result["_grounding_status"] = "GROUNDED"
+            gov = GeoxGovernance(
+                floors_ok=floors,
+                warnings=warnings
+            )
 
-            return result
+            # 3. Build Uncertainty Block
+            unc = GeoxUncertainty(
+                level=0.12 if is_meta_attribute else 0.05,
+                type="image_only_structural_interpretation" if "line" in attr_name else "perceptual_lineament",
+                notes=_generate_uncertainty_factors(attr_name)
+            )
+
+            # 4. Construct Final Envelope
+            return GeoxMcpEnvelope(
+                ok=True,
+                verdict="PASS" if not warnings else "PARTIAL",
+                source_domain="geox-earth-witness",
+                uncertainty=unc,
+                contrast_metadata=contrast_dict,
+                governance=gov,
+                result=result
+            )
 
         return wrapper
 

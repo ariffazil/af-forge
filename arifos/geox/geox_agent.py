@@ -26,9 +26,9 @@ from __future__ import annotations
 import asyncio
 import logging
 import uuid
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from collections.abc import Awaitable, Callable
 from typing import Any
 
 from arifos.geox.geox_schemas import (
