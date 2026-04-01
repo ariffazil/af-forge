@@ -170,7 +170,7 @@ class WellTrajectoryPrimitive:
     trajectory: list[Vector3] = field(default_factory=list)
     md_values: list[float] = field(default_factory=list)
     tvd_values: list[float] = field(default_factory=list)
-    color: RenderColor = field(default_factory=RenderColor(r=0.0, g=0.8, b=0.0))
+    color: RenderColor = field(default_factory=lambda: RenderColor(r=0.0, g=0.8, b=0.0))
     radius: float = 50.0
     show_markers: bool = True
     marker_interval: float = 500.0
@@ -216,7 +216,7 @@ class UnitPolygonPrimitive:
     formation_age: str | None = None
     lithology: str | None = None
     points_2d: list[tuple[float, float]] = field(default_factory=list)
-    color: RenderColor = field(default_factory=RenderColor(r=0.7, g=0.7, b=0.7))
+    color: RenderColor = field(default_factory=lambda: RenderColor(r=0.7, g=0.7, b=0.7))
     opacity: float = 0.6
     bbox: BoundingBox | None = None
     provenance: str = ""
