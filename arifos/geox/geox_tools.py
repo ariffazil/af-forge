@@ -47,10 +47,8 @@ from arifos.geox.tools.lem_bridge import LEMBridgeTool
 from arifos.geox.tools.macrostrat_tool import MacrostratTool
 from arifos.geox.tools.seismic_visual_filter import SeismicVisualFilterTool
 from arifos.geox.tools.seismic import SeismicSingleLineTool
+from arifos.geox.tools.single_line_interpreter import SingleLineInterpreter
 from arifos.geox.tools.well_log_tool import WellLogTool
-
-# Alias for backward compatibility
-SingleLineInterpreter = SeismicSingleLineTool
 
 # ---------------------------------------------------------------------------
 # EarthModelTool

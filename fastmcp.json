@@ -20,11 +20,14 @@
     "editable": ["."]
   },
   "deployment": {
-    "transport": "stdio",
+    "transport": "http",
     "log_level": "INFO",
     "env": {
       "GEOX_VERSION": "0.4.2",
-      "DITEMPA": "BUKAN_DIBERI"
+      "DITEMPA": "BUKAN_DIBERI",
+      "HOST": "0.0.0.0",
+      "PORT": "8000",
+      "GEOX_MODE": "governance-engine"
     }
   }
 }
