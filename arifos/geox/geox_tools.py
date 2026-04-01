@@ -47,6 +47,7 @@ from arifos.geox.tools.lem_bridge import LEMBridgeTool
 from arifos.geox.tools.macrostrat_tool import MacrostratTool
 from arifos.geox.tools.seismic_visual_filter import SeismicVisualFilterTool
 from arifos.geox.tools.seismic import SeismicSingleLineTool
+from arifos.geox.tools.well_log_tool import WellLogTool
 
 # Alias for backward compatibility
 SingleLineInterpreter = SeismicSingleLineTool
@@ -1138,4 +1139,6 @@ class ToolRegistry:
         registry.register(SeismicVisualFilterTool())
         registry.register(SeismicAttributesTool())
         registry.register(SingleLineInterpreter(), name="SingleLineInterpreter")
+        registry.register(WellLogTool(), name="WellLogTool")
+        registry.register(WellLogTool(), name="PetroPhysicsTool")  # alias for MCP compat
         return registry

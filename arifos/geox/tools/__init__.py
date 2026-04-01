@@ -20,4 +20,5 @@ from . import seismic
 __all__ = [
     "generic",
     "seismic",
+    "well_log_tool",
 ]
