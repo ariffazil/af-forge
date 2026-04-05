@@ -17,9 +17,7 @@ import { buildModeSettings } from "../flags/modes.js";
 import { ToolRegistry } from "../tools/ToolRegistry.js";
 import type { FeatureFlags } from "../flags/featureFlags.js";
 import type { ToolPolicyConfig } from "../config/RuntimeConfig.js";
-import { ForgeScoreboard } from "../scoreboard/ForgeScoreboard.js";
-import { RunMetricsLogger } from "../scoreboard/RunMetricsLogger.js";
-import type { ForgeTaskRecord } from "../types/scoreboard.js";
+import { RunReporter } from "./RunReporter.js";
 
 export type AgentEngineDependencies = {
   llmProvider: LlmProvider;
@@ -27,8 +25,7 @@ export type AgentEngineDependencies = {
   longTermMemory: LongTermMemory;
   featureFlags?: FeatureFlags;
   toolPolicy?: ToolPolicyConfig;
-  scoreboard?: ForgeScoreboard;
-  runMetricsLogger?: RunMetricsLogger;
+  runReporter?: RunReporter;
   apiPricing?: {
     inputCostPerMillionTokens: number;
     outputCostPerMillionTokens: number;
@@ -212,26 +209,14 @@ export class AgentEngine {
       metrics,
     };
 
-    if (this.dependencies.scoreboard) {
-      await this.dependencies.scoreboard.append(
-        buildTaskRecord(
-          options,
-          this.profile.name,
-          result,
-          startedAt,
-          metrics.llmCost,
-        ),
+    if (this.dependencies.runReporter) {
+      await this.dependencies.runReporter.reportRun(
+        options,
+        this.profile.name,
+        result,
+        startedAt,
+        metrics.llmCost,
       );
-    }
-
-    if (this.dependencies.runMetricsLogger) {
-      await this.dependencies.runMetricsLogger.log(options.taskId ?? sessionId, {
-        taskId: options.taskId ?? sessionId,
-        command: options.taskCommand ?? this.profile.name,
-        taskType: options.taskType ?? inferTaskType(this.profile.name),
-        sessionId,
-        metrics,
-      });
     }
 
     return result;
@@ -348,73 +333,6 @@ function inferTestsPassed(profileName: string, finalText: string, completed: boo
   }
 
   return completed;
-}
-
-function buildTaskRecord(
-  options: EngineRunOptions,
-  profileName: string,
-  result: AgentRunResult,
-  startedAt: Date,
-  codexApiCost: number,
-): ForgeTaskRecord {
-  const completedAt = new Date();
-  const passAt1 = result.metrics.testsPassed && (options.attemptNumber ?? 1) === 1 ? 1 : 0;
-  const passAtK = result.metrics.testsPassed ? 1 : 0;
-
-  return {
-    taskId: options.taskId ?? result.sessionId,
-    taskType: options.taskType ?? inferTaskType(profileName),
-    taskCommand: options.taskCommand ?? profileName,
-    profileName,
-    sessionId: result.sessionId,
-    createdAt: startedAt.toISOString(),
-    completedAt: completedAt.toISOString(),
-    taskCompletion: result.metrics.completion ? 1 : 0,
-    trustMode: result.metrics.trustMode,
-    passAt1,
-    passAtK,
-    codexTurns: result.turnCount,
-    toolCalls: result.metrics.toolCalls,
-    toolCallsByType: result.metrics.toolCallsByType,
-    responsesCalls: result.metrics.responsesCalls,
-    toolCallParseFailures: result.metrics.toolCallParseFailures,
-    previousResponseResumes: result.metrics.previousResponseResumes,
-    memoryInjectedItems: result.metrics.memoryInjectedItems,
-    memoryInjectedBytes: result.metrics.memoryInjectedBytes,
-    memoryUsedReferences: result.metrics.memoryUsedReferences,
-    plannerSubtasks: result.metrics.plannerSubtasks,
-    workerSuccessRate: result.metrics.workerSuccessRate,
-    coordinationFailures: result.metrics.coordinationFailures,
-    blockedDangerousActions: result.metrics.blockedDangerousActions,
-    blockedCommands: result.metrics.blockedCommands,
-    timeoutEvents: result.metrics.timeoutEvents,
-    restrictedPathAttempts: result.metrics.restrictedPathAttempts,
-    totalEstimatedTokens: result.totalEstimatedTokens,
-    llmTokensIn: result.metrics.llmTokensIn,
-    llmTokensOut: result.metrics.llmTokensOut,
-    codexApiCost,
-    wallClockMs: result.metrics.wallClockMs,
-    humanMinutes: options.humanMinutes ?? 0,
-    testsPassed: result.metrics.testsPassed ? 1 : 0,
-    lintIssuesDelta: options.lintIssuesDelta ?? 0,
-    errorMessage: result.metrics.errorMessage,
-    metadata: {
-      maxAttempts: options.maxAttempts ?? 1,
-    },
-  };
-}
-
-function inferTaskType(profileName: string): ForgeTaskRecord["taskType"] {
-  switch (profileName) {
-    case "fix":
-      return "bugfix";
-    case "test":
-      return "test";
-    case "explore":
-      return "explore";
-    default:
-      return "other";
-  }
 }
 
 function countMemoryReferences(messages: AgentMessage[]): number {

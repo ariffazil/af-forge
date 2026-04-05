@@ -13,6 +13,7 @@ import { ToolRegistry } from "../src/tools/ToolRegistry.js";
 import { ReadFileTool, WriteFileTool } from "../src/tools/FileTools.js";
 import { redactForExternalMode } from "../src/engine/redact.js";
 import { ForgeScoreboard } from "../src/scoreboard/ForgeScoreboard.js";
+import { RunReporter } from "../src/engine/RunReporter.js";
 
 class ScriptedProvider implements LlmProvider {
   readonly name = "scripted";
@@ -259,7 +260,7 @@ test("forge scoreboard records runs and summarizes the current week", async () =
     llmProvider: new ScriptedProvider([{ content: "Completed task." }]),
     toolRegistry: new ToolRegistry(),
     longTermMemory: new LongTermMemory(memoryPath),
-    scoreboard,
+    runReporter: new RunReporter(scoreboard),
     apiPricing: {
       inputCostPerMillionTokens: 1,
       outputCostPerMillionTokens: 2,

@@ -1,7 +1,7 @@
 {
-  "name": "agent-workbench",
+  "name": "af-forge",
   "version": "0.1.0",
-  "description": "TypeScript coding agent CLI and engine with pluggable tools, safety modes, and layered memory.",
+  "description": "AF-FORGE — Constitutional Event-Sourced Agent Runtime. Planner/Executor/Verifier triad, policy engine, governed memory, and 888_HOLD human sovereignty gates.",
   "type": "module",
   "bin": {
     "agent": "./dist/src/cli.js"

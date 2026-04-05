@@ -11,6 +11,7 @@ import { AgentEngine } from "./engine/AgentEngine.js";
 import { readRuntimeConfig } from "./config/RuntimeConfig.js";
 import { ForgeScoreboard } from "./scoreboard/ForgeScoreboard.js";
 import { RunMetricsLogger } from "./scoreboard/RunMetricsLogger.js";
+import { RunReporter } from "./engine/RunReporter.js";
 function buildToolRegistry() {
     const registry = new ToolRegistry();
     registry.register(new ReadFileTool());
@@ -27,8 +28,7 @@ function createEngine(profile) {
         llmProvider: createLlmProvider(runtimeConfig),
         toolRegistry: buildToolRegistry(),
         longTermMemory: new LongTermMemory(runtimeConfig.memoryPath),
-        scoreboard: new ForgeScoreboard(runtimeConfig.scoreboardPath),
-        runMetricsLogger: new RunMetricsLogger(runtimeConfig.runMetricsDir),
+        runReporter: new RunReporter(new ForgeScoreboard(runtimeConfig.scoreboardPath), new RunMetricsLogger(runtimeConfig.runMetricsDir)),
         featureFlags: runtimeConfig.featureFlags,
         toolPolicy: runtimeConfig.toolPolicy,
         apiPricing: runtimeConfig.apiPricing,

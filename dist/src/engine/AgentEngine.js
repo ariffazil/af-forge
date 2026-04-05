@@ -159,17 +159,8 @@ export class AgentEngine {
             transcript: shortTermMemory.getMessages(),
             metrics,
         };
-        if (this.dependencies.scoreboard) {
-            await this.dependencies.scoreboard.append(buildTaskRecord(options, this.profile.name, result, startedAt, metrics.llmCost));
-        }
-        if (this.dependencies.runMetricsLogger) {
-            await this.dependencies.runMetricsLogger.log(options.taskId ?? sessionId, {
-                taskId: options.taskId ?? sessionId,
-                command: options.taskCommand ?? this.profile.name,
-                taskType: options.taskType ?? inferTaskType(this.profile.name),
-                sessionId,
-                metrics,
-            });
+        if (this.dependencies.runReporter) {
+            await this.dependencies.runReporter.reportRun(options, this.profile.name, result, startedAt, metrics.llmCost);
         }
         return result;
     }
@@ -254,64 +245,6 @@ function inferTestsPassed(profileName, finalText, completed) {
         return !/fail|error|not ok/i.test(finalText);
     }
     return completed;
-}
-function buildTaskRecord(options, profileName, result, startedAt, codexApiCost) {
-    const completedAt = new Date();
-    const passAt1 = result.metrics.testsPassed && (options.attemptNumber ?? 1) === 1 ? 1 : 0;
-    const passAtK = result.metrics.testsPassed ? 1 : 0;
-    return {
-        taskId: options.taskId ?? result.sessionId,
-        taskType: options.taskType ?? inferTaskType(profileName),
-        taskCommand: options.taskCommand ?? profileName,
-        profileName,
-        sessionId: result.sessionId,
-        createdAt: startedAt.toISOString(),
-        completedAt: completedAt.toISOString(),
-        taskCompletion: result.metrics.completion ? 1 : 0,
-        trustMode: result.metrics.trustMode,
-        passAt1,
-        passAtK,
-        codexTurns: result.turnCount,
-        toolCalls: result.metrics.toolCalls,
-        toolCallsByType: result.metrics.toolCallsByType,
-        responsesCalls: result.metrics.responsesCalls,
-        toolCallParseFailures: result.metrics.toolCallParseFailures,
-        previousResponseResumes: result.metrics.previousResponseResumes,
-        memoryInjectedItems: result.metrics.memoryInjectedItems,
-        memoryInjectedBytes: result.metrics.memoryInjectedBytes,
-        memoryUsedReferences: result.metrics.memoryUsedReferences,
-        plannerSubtasks: result.metrics.plannerSubtasks,
-        workerSuccessRate: result.metrics.workerSuccessRate,
-        coordinationFailures: result.metrics.coordinationFailures,
-        blockedDangerousActions: result.metrics.blockedDangerousActions,
-        blockedCommands: result.metrics.blockedCommands,
-        timeoutEvents: result.metrics.timeoutEvents,
-        restrictedPathAttempts: result.metrics.restrictedPathAttempts,
-        totalEstimatedTokens: result.totalEstimatedTokens,
-        llmTokensIn: result.metrics.llmTokensIn,
-        llmTokensOut: result.metrics.llmTokensOut,
-        codexApiCost,
-        wallClockMs: result.metrics.wallClockMs,
-        humanMinutes: options.humanMinutes ?? 0,
-        testsPassed: result.metrics.testsPassed ? 1 : 0,
-        lintIssuesDelta: options.lintIssuesDelta ?? 0,
-        errorMessage: result.metrics.errorMessage,
-        metadata: {
-            maxAttempts: options.maxAttempts ?? 1,
-        },
-    };
-}
-function inferTaskType(profileName) {
-    switch (profileName) {
-        case "fix":
-            return "bugfix";
-        case "test":
-            return "test";
-        case "explore":
-            return "explore";
-        default:
-            return "other";
-    }
 }
 function countMemoryReferences(messages) {
     return messages.filter((message) => message.role === "assistant" && /\bmemory\b/i.test(message.content)).length;

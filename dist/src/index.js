@@ -1,4 +1,5 @@
 export * from "./engine/AgentEngine.js";
+export * from "./engine/RunReporter.js";
 export * from "./llm/LlmProvider.js";
 export * from "./llm/MockLlmProvider.js";
 export * from "./llm/OpenAIResponsesProvider.js";
