@@ -52,5 +52,32 @@
       "profile": "explore",
       "turnCount": 1
     }
+  },
+  {
+    "id": "93b04657-b1e9-45c0-ae93-dd6194c09449",
+    "summary": "Profile: explore\nTools visible: read_file, list_files, grep_text\nMock provider completed the task without additional tool calls.",
+    "keywords": [
+      "explain",
+      "this",
+      "repository",
+      "profile",
+      "explore",
+      "tools",
+      "visible",
+      "read_file",
+      "list_files",
+      "grep_text",
+      "mock",
+      "provider",
+      "completed",
+      "task",
+      "without",
+      "additional"
+    ],
+    "createdAt": "2026-04-07T15:13:22.582Z",
+    "metadata": {
+      "profile": "explore",
+      "turnCount": 1
+    }
   }
 ]
