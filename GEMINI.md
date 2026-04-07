@@ -1,14 +1,16 @@
 # arifOS workspace context
 
-## Naming alignment
-- init_anchor = session bootstrap / identity
-- arifOS_kernel = meta routing
-- apex_soul = constitutional verdict
-- vault_ledger = seal / verify
-- agi_mind = reasoning
-- asi_heart = simulation / ethical critique
-- engineering_memory = governed execution
-- physics_reality = grounding / evidence
+## Naming alignment (canonical arifos.* tools)
+- arifos.init = session bootstrap / identity
+- arifos.route = meta routing
+- arifos.judge = constitutional verdict
+- arifos.vault = seal / verify
+- arifos.mind = reasoning
+- arifos.heart = simulation / ethical critique
+- arifos.memory = governed execution
+- arifos.sense = grounding / evidence
+- arifos.ops = operational metrics / cost estimation
+- arifos.forge = build / test / code execution
 
 ## Local skill registry
 - planner: goal → steps decomposition (Bounded, No Exec)
