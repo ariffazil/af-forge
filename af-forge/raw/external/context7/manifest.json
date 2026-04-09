@@ -1,0 +1,24 @@
+{
+  "$schema": "./manifest.schema.json",
+  "version": "1.0.0",
+  "description": "Context7 ingest manifest for AF-FORGE wiki",
+  "last_updated": "2026-04-09",
+  "ingests": [
+    {
+      "library": "fastmcp",
+      "context7_id": "fastmcp",
+      "canonical_name": "FastMCP",
+      "version": "3.1.1",
+      "file": "fastmcp-v3.1.1.json",
+      "last_sync": "2026-04-09",
+      "status": "active",
+      "blueprint_dest": "20_BLUEPRINTS/FastMCP_Integration.md",
+      "alloy_updated": true,
+      "smith_note": "70_SMITH_NOTES/2026-04-09_Context7_FastMCP.md",
+      "operator": "Arif",
+      "confidence": 0.95,
+      "epistemic_level": "DER",
+      "arifos_floors": ["F1", "F2", "F4", "F7"]
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "af-forge-context7-manifest",
+  "title": "AF-FORGE Context7 Manifest Schema",
+  "description": "Schema for tracking Context7 documentation ingests into AF-FORGE wiki",
+  "type": "object",
+  "required": ["version", "description", "last_updated", "ingests"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "version": {
+      "type": "string",
+      "description": "Manifest format version (semver)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this manifest"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of last manifest update (YYYY-MM-DD)"
+    },
+    "ingests": {
+      "type": "array",
+      "description": "List of all Context7 ingests",
+      "items": {
+        "$ref": "#/definitions/IngestEntry"
+      }
+    }
+  },
+  "definitions": {
+    "IngestEntry": {
+      "type": "object",
+      "required": [
+        "library",
+        "context7_id",
+        "version",
+        "file",
+        "last_sync",
+        "status"
+      ],
+      "properties": {
+        "library": {
+          "type": "string",
+          "description": "Short library name (e.g., 'fastmcp')"
+        },
+        "context7_id": {
+          "type": "string",
+          "description": "Canonical Context7 library ID"
+        },
+        "canonical_name": {
+          "type": "string",
+          "description": "Human-readable library name (e.g., 'FastMCP')"
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of library docs ingested (semver)"
+        },
+        "file": {
+          "type": "string",
+          "description": "Filename in raw/external/context7/ containing raw docs",
+          "pattern": "^.+\\.json$"
+        },
+        "last_sync": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of last successful sync (YYYY-MM-DD)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "deprecated", "superseded", "failed"],
+          "description": "Current status of this ingest"
+        },
+        "blueprint_dest": {
+          "type": "string",
+          "description": "Path to generated blueprint (relative to wiki/)"
+        },
+        "alloy_updated": {
+          "type": "boolean",
+          "description": "Whether 30_ALLOYS/ was updated with this version"
+        },
+        "smith_note": {
+          "type": "string",
+          "description": "Path to smith note (relative to wiki/)"
+        },
+        "operator": {
+          "type": "string",
+          "description": "Who performed the ingest (Arif, Claude, etc.)"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Confidence in ingest quality (F7 Humility)"
+        },
+        "epistemic_level": {
+          "type": "string",
+          "enum": ["OBS", "DER", "INT", "SPEC"],
+          "description": "Epistemic level of synthesized knowledge"
+        },
+        "arifos_floors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^F\\d+$"
+          },
+          "description": "arifOS constitutional floors applied during ingest"
+        },
+        "superseded_by": {
+          "type": "string",
+          "description": "If status='superseded', points to newer ingest entry"
+        },
+        "failure_reason": {
+          "type": "string",
+          "description": "If status='failed', explains why"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
