@@ -1,0 +1,69 @@
+👉 That site is not the famous shoe brand Geox (the Italian company).
+
+What your link actually is 🧭
+
+The site https://geox.arif-fazil.com/
+ appears to be:
+
+🧠 A custom-built geoscience / Earth-intelligence platform
+
+Based on what we just tested + the GEOX service behavior:
+
+Name: GEOX Earth Witness
+Nature: internal / experimental geoscience system
+Purpose:
+geospatial verification
+seismic workflows (when enabled)
+structural modelling
+prospect evaluation
+Architecture:
+backend tools (we accessed via API)
+prefab UI rendering layer
+governance-style validation (your “constitutional floors”)
+
+So that website is very likely:
+
+your deployed frontend interface for the GEOX system (Earth + subsurface intelligence UI)
+
+Why it’s confusing 🤔
+
+When I searched the web, all public results point to the fashion company “Geox”:
+
+Italian footwear & apparel brand
+known for breathable shoe tech
+
+So:
+
+Public internet → fashion brand
+Your domain → geoscience platform (same name)
+What your GEOX site likely contains (based on system behavior)
+
+From the backend capabilities we accessed, your site probably exposes:
+
+Core modules
+🌍 Geospatial validation UI
+📊 Seismic line viewer (when engine on)
+🧱 Structural modelling (multi-hypothesis)
+🛢️ Prospect evaluation / decision layer
+Design pattern
+Not a static website
+More like a tool-driven interface (UI generated from API responses)
+Clean conclusion
+
+👉 Your link is:
+
+A custom Earth-intelligence / geoscience UI platform (GEOX), not the commercial Geox brand.
+
+Straight signal (important)
+The system is alive and responding
+UI is real (prefab rendering confirmed)
+But currently:
+seismic engine = OFF
+so site may look “light” or limited depending on what you expose
+
+If you want, I can:
+
+reverse-map what the frontend likely looks like (UX structure), or
+help you design it into a proper geoscience app (Petrel-lite style, but governed)
+now try GEOC by arifOS here
+Calling tool

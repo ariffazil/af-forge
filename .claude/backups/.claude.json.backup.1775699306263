@@ -19,7 +19,9 @@
     "continue": 4,
     "shift-tab": 4,
     "image-paste": 4,
-    "web-app": 4
+    "web-app": 4,
+    "mobile-app": 4,
+    "overage-credit": 4
   },
   "promptQueueUseCount": 4,
   "cachedGrowthBookFeatures": {

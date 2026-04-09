@@ -19,9 +19,11 @@
     "continue": 4,
     "shift-tab": 4,
     "image-paste": 4,
-    "web-app": 4
+    "web-app": 4,
+    "mobile-app": 4,
+    "overage-credit": 4
   },
-  "promptQueueUseCount": 3,
+  "promptQueueUseCount": 6,
   "cachedGrowthBookFeatures": {
     "tengu_bergotte_lantern": false,
     "tengu_sm_compact": false,
