@@ -7,6 +7,7 @@
 
 ## Start here
 - [[SCHEMA]] — what this wiki is, how it is maintained, and the Karpathy-style persistence pattern
+- [[80_FEDERATION/Three_Wikis_Map]] — the gateway that makes AF-FORGE, arifOS, and GEOX read as one system
 - [[log]] — chronological history of wiki ingests, fixes, and audits
 
 ## 00_OPERATORS, who runs the forge

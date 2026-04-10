@@ -26,3 +26,8 @@
 - Rewrote `index.md` so navigation reflects the actual live wiki tree.
 - Filled missing links that previously pointed to pages that did not exist.
 - Added frontmatter to `20_BLUEPRINTS/Memory_Stack.md` so it participates cleanly in the wiki schema.
+
+## [2026-04-10] federation | three-wiki gateway strengthened
+- Promoted `80_FEDERATION/Three_Wikis_Map.md` into a real federation gateway from the AF-FORGE side.
+- Updated `index.md` so federation is visible at the top-level start path.
+- Tightened the language so AF-FORGE, arifOS, and GEOX read as one stack with different roles rather than disconnected doc islands.
