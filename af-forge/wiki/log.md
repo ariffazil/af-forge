@@ -31,3 +31,11 @@
 - Promoted `80_FEDERATION/Three_Wikis_Map.md` into a real federation gateway from the AF-FORGE side.
 - Updated `index.md` so federation is visible at the top-level start path.
 - Tightened the language so AF-FORGE, arifOS, and GEOX read as one stack with different roles rather than disconnected doc islands.
+
+## [2026-04-10] forge | arifOS kernel primitives implemented
+- Formalized missing canonical primitives: Pattern Registry, Pattern Selection Engine, Planner, Tool Contract Registry, and Agent Role Registry.
+- Implemented all primitives in pure Python within `core/kernel/` for constitutional auditability.
+- Integrated primitives into the `KernelCore` metabolic pipeline (`arifosmcp/runtime/kernel_core.py`).
+- Established a comprehensive evaluation harness in `tests/evaluation_harness/test_harness.py`.
+- Updated wiki index and added `20_BLUEPRINTS/Kernel_Primitives.md` and `90_AUDITS/Refactor_Summaries.md`.
+- Verified that all 4 scenario tests pass against the new kernel substrate.

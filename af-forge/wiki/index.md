@@ -18,6 +18,7 @@
 - [[10_RITUALS/Ingest]] — ingest workflow for new infrastructure knowledge and external docs
 
 ## 20_BLUEPRINTS, what is built
+- [[20_BLUEPRINTS/Kernel_Primitives]] — Pattern Registry, Planner, and Agent Role Registry primitives
 - [[20_BLUEPRINTS/Memory_Stack]] — L1/L2/L3 memory model for state, wiki, and VAULT999
 - [[20_BLUEPRINTS/Stack_Components]] — VPS topology, components, ports, domains, and control surfaces
 - [[20_BLUEPRINTS/Adapter_Bus]] — CLI/agent adapter surface and trust boundary map
@@ -41,6 +42,7 @@
 - [[80_FEDERATION/Three_Wikis_Map]] — arifOS, GEOX, AF-FORGE role separation
 
 ## 90_AUDITS, sealed reference material
+- [[90_AUDITS/Refactor_Summaries]] — record of major substrate refactors and forge operations
 - [[90_AUDITS/Memory_Manifest]] — memory/audit manifest for AF-FORGE
 
 ## Raw sources
