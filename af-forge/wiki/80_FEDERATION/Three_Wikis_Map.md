@@ -41,6 +41,7 @@ It is one third of a larger system:
 Suggested arifOS entry points:
 - `/root/arifOS/wiki/index.md`
 - `Federation_Three_Wikis`
+- `Naming_Canon`
 - `What-is-arifOS`
 - `Floors`
 - `Concept_Deployment_Architecture`

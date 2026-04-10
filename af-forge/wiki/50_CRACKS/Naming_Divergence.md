@@ -10,6 +10,7 @@ operator: Copilot
 # Crack: Container Naming Divergence
 
 > **Finding**: 6 containers use non-canonical names per `COPILOT_STUDIO_ARIFOS_INSTRUCTION_PACK.md`.
+> **Canon Reference**: `/root/arifOS/wiki/pages/Naming_Canon.md`
 
 ---
 
@@ -26,6 +27,11 @@ operator: Copilot
 
 ## Remediation Pattern
 
-For each container, update compose `container_name:` then `docker compose up -d --force-recreate <service>`.
+Apply the shared naming law first:
+- one canonical name
+- legacy names treated as aliases or migration residue
+- one declared truth source per service
+
+Then for each container, update compose `container_name:` and any dependent docs or dashboards, then `docker compose up -d --force-recreate <service>`.
 
 > **F1 Gate**: Container renames require service restart (~5s downtime each). Do not rename all at once.
