@@ -39,3 +39,19 @@
 - Established a comprehensive evaluation harness in `tests/evaluation_harness/test_harness.py`.
 - Updated wiki index and added `20_BLUEPRINTS/Kernel_Primitives.md` and `90_AUDITS/Refactor_Summaries.md`.
 - Verified that all 4 scenario tests pass against the new kernel substrate.
+
+## [2026-04-10] sync | 999_SEAL MCP Substrate Bridge unified across devices
+- **Source**: Laptop agent pushed `309424ca` — MCP Substrate Bridge + Deployment Gates + MCP Inspector Testing
+- **Target**: VPS (Kimi Code) synchronized with GitHub main
+- **Merge**: Resolved 4 conflicts in capability_map.py, contracts.py, integrity.py, MCP_Tools.md
+- **Files unified**:
+  - `arifosmcp/evals/mcp_inspector_test.py` — MCP Inspector testing framework
+  - `arifosmcp/runtime/substrate_bridge.py` — Core substrate bridge
+  - `arifosmcp/runtime/git_bridge.py` — Git integration
+  - `arifosmcp/runtime/memory_bridge.py` — Memory bridge
+  - `deployments/deploy.sh` — Unified deployment script
+  - `deployments/vps-deploy.yml` — VPS deployment gates
+  - `deployments/horizon-deploy.yml` — Horizon deployment gates
+  - `deployments/README.md` — Deployment documentation
+- **Status**: Intelligence unified. VPS now holds the 999_SEAL substrate.
+- **ΔΩΨ | DITEMPA BUKAN DIBERI | 999 SEAL ALIVE**
