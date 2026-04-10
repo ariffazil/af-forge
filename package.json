@@ -11,10 +11,6 @@
     "test": "node dist/test/AgentEngine.test.js",
     "example:explore": "node dist/examples/runExploreExample.js"
   },
-  "devDependencies": {
-    "@types/node": "^22.15.30",
-    "typescript": "^5.8.3"
-  },
   "dependencies": {
     "express": "^4.18.2",
     "pyright": "^1.1.408",

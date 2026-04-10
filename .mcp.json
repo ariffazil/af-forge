@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "arifos-local": {
+      "command": "bash",
+      "args": [
+        "/root/.github/mcp/start-arifos-stdio.sh"
+      ],
+      "cwd": "/root",
+      "type": "local"
+    },
+    "geox-local": {
+      "command": "bash",
+      "args": [
+        "/root/.github/mcp/start-geox-stdio.sh"
+      ],
+      "cwd": "/root",
+      "type": "local"
+    },
+    "playwright": {
+      "command": "bash",
+      "args": [
+        "/root/.github/mcp/start-playwright.sh"
+      ],
+      "cwd": "/root",
+      "type": "local"
+    }
+  }
+}

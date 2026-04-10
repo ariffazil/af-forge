@@ -108,6 +108,34 @@ class OutputEnvelope(BaseModel):
 
 # --- 3. Metabolic & Selection Functions ---
 
+def select_philosophical_anchor(tool_id: str, state: MindState) -> Dict[str, str]:
+    corpus = PHILOSOPHICAL_CORPUS.get(tool_id, PHILOSOPHICAL_CORPUS["arifos.mind"])
+    return random.choice(corpus)
+
+def judge(state: MindState) -> tuple[str, List[str]]:
+    """F11/F13: Constitutional Verdict Gate."""
+    violations = []
+    if state.provenance.human_equivalence_claimed:
+        violations.append("F9: HANTU_CLAIM (Human equivalence claimed without biological substrate)")
+    
+    if any(h.confidence > 0.95 and not h.evidence_for for h in state.hypotheses):
+        violations.append("F7: HUBRIS_DETECTED (High confidence without evidence)")
+
+    verdict = "PASS" if not violations else "HOLD"
+    return verdict, violations
+
+def chaos_score(state: MindState) -> float:
+    """Entropy delta calculation."""
+    if not state.hypotheses:
+        return 1.0
+    
+    # Entropy = Uncertainty + Risk - Evidence
+    score = (len(state.unknowns) * 0.2) + (len(state.risks) * 0.3)
+    if state.provenance.human_equivalence_claimed:
+        score += 0.5
+        
+    return min(1.0, score)
+
 def compress_for_operator(state: MindState, tool_id: str = "arifos.mind", tier: Literal["T1_LEAN", "T2_GOVERNED", "T3_DEBUG"] = "T2_GOVERNED") -> OutputEnvelope:
     """Wide mind -> Narrow voice. Implements Workspace Law (L7) and Humility Law (L10)."""
     top_hypotheses = sorted(state.hypotheses, key=lambda h: h.confidence, reverse=True)[:2]

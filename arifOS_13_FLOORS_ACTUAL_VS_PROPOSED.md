@@ -358,19 +358,19 @@ reject(holdId: string, reason?: string): HoldQueueItem
 |-------|-----------|-------------------|-----------------|------|
 | F1 | Identity Anchor | ✅ Python function | ✅ `ContinuityStore` | ✓ Implemented |
 | F2 | Scope Authority | ✅ Python function | ✅ `BaseTool.isPermitted` | ✓ Implemented |
-| F3 | Input Clarity | ✅ Python function | ❌ **NOT IMPLEMENTED** | ⚠️ Gap |
-| F4 | Entropy Control | ✅ Python function | ⚠️ Pattern blocking | Partial |
+| F3 | Input Clarity | ✅ Python function | ✅ `src/governance/f3InputClarity.ts` | ✓ Implemented |
+| F4 | Entropy Control | ✅ Python function | ✅ `src/governance/f4Entropy.ts` | ✓ Implemented |
 | F5 | Stability/Reversibility | ✅ Python function | ✅ `ApprovalBoundary` | ✓ Implemented |
-| F6 | Harm/Dignity | ✅ Python function | ❌ **NOT IMPLEMENTED** | ⚠️ Gap |
-| F7 | Confidence Humility | ✅ Python function | ❌ **NOT IMPLEMENTED** | ⚠️ Gap |
-| F8 | Grounding/Truth | ✅ Python function | ⚠️ `MemoryContract` | Partial |
-| F9 | Injection Resistance | ✅ Python function | ⚠️ Redaction only | Partial |
+| F6 | Harm/Dignity | ✅ Python function | ✅ `src/governance/f6HarmDignity.ts` | ✓ Implemented |
+| F7 | Confidence Humility | ✅ Python function | ✅ `src/governance/f7Confidence.ts` | ✓ Implemented |
+| F8 | Grounding/Truth | ✅ Python function | ✅ `src/governance/f8Grounding.ts` | ✓ Implemented |
+| F9 | Injection Resistance | ✅ Python function | ✅ `src/governance/f9Injection.ts` | ✓ Implemented |
 | F10 | Memory Integrity | ✅ Python function | ✅ `MemoryContract` | ✓ Implemented |
-| F11 | Coherence | ✅ Python function | ❌ **NOT IMPLEMENTED** | ⚠️ Gap |
+| F11 | Coherence | ✅ Python function | ✅ `src/governance/f11Coherence.ts` | ✓ Implemented |
 | F12 | Continuity | ✅ Python function | ✅ `ContinuityStore` | ✓ Implemented |
 | F13 | Human Sovereignty | ✅ Python function | ✅ `ApprovalBoundary` | ✓ Implemented |
 
-**Score:** 8/13 fully implemented, 3 partial, 2 missing
+**Score: 13/13 fully implemented**
 
 ---
 
@@ -447,35 +447,14 @@ ContinuityStore: {
 
 ---
 
-## Recommendations for Closing Gaps
+## Status of Previous Gaps
 
-### Missing Floors to Implement
+All gaps identified in the 2026-04-07 audit have been addressed in the current AF-FORGE implementation via the `src/governance` module:
 
-1. **F3 Input Clarity**: Add CLI validation in `parseArgs.ts`:
-   ```typescript
-   if (task.length < 8) {
-     throw new Error("Input too ambiguous. Please provide more detail. (SABAR)");
-   }
-   ```
-
-2. **F6 Harm/Dignity**: Add content filter in `AgentEngine.run()` before LLM call:
-   ```typescript
-   const harmMarkers = ["harm", "attack", "exploit", "bypass"];
-   if (harmMarkers.some(m => task.includes(m))) {
-     return { finalText: "VOID: Potential harmful intent detected." };
-   }
-   ```
-
-3. **F7 Confidence Humility**: Would require LLM provider changes to expose confidence scores (not available in current OpenAI Responses API).
-
-4. **F11 Coherence**: Add cross-tool call contradiction detection in `AgentEngine.executeToolCalls()`.
-
-### Telemetry Metrics (Optional)
-
-The external proposal assumes rich telemetry (`confidence`, `uncertainty_sigma`, `entropy_delta_s`, `g_star`, `peace2`). AF-FORGE currently doesn't track these. To implement:
-
-- Add to `LlmTurnResponse.usage` or create new `Telemetry` type
-- Calculate from tool call patterns, memory consistency, etc.
+1. **F3 Input Clarity**: ✅ **IMPLEMENTED** in `src/governance/f3InputClarity.ts`.
+2. **F6 Harm/Dignity**: ✅ **IMPLEMENTED** in `src/governance/f6HarmDignity.ts`.
+3. **F7 Confidence Humility**: ✅ **IMPLEMENTED** in `src/governance/f7Confidence.ts` (using heuristics).
+4. **F11 Coherence**: ✅ **IMPLEMENTED** in `src/governance/f11Coherence.ts`.
 
 ---
 

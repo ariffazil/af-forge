@@ -15,6 +15,8 @@ AF-FORGE is a **constitutional, event-sourced agent runtime** written in TypeScr
 - Tools are risk-scored (reversibility labels)
 - Everything is replayable (append-only event log)
 
+**arifOS 000-999 Pipeline:** INIT → SENSE → MIND → HEART → ASI → JUDGE → FORGE → VAULT
+
 ---
 
 ## Technology Stack
@@ -61,6 +63,18 @@ AGENT_WORKBENCH_TRUST_LOCAL_VPS=1 node dist/src/cli.js explore "scan this repo"
 
 ---
 
+## Shared MCP Launchers
+
+Repo-local MCP launchers live in `.github/mcp/`:
+
+- `start-arifos-stdio.sh`
+- `start-geox-stdio.sh`
+- `start-playwright.sh`
+
+Keep the server names `arifos-local`, `geox-local`, and `playwright` aligned across `.mcp.json`, `.claude/mcp.json`, `.cursor/mcp.json`, `.opencode.json`, and `.gemini/settings.json`.
+
+---
+
 ## Project Structure
 
 ```
@@ -83,6 +97,15 @@ af-forge/
 │   ├── flags/            # Feature flags and runtime modes
 │   │   ├── featureFlags.ts       # ENABLE_* flags
 │   │   └── modes.ts              # internal_mode vs external_safe_mode
+│   ├── governance/       # arifOS 13 Floors constitutional enforcement
+│   │   ├── index.ts              # Governance module exports
+│   │   ├── f3InputClarity.ts     # F3: Input clarity validation
+│   │   ├── f4Entropy.ts          # F4: Entropy/risk calculation
+│   │   ├── f6HarmDignity.ts      # F6: Harm and dignity protection
+│   │   ├── f7Confidence.ts       # F7: Confidence estimation
+│   │   ├── f8Grounding.ts        # F8: Evidence grounding checks
+│   │   ├── f9Injection.ts        # F9: Prompt injection detection
+│   │   └── f11Coherence.ts       # F11: Response coherence validation
 │   ├── jobs/             # Background job management
 │   │   └── BackgroundJobManager.ts
 │   ├── llm/              # LLM provider abstractions
@@ -107,6 +130,7 @@ af-forge/
 │   │   ├── jobs.ts               # Job types
 │   │   ├── memory.ts             # Memory record types
 │   │   ├── scoreboard.ts         # Scoreboard types
+│   │   ├── session.ts            # Session state and sense types
 │   │   └── tool.ts               # Tool schemas, permissions, results
 │   ├── utils/            # Utilities
 │   │   ├── fs.ts                 # Filesystem helpers
@@ -114,7 +138,9 @@ af-forge/
 │   ├── cli.ts            # CLI entry point
 │   └── index.ts          # Public API exports
 ├── test/
-│   └── AgentEngine.test.ts       # Test suite (node:test)
+│   ├── AgentEngine.test.ts       # Main test suite (node:test)
+│   ├── confidence.test.ts        # Confidence estimation tests
+│   └── sense.test.ts             # Sense/latency space tests
 ├── examples/
 │   └── runExploreExample.ts      # Example usage
 ├── dist/                 # Compiled JavaScript output (gitignored)
@@ -148,6 +174,8 @@ import { AgentEngine } from "../engine/AgentEngine.ts";
 - **ModuleResolution:** NodeNext
 - **Strict:** true
 - **Declaration:** true (generates .d.ts files)
+- **OutDir:** dist/
+- **RootDir:** .
 
 ### Naming Conventions
 
@@ -240,11 +268,26 @@ test("test name", async () => {
 
 1. **CLI** (`src/cli.ts`) parses args → selects an `AgentProfile`
 2. **AgentEngine** (`src/engine/AgentEngine.ts`) drives the loop:
+   - Runs constitutional governance checks (F3, F6, F9 before execution)
    - Injects relevant `LongTermMemory` entries as system messages
    - Calls `LlmProvider.completeTurn()` each turn
    - Passes tool calls through `ToolRegistry.runTool()` with permission + policy checks
+   - Runs per-tool governance (F4, F6, F8 during tool execution)
+   - Runs post-execution governance (F7, F11 after completion)
    - Appends results to `ShortTermMemory` (in-session transcript)
 3. On completion, stores summary in `LongTermMemory` and reports metrics via `RunReporter` → `ForgeScoreboard` + `RunMetricsLogger`
+
+### Governance Floors (arifOS F3-F11)
+
+| Floor | Name | Location | Trigger | Verdicts |
+|-------|------|----------|---------|----------|
+| F3 | Input Clarity | `src/governance/f3InputClarity.ts` | Pre-execution | PASS, SABAR |
+| F4 | Entropy | `src/governance/f4Entropy.ts` | Per-tool | PASS, HOLD |
+| F6 | Harm/Dignity | `src/governance/f6HarmDignity.ts` | Pre-execution + per-tool | PASS, VOID |
+| F7 | Confidence | `src/governance/f7Confidence.ts` | Post-execution | PASS, HOLD |
+| F8 | Grounding | `src/governance/f8Grounding.ts` | Per-tool | PASS, HOLD |
+| F9 | Injection | `src/governance/f9Injection.ts` | Pre-execution | PASS, VOID |
+| F11 | Coherence | `src/governance/f11Coherence.ts` | Post-tool batch | PASS, HOLD |
 
 ### Trust & Safety Layers
 
@@ -355,16 +398,31 @@ When in `external_safe_mode`:
 3. Add CLI command handler in `src/cli/commands.ts` if needed
 4. Build and test
 
+### Adding a New Governance Floor
+
+1. Create floor implementation in `src/governance/f{N}{Name}.ts`
+2. Export from `src/governance/index.ts`
+3. Integrate into `AgentEngine.ts` at appropriate lifecycle point
+4. Update governance check types if adding new verdicts
+
 ---
 
 ## Constitutional Principles (arifOS F1–F13)
 
 AF-FORGE implements constitutional constraints from arifOS:
 
-- **F1 Amanah** — No irreversible action without VAULT999 seal → maps to `888_HOLD` gate / `destructive` risk tools
-- **F2 Truth** — No ungrounded claims (τ ≥ 0.99)
-- **F9 Anti-Hantu** — No deception or manipulation in agent output
-- **F13 Sovereign** — Human (Arif) holds final authority → `888_HOLD` gates must block, not auto-approve
+| Floor | Principle | Implementation |
+|-------|-----------|----------------|
+| F1 | Amanah | No irreversible action without VAULT999 seal → `888_HOLD` gate / `destructive` risk tools |
+| F2 | Truth | No ungrounded claims (τ ≥ 0.99) |
+| F3 | Input Clarity | Clear task definition required → Pre-execution SABAR check |
+| F4 | Entropy | Risk accumulation tracking across tool calls |
+| F6 | Harm/Dignity | No harm to humans/dignity → VOID check on task and tools |
+| F7 | Confidence | Humility in uncertainty → Post-execution confidence estimate |
+| F8 | Grounding | Evidence-based reasoning → Per-tool evidence counting |
+| F9 | Anti-Hantu | No deception/manipulation → Injection detection + VOID |
+| F11 | Coherence | Internal consistency → Post-tool coherence check |
+| F13 | Sovereign | Human (Arif) holds final authority → `888_HOLD` gates must block |
 
 ---
 
@@ -409,6 +467,7 @@ agent scoreboard [--period weekly] [--command explore|fix|test|coordinate] [--tr
 5. **Follow constitutional principles** — F1, F2, F9, F13 are non-negotiable
 6. **Use ScriptedProvider for deterministic tests** — see existing tests for patterns
 7. **Keep mode-aware** — `internal_mode` vs `external_safe_mode` have different capabilities
+8. **Governance is enforced** — All F3-F11 floors are active in the engine
 
 ---
 
@@ -440,4 +499,4 @@ The `OutputEnvelope` for every tool includes a `philosophical_anchor`. The runti
 
 ---
 
-*Last updated: 2026-04-07*
+*Last updated: 2026-04-10*

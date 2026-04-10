@@ -1,0 +1,38 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md"
+  ],
+  "mcp": {
+    "arifos-local": {
+      "type": "local",
+      "command": [
+        "bash",
+        "/root/.github/mcp/start-arifos-stdio.sh"
+      ],
+      "cwd": "/root",
+      "enabled": true,
+      "timeout": 30000
+    },
+    "geox-local": {
+      "type": "local",
+      "command": [
+        "bash",
+        "/root/.github/mcp/start-geox-stdio.sh"
+      ],
+      "cwd": "/root",
+      "enabled": true,
+      "timeout": 30000
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "bash",
+        "/root/.github/mcp/start-playwright.sh"
+      ],
+      "cwd": "/root",
+      "enabled": true,
+      "timeout": 30000
+    }
+  }
+}

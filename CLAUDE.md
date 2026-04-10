@@ -21,6 +21,18 @@ Each subproject has its own CLAUDE.md / AGENTS.md — this file covers workspace
 
 ---
 
+## Shared MCP Launchers
+
+Use the repo-local launcher scripts in `.github/mcp/` for agent MCP wiring:
+
+- `start-arifos-stdio.sh`
+- `start-geox-stdio.sh`
+- `start-playwright.sh`
+
+The shared server names are `arifos-local`, `geox-local`, and `playwright`. Keep `.mcp.json`, `.claude/mcp.json`, `.cursor/mcp.json`, `.opencode.json`, and `.gemini/settings.json` aligned to those names.
+
+---
+
 ## AF-FORGE Commands
 
 Work from `AF-FORGE/`:
@@ -60,23 +72,32 @@ There is **no watch mode**. Always `npm run build` before running tests after an
 Work from `arifOS/`:
 
 ```bash
+# Python dev
+pip install -e ".[dev]"
+pytest tests/ -v                           # full suite
+pytest tests/test_constitutional.py -v    # single file
+pytest tests/ --cov=core --cov-report=term-missing
+
+# Lint / format / type check (100-char line length)
+ruff check .          # lint
+ruff check . --fix    # auto-fix
+black .               # format
+mypy --ignore-missing-imports .
+
+# Run MCP server
+python stdio_server.py    # stdio transport
+python server.py          # HTTP/SSE transport
+
 # Deployment (Docker-based)
 make fast-deploy     # 2-3 min — code changes only (uses layer cache)
 make reforge         # 10-15 min — full rebuild (Dockerfile / deps changed)
 make auto-deploy     # autonomous deploy based on change analysis
-make strategy        # analyze and recommend rebuild strategy
-
-# Monitoring
-make status          # service status
-make logs            # follow logs
-make health          # health endpoint check
-
-# Python development
-pip install -e ".[dev]"
-pytest               # run tests
-ruff check .         # lint
-mypy .               # type check
+make status && make logs && make health
 ```
+
+**Async tests:** `asyncio_mode = "auto"` in `pyproject.toml` — do **not** add `@pytest.mark.asyncio`.
+
+**Tool decorators:** `@mcp.tool()` outer, `@constitutional_floor()` inner (see `server.py`). Confirm current tool list in `server.py` or `codebase/mcp/core/tool_registry.py` before edits — tool sets differ across docs.
 
 ---
 
@@ -124,6 +145,16 @@ CLI (cli.ts) → AgentProfile → AgentEngine
 
 Task state machine: `TASK_CREATED → PLAN_PROPOSED → APPROVAL_REQUIRED → TOOL_RUN_STARTED → TOOL_RUN_FINISHED → TASK_COMPLETED | TASK_ABORTED`
 
+**Agent profiles** (`src/agents/profiles.ts`): `explore`, `fix`, `test`, `coordinator`, `worker` — plain objects (`AgentProfile` type), not classes. Each has a tool allowlist and token budget. All config in `src/config/RuntimeConfig.ts` via `readRuntimeConfig()` (env vars use `AGENT_WORKBENCH_` prefix).
+
+**Trust layers:**
+
+| Layer | Mechanism |
+|---|---|
+| Mode | `internal_mode` (full access) vs `external_safe_mode` (no `run_command`, secrets/URLs redacted) |
+| Tool risk | `safe` / `guarded` / `dangerous` — `dangerous` requires `ENABLE_DANGEROUS_TOOLS=1` |
+| Policy | `allowedCommandPrefixes`, `blockedCommandPatterns`, `commandTimeoutMs`, `maxFileBytes` |
+
 ### Policy Gates (shared across all subprojects)
 
 | Risk | Gate | Examples |
@@ -136,7 +167,11 @@ Task state machine: `TASK_CREATED → PLAN_PROPOSED → APPROVAL_REQUIRED → TO
 
 ### GEOX Architecture (Theory → Engine → Tools → Governance)
 
-Every MCP tool is wrapped by `@contrast_governed_tool` which runs the full THEORY → ENGINE → GOVERNANCE pass and returns a verdict (`SEAL ≥ 0.80`, `PARTIAL ≥ 0.50`, `SABAR ≥ 0.25`, `VOID < 0.25`) before any data is written.
+Every MCP tool is wrapped by `@contrast_governed_tool` which runs the full THEORY → ENGINE → GOVERNANCE pass and returns a verdict (`SEAL ≥ 0.80`, `PARTIAL ≥ 0.50`, `SABAR ≥ 0.25`, `VOID < 0.25`) before any data is written. Verdict constants in `arifos/geox/__init__.py`.
+
+**GUI stack:** React 19, TypeScript, Vite, MapLibre GL 4, CesiumJS, Zustand, Radix UI, Tailwind CSS. Governance badges must remain visible at all times — constitutional constraint, not style.
+
+**Federated co-agent:** In production GEOX connects to the arifOS kernel at `arifosmcp.arif-fazil.com/mcp`. For local dev the MCP server runs standalone (VAULT writes gracefully skipped).
 
 ---
 
@@ -186,4 +221,60 @@ init → sense → mind → heart → judge → vault
 Public tools: `arifos.v2.init`, `arifos.v2.route`, `arifos.v2.judge`
 Internal tools: `sense`, `mind`, `heart`, `ops`, `memory`, `vault`, `forge` (forge only after SEAL)
 
-Skill registry rule: one primary skill per task, max two secondary. Run `floor-checker` first for any risky operation.
+Skill registry rule: one primary skill per task, max two secondary. Run `floor-checker` first for any risky operation. `vps-operator` never designs architecture; `web-architect` never executes production infra changes.
+
+---
+
+## VPS & Docker Operations
+
+### Verify runtime context first
+```bash
+hostname && whoami && pwd
+docker ps --format "table {{.Names}}\t{{.Status}}" 2>/dev/null | head -5
+```
+If `docker ps` returns containers, you are already on the VPS — do not ask for SSH credentials.
+
+### Canonical container names (singular, no `arifos_` prefix)
+
+| Container | Role |
+|---|---|
+| `mcp` | arifOS kernel / MCP server (port 8080) |
+| `traefik` | Edge router / TLS |
+| `postgres` | Primary database |
+| `redis` | Cache / pub-sub |
+| `qdrant` | Vector memory |
+| `ollama` | Local LLM inference |
+| `openclaw` | Agent gateway (port 18789) |
+| `geox` | Geospatial MCP co-agent |
+| `prometheus` / `grafana` | Metrics |
+| `n8n` | Workflow automation |
+
+Always set an explicit `name:` in Docker Compose networks to prevent auto-prefixing:
+```yaml
+networks:
+  arifos_net:
+    name: arifos_net
+    external: true
+```
+
+### Multi-agent file conflict prevention
+Copilot, Gemini, Kimi, Claude, and OpenCode all operate on the same VPS files. Before editing `docker-compose.yml`, `.env`, or any config:
+```bash
+git fetch origin && git status
+```
+If `origin/main` is ahead, reconcile before editing.
+
+---
+
+## Arif's Execution Shorthand
+
+These are **unambiguous execution directives** — do not ask for clarification:
+
+| Shorthand | Meaning |
+|---|---|
+| `seal` / `forge seal` | Finalize, commit, push |
+| `forge` | Execute the plan now |
+| `phase N` | Execute phase N of the agreed plan |
+| `yes` / `start` / `Start. ✅` | Proceed with the proposed action |
+| `1 2 3 4 forge` | Execute items 1, 2, 3, 4 in order |
+| `alligned` / `align all` | Sync all agent config files (CLAUDE.md, GEMINI.md, copilot-instructions.md, AGENTS.md, KIMI.md) |

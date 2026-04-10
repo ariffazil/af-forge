@@ -24,6 +24,13 @@
 - web-architect: web/system design
 - vps-operator: infra/container ops
 
+## Shared MCP launchers
+- `.github/mcp/start-arifos-stdio.sh`
+- `.github/mcp/start-geox-stdio.sh`
+- `.github/mcp/start-playwright.sh`
+- Shared server names: `arifos-local`, `geox-local`, `playwright`
+- Keep `.mcp.json`, `.claude/mcp.json`, `.cursor/mcp.json`, `.opencode.json`, and `.gemini/settings.json` aligned
+
 ## Context Doctrine (Refined)
 1. **Context Law:** Context is a bounded workspace for active inference, not intelligence.
 2. **Optimization Law:** Maximize relevance density, not just token reduction.
