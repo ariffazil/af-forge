@@ -23,6 +23,14 @@
       ],
       "cwd": "/root",
       "type": "local"
+    },
+    "af-forge": {
+      "command": "bash",
+      "args": [
+        "/root/af-forge/.github/mcp/start-af-forge-stdio.sh"
+      ],
+      "cwd": "/root/af-forge",
+      "type": "local"
     }
   }
 }
