@@ -6,13 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Layout
 
-This workspace is a **constitutional AI governance ecosystem** with three primary subprojects:
+This workspace is a **policy-governed AI engineering workspace** with three primary subprojects:
 
 | Directory | Stack | Role |
 |-----------|-------|------|
 | `AF-FORGE/` | TypeScript / Node.js 22+ | Agent runtime (Planner/Executor/Verifier, event store, policy engine) |
-| `arifOS/` | Python 3.12+ / FastMCP | Constitutional kernel (13 Floors F1–F13, MCP server, VAULT999) |
-| `GEOX/` | Python 3.10+ + React 19 | Geospatial co-agent (seismic, well-log, governance verdicts) |
+| `arifOS/` | Python 3.12+ / FastMCP | Policy kernel (F1-F13 governance, MCP server, immutable audit path) |
+| `GEOX/` | Python 3.10+ + React 19 | Geospatial domain service (seismic, well-log, governance verdicts) |
 | `APEX/` | Docs only | Constitutional theory hub |
 | `WORKFLOWS/` | Markdown | Autonomous workflow definitions (Subuh, Morning, etc.) |
 | `VAULT999/` | Ledger | Immutable audit registry for sealed verdicts |
@@ -30,6 +30,18 @@ Use the repo-local launcher scripts in `.github/mcp/` for agent MCP wiring:
 - `start-playwright.sh`
 
 The shared server names are `arifos-local`, `geox-local`, and `playwright`. Keep `.mcp.json`, `.claude/mcp.json`, `.cursor/mcp.json`, `.opencode.json`, and `.gemini/settings.json` aligned to those names.
+
+## Scientific terminology
+
+Keep repo and tool identifiers exactly as implemented, but use operational descriptions in prose:
+
+- `sense` = evidence acquisition
+- `mind` = reasoning
+- `heart` = safety and impact review
+- `judge` = policy verdict
+- `vault` = immutable audit record
+- `forge` = controlled execution or build/test dispatch
+- `888_HOLD` = manual approval gate
 
 ---
 
@@ -163,7 +175,7 @@ Task state machine: `TASK_CREATED → PLAN_PROPOSED → APPROVAL_REQUIRED → TO
 | `write_safe` / `external_network` | ON_LOOP | branch create, package install |
 | `destructive` / `credential` / `infra_mutation` / `merge_publish` | **888_HOLD** | delete files, .env write, docker-compose, protected-branch merge |
 
-**888_HOLD blocks until human approval.** It must never be auto-approved — this maps to constitutional principle F13 Sovereign.
+**888_HOLD blocks until human approval.** Treat it as a manual approval gate and never auto-approve it.
 
 ### GEOX Architecture (Theory → Engine → Tools → Governance)
 
@@ -171,20 +183,20 @@ Every MCP tool is wrapped by `@contrast_governed_tool` which runs the full THEOR
 
 **GUI stack:** React 19, TypeScript, Vite, MapLibre GL 4, CesiumJS, Zustand, Radix UI, Tailwind CSS. Governance badges must remain visible at all times — constitutional constraint, not style.
 
-**Federated co-agent:** In production GEOX connects to the arifOS kernel at `arifosmcp.arif-fazil.com/mcp`. For local dev the MCP server runs standalone (VAULT writes gracefully skipped).
+**Federated domain service:** In production GEOX connects to the arifOS kernel at `arifosmcp.arif-fazil.com/mcp`. For local dev the MCP server runs standalone and skips immutable-record writes gracefully.
 
 ---
 
-## Constitutional Floors (F1–F13)
+## Governance Floors (F1-F13)
 
 These are non-negotiable in all subprojects. The four most load-bearing:
 
 | Floor | Rule | Implementation |
 |-------|------|----------------|
-| **F1 Amanah** | No irreversible action without VAULT999 seal | Maps to `888_HOLD` / `destructive` risk tools |
+| **F1 Irreversible-change control** | No irreversible action without an explicit audit record | Maps to `888_HOLD` / `destructive` risk tools |
 | **F2 Truth** | No ungrounded claims (τ ≥ 0.99) | Evidence links required on every conclusion |
-| **F9 Anti-Hantu** | No deception or manipulation | Enforced in agent output and LLM response redaction |
-| **F13 Sovereign** | Human (Arif) holds final authority | `888_HOLD` gates must block, not auto-approve |
+| **F9 Injection/deception prevention** | No deception or manipulation | Enforced in agent output and LLM response redaction |
+| **F13 Human approval authority** | Human (Arif) holds final authority | `888_HOLD` gates must block, not auto-approve |
 
 ---
 
@@ -212,14 +224,14 @@ import { AgentEngine } from "../engine/AgentEngine";
 
 ---
 
-## arifOS MCP Golden Path
+## arifOS MCP Standard Pipeline
 
 ```
 init → sense → mind → heart → judge → vault
 ```
 
 Public tools: `arifos.v2.init`, `arifos.v2.route`, `arifos.v2.judge`
-Internal tools: `sense`, `mind`, `heart`, `ops`, `memory`, `vault`, `forge` (forge only after SEAL)
+Internal tools: `sense`, `mind`, `heart`, `ops`, `memory`, `vault`, `forge` (use the identifiers as implemented; describe them operationally with the terminology map above)
 
 Skill registry rule: one primary skill per task, max two secondary. Run `floor-checker` first for any risky operation. `vps-operator` never designs architecture; `web-architect` never executes production infra changes.
 
@@ -266,7 +278,7 @@ If `origin/main` is ahead, reconcile before editing.
 
 ---
 
-## Arif's Execution Shorthand
+## Operator shorthand
 
 These are **unambiguous execution directives** — do not ask for clarification:
 

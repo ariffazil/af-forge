@@ -1,13 +1,12 @@
 # AF-FORGE Agent Workbench — AGENTS.md
 
-> **For AI coding agents working on this codebase.**  
-> **Motto:** *Ditempa Bukan Diberi* — Forged, Not Given [ΔΩΨ | ARIF]
+> **For AI coding agents working on this codebase.**
 
 ---
 
 ## Project Overview
 
-AF-FORGE is a **constitutional, event-sourced agent runtime** written in TypeScript. It implements a **Planner/Executor/Verifier triad** architecture with built-in policy gates, memory governance, and human sovereignty controls (888_HOLD).
+AF-FORGE is a **policy-governed, event-sourced agent runtime** written in TypeScript. It implements a **Planner/Executor/Verifier** architecture with built-in policy gates, memory governance, and human approval controls (`888_HOLD`).
 
 **Key Philosophy:**
 - State is explicit (state machine, not chat loop)
@@ -15,7 +14,7 @@ AF-FORGE is a **constitutional, event-sourced agent runtime** written in TypeScr
 - Tools are risk-scored (reversibility labels)
 - Everything is replayable (append-only event log)
 
-**arifOS 000-999 Pipeline:** INIT → SENSE → MIND → HEART → ASI → JUDGE → FORGE → VAULT
+**Stage sequence (identifiers retained for compatibility):** `INIT` (session bootstrap) → `SENSE` (evidence acquisition) → `MIND` (reasoning) → `HEART` (safety review) → `ASI` (advanced synthesis) → `JUDGE` (policy verdict) → `FORGE` (execution dispatch) → `VAULT` (immutable record)
 
 ---
 
@@ -355,9 +354,9 @@ All runtime configuration is in `src/config/RuntimeConfig.ts` via `readRuntimeCo
 
 ### 888_HOLD Gate
 
-The **888_HOLD** is a human sovereignty circuit breaker:
+The **888_HOLD** is a manual approval circuit breaker:
 - Blocks high-risk operations until human approval
-- Maps to constitutional principle **F13 Sovereign** (Arif holds final authority)
+- Maps to governance principle **F13 Human approval authority** (Arif holds final authority)
 - Required for: `destructive`, `credential`, `infra_mutation`, `merge_publish` risk tools
 
 ### External Safe Mode
@@ -407,22 +406,22 @@ When in `external_safe_mode`:
 
 ---
 
-## Constitutional Principles (arifOS F1–F13)
+## Governance Constraints (arifOS F1-F13)
 
-AF-FORGE implements constitutional constraints from arifOS:
+AF-FORGE implements governance constraints from arifOS:
 
 | Floor | Principle | Implementation |
 |-------|-----------|----------------|
-| F1 | Amanah | No irreversible action without VAULT999 seal → `888_HOLD` gate / `destructive` risk tools |
+| F1 | Irreversible-change control | No irreversible action without an immutable audit record → `888_HOLD` gate / `destructive` risk tools |
 | F2 | Truth | No ungrounded claims (τ ≥ 0.99) |
 | F3 | Input Clarity | Clear task definition required → Pre-execution SABAR check |
 | F4 | Entropy | Risk accumulation tracking across tool calls |
 | F6 | Harm/Dignity | No harm to humans/dignity → VOID check on task and tools |
 | F7 | Confidence | Humility in uncertainty → Post-execution confidence estimate |
 | F8 | Grounding | Evidence-based reasoning → Per-tool evidence counting |
-| F9 | Anti-Hantu | No deception/manipulation → Injection detection + VOID |
+| F9 | Injection/deception prevention | No deception/manipulation → Injection detection + VOID |
 | F11 | Coherence | Internal consistency → Post-tool coherence check |
-| F13 | Sovereign | Human (Arif) holds final authority → `888_HOLD` gates must block |
+| F13 | Human approval authority | Human (Arif) holds final authority → `888_HOLD` gates must block |
 
 ---
 
@@ -464,7 +463,7 @@ agent scoreboard [--period weekly] [--command explore|fix|test|coordinate] [--tr
 2. **Rebuild before testing** — no watch mode available
 3. **Respect risk levels** — dangerous tools require explicit flags
 4. **Test in isolation** — use temp directories, don't pollute working directory
-5. **Follow constitutional principles** — F1, F2, F9, F13 are non-negotiable
+5. **Follow governance constraints** — F1, F2, F9, F13 are non-negotiable
 6. **Use ScriptedProvider for deterministic tests** — see existing tests for patterns
 7. **Keep mode-aware** — `internal_mode` vs `external_safe_mode` have different capabilities
 8. **Governance is enforced** — All F3-F11 floors are active in the engine
@@ -473,29 +472,22 @@ agent scoreboard [--period weekly] [--command explore|fix|test|coordinate] [--tr
 
 ---
 
-## Unified Philosophical Calibration
+## Operational Stage Map
 
-arifOS utilizes a global corpus of human anchors to discipline reasoning across all tool stages. These anchors are ingested as constitutional nudges, ensuring every tool output is grounded in human wisdom.
+Use implemented identifiers exactly as they appear in code and configs, but describe them with operational meanings in prose:
 
-### Cross-Tool Anchors (000–FORGE)
-
-| Tool | Principle / Anchor Category | Constitutional Role |
-|------|-----------------------------|---------------------|
-| **arifos.init** | `origin_intent`, `foundation` | Purpose before motion (Montaigne) |
-| **arifos.sense** | `evidence`, `perception` | Evidence threshold guard (Clifford) |
-| **arifos.mind** | `logic`, `uncertainty` | Anti-self-deception (Feynman) |
-| **arifos.route** | `discernment`, `fit` | Anti-tool monoculture (Maslow) |
-| **arifos.memory** | `continuity`, `identity` | History as prevention (Santayana) |
-| **arifos.heart** | `dignity`, `non-harm` | Harm floor (Hippocrates) |
-| **arifos.ops** | `practice`, `resilience` | Execution over theater (Franklin) |
-| **arifos.judge** | `justice`, `fairness` | Power humility (Acton) |
-| **arifos.vault** | `integrity`, `finality` | Record preservation (Cicero) |
-| **arifos.forge** | `craftsmanship`, `form` | Minimal strong form (Saint-Exupéry) |
-
-### Trigger-Based Digestion
-The `OutputEnvelope` for every tool includes a `philosophical_anchor`. The runtime selects anchors based on:
-1.  **Tool Context:** Specific to the stage (e.g., `VAULT_Q` for 999_VAULT).
-2.  **Cognitive State:** Triggers like `low_grounding` or `overconfidence` pull specific category anchors (e.g., `uncertainty_humility` for high unknowns).
+| Tool or stage | Operational meaning |
+|------|-----------------------------|
+| `arifos.init` | Session bootstrap and identity binding |
+| `arifos.sense` | Evidence acquisition and grounding |
+| `arifos.mind` | Reasoning and synthesis |
+| `arifos.route` | Task routing |
+| `arifos.memory` | Memory retrieval and continuity |
+| `arifos.heart` | Safety and impact review |
+| `arifos.ops` | Operational metrics and cost estimation |
+| `arifos.judge` | Policy verdict |
+| `arifos.vault` | Immutable audit record |
+| `arifos.forge` | Controlled execution, build, or test dispatch |
 
 ---
 
