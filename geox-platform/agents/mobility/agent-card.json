@@ -2,7 +2,7 @@
   "$schema": "https://geox.arif-fazil.com/schemas/a2a-agent-card.schema.json",
   "name": "geox-mobility",
   "description": "Mobility and routing specialist. Optimizes routes, analyzes traffic patterns, and enables terrain navigation for ground operations.",
-  "url": "https://a2a.geox.arif-fazil.com/agents/mobility",
+  "url": "https://geox.arif-fazil.com/a2a/agents/mobility",
   "version": "2026.04.11",
   "capabilities": {
     "streaming": true,
@@ -37,7 +37,7 @@
   ],
   "authentication": {
     "schemes": ["mtls"],
-    "credentials": "https://a2a.geox.arif-fazil.com/.well-known/mobility-certs.pem"
+    "credentials": "https://geox.arif-fazil.com/a2a/.well-known/mobility-certs.pem"
   },
   "_geox": {
     "domain": "mobility",
