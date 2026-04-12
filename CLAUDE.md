@@ -130,7 +130,10 @@ ruff check arifos/geox/
 ruff format arifos/geox/
 mypy arifos/geox/
 
-# MCP server (stdio — for Claude Desktop / Smithery)
+# Canonical dimension-native server
+python geox_unified.py --mode bridge
+
+# Compatibility wrapper for stdio-oriented integrations
 python geox_mcp_server.py
 
 # GUI (React 19)
@@ -140,6 +143,10 @@ npm run typecheck
 npm run lint
 npm run build
 ```
+
+`geox_unified.py` is the canonical GEOX server. `geox_mcp_server.py` is retained as a compatibility wrapper for older integrations.
+
+Public deployment truth must stay explicit: only the dashboard (`/`), health endpoint (`/health`), and MCP endpoint (`/mcp/`) are live right now; WebMCP discovery and A2A publication are still partial/internal until their public route and contract are verified.
 
 ---
 

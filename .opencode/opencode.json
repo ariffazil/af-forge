@@ -10,7 +10,7 @@
   },
   "tools": {
     "mcp_*": false,
-    "skill": "allow"
+    "skill": true
   },
   "agent": {
     "build": {
@@ -20,7 +20,7 @@
         "bash": "ask",
         "edit": "ask"
       },
-      "prompt": "{file:.opencode/prompts/build.txt}"
+      "prompt": "You are the AF-FORGE build agent. Follow all constitutional constraints and safety protocols. Use tools responsibly and request approval for destructive operations."
     },
     "plan": {
       "description": "Read-only planning agent for analysis without changes",
@@ -85,13 +85,5 @@
         "AF_FORGE_PORT": "7071"
       }
     }
-  },
-  "rules": [
-    "When using bash commands that modify files, always request approval first.",
-    "For destructive operations (delete, force push, etc.), always use question tool to request 888_HOLD approval.",
-    "Use @forge-explore for repository analysis tasks.",
-    "Use @forge-coordinator for multi-step tasks requiring parallel execution.",
-    "Use @forge-worker for focused subtasks with limited scope.",
-    "Follow arifOS constitutional principles: F1 Amanah, F2 Truth, F9 Anti-Hantu, F13 Sovereign."
-  ]
+  }
 }

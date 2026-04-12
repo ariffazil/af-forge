@@ -51,6 +51,7 @@ pytest tests --cov=arifos.geox
 ruff check arifos/geox/
 ruff format arifos/geox/
 mypy arifos/geox/
+python geox_unified.py --mode bridge
 python geox_mcp_server.py
 
 cd geox-gui
@@ -66,7 +67,7 @@ GEOX coverage is enforced at `fail_under = 65`.
 
 - **AF-FORGE is the TypeScript execution runtime.** `AF-FORGE/src/cli.ts` builds an `AgentEngine` from `ToolRegistry`, the LLM provider factory, `LongTermMemory`, and `RunReporter`. `AgentEngine` handles governance checks, mode-based tool permissions, memory injection, tool execution, and telemetry before persisting a run summary.
 - **arifOS is the canonical policy kernel.** Root `arifOS/server.py` is the supported public entrypoint and decides between the lightweight Horizon gateway and the full runtime based on environment. The standard tool flow is `init -> sense -> mind -> heart -> judge -> vault`.
-- **GEOX is a federated domain service.** Root `GEOX/geox_mcp_server.py` adapts to FastMCP 2.x/3.x, exposes MCP tools plus health routes, and degrades gracefully when optional memory, prefab UI, or seismic components are missing. The package itself is layered `THEORY -> ENGINE -> TOOLS -> GOVERNANCE`, with `geox-gui/` as a separate React/Vite cockpit.
+- **GEOX is a federated domain service.** `GEOX/geox_unified.py` is the canonical dimension-native server; `GEOX/geox_mcp_server.py` is a compatibility wrapper for older integrations. Public state must stay truthful: only the dashboard (`/`), health endpoint (`/health`), and MCP surface (`/mcp/`) are live; WebMCP discovery and A2A routing remain partial/internal until the public route and contract are verified. The package itself is layered `THEORY -> ENGINE -> TOOLS -> GOVERNANCE`, with `geox-gui/` as a separate React/Vite cockpit.
 - **The projects are meant to work together.** AF-FORGE is the execution runtime, arifOS is the policy authority, and GEOX is a domain-specific geospatial service that plugs back into arifOS in production.
 
 ## Key conventions
