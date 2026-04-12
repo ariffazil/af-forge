@@ -51,6 +51,7 @@ pytest tests --cov=arifos.geox
 ruff check arifos/geox/
 ruff format arifos/geox/
 mypy arifos/geox/
+python geox_unified.py --mode bridge
 python geox_mcp_server.py
 
 cd geox-gui
@@ -65,9 +66,9 @@ GEOX coverage is enforced at `fail_under = 65`.
 ## High-level architecture
 
 - **AF-FORGE is the TypeScript execution runtime.** `AF-FORGE/src/cli.ts` builds an `AgentEngine` from `ToolRegistry`, the LLM provider factory, `LongTermMemory`, and `RunReporter`. `AgentEngine` handles governance checks, mode-based tool permissions, memory injection, tool execution, and telemetry before persisting a run summary.
-- **arifOS is the canonical kernel.** Root `arifOS/server.py` is the supported public entrypoint and decides between the lightweight Horizon gateway and the full sovereign runtime based on environment. The canonical tool flow is `init -> sense -> mind -> heart -> judge -> vault`.
-- **GEOX is a federated co-agent.** Root `GEOX/geox_mcp_server.py` adapts to FastMCP 2.x/3.x, exposes MCP tools plus health routes, and degrades gracefully when optional memory, prefab UI, or seismic components are missing. The package itself is layered `THEORY -> ENGINE -> TOOLS -> GOVERNANCE`, with `geox-gui/` as a separate React/Vite cockpit.
-- **The projects are meant to work together.** AF-FORGE is the execution shell, arifOS is the constitutional authority, and GEOX is a domain-specific witness that plugs back into arifOS in production.
+- **arifOS is the canonical policy kernel.** Root `arifOS/server.py` is the supported public entrypoint and decides between the lightweight Horizon gateway and the full runtime based on environment. The standard tool flow is `init -> sense -> mind -> heart -> judge -> vault`.
+- **GEOX is a federated domain service.** `GEOX/geox_unified.py` is the canonical dimension-native server; `GEOX/geox_mcp_server.py` is a compatibility wrapper for older integrations. Public state must stay truthful: only the dashboard (`/`), health endpoint (`/health`), and MCP surface (`/mcp/`) are live; WebMCP discovery and A2A routing remain partial/internal until the public route and contract are verified. The package itself is layered `THEORY -> ENGINE -> TOOLS -> GOVERNANCE`, with `geox-gui/` as a separate React/Vite cockpit.
+- **The projects are meant to work together.** AF-FORGE is the execution runtime, arifOS is the policy authority, and GEOX is a domain-specific geospatial service that plugs back into arifOS in production.
 
 ## Key conventions
 
@@ -76,9 +77,14 @@ GEOX coverage is enforced at `fail_under = 65`.
 - **AF-FORGE profiles are plain objects.** `src/agents/profiles.ts` exports builder functions returning `AgentProfile` objects; they are not classes.
 - **AF-FORGE tests use `node:test` and compiled output.** Multi-turn tests follow the local `ScriptedProvider` pattern in `test/AgentEngine.test.ts`, and tests isolate state with per-test temp directories.
 - **arifOS runtime truth lives in code, not stale docs.** `server.py` is the canonical public entrypoint, and the stdio entrypoint is `ops/runtime/stdio_server.py` rather than a root-level script.
+- **Use scientific terminology in prose while preserving code identifiers.** Explain stage names operationally: `sense` = evidence acquisition, `mind` = reasoning, `heart` = safety review, `judge` = policy verdict, `vault` = immutable record, `forge` = controlled execution, and `888_HOLD` = manual approval gate.
+- **Pasted agent output is not runtime truth.** When the user provides external agent analysis, doctrine, or audit text, treat it as source material to ingest or contrast; verify claims against current files and symbols before updating wiki pages, deployment guidance, or architectural summaries.
+- **arifOS wiki edits are bundle changes.** When adding or revising content under `arifOS/wiki/`, update the related raw ingest/page plus `wiki/index.md`, `wiki/log.md`, and `wiki/PAGE_REGISTRY.md` when the new material should be discoverable in the canonical wiki surface.
+- **Regenerate arifOS wiki views after wiki edits.** Run `python wiki/scripts/generate_views.py` after changing `arifOS/wiki/` pages, registry metadata, or raw ingests so `wiki/view/` stays aligned with the source wiki.
 - **arifOS and GEOX pytest are configured with `asyncio_mode = "auto"`.** Do not add `@pytest.mark.asyncio` unless a test truly needs custom asyncio behavior.
 - **GEOX tools are governance-wrapped.** `@contrast_governed_tool` is part of the contract, and verdicts follow the fixed ladder exported from `arifos/geox/__init__.py`: `SEAL`, `PARTIAL`, `SABAR`, `VOID`.
 - **GEOX governance visibility is a product constraint.** In `geox-gui`, governance badges must remain visible; do not treat them as optional decoration.
 - **Shared MCP launcher scripts live under `.github/mcp/`.** `arifos-local`, `geox-local`, and `playwright` should be kept aligned across `.mcp.json`, `.claude/mcp.json`, `.cursor/mcp.json`, `.opencode.json`, and `.gemini/settings.json`.
+- **Project MCP config uses `mcpServers`.** When configuring MCP for Copilot in this workspace, inspect `/root/.mcp.json` first, keep the repo-local launcher scripts wired there, and use the `mcpServers` top-level key rather than `servers`.
 - **Shared infra files may be edited by multiple agents.** Before changing `docker-compose*.yml`, `.env*`, or other deployment config, run `git fetch origin && git status` and reconcile if the branch has moved.
-- **High-risk work maps to `888_HOLD`.** Destructive actions, credential handling, and production infra mutations require explicit human approval and should never be auto-approved.
+- **High-risk work maps to `888_HOLD`.** Treat it as a manual approval gate: destructive actions, credential handling, and production infra mutations require explicit human approval and should never be auto-approved.
