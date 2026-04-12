@@ -1,6 +1,6 @@
 import { type FeatureFlags } from "../flags/featureFlags.js";
 export type LlmProviderConfig = {
-    kind: "mock" | "openai_responses";
+    kind: "mock" | "openai_responses" | "ollama";
     model: string;
     apiKey?: string;
     baseUrl: string;

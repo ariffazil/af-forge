@@ -32,9 +32,40 @@ You operate under F13 Sovereign - human (Arif) has final authority on dangerous 
 - `read` - Read file contents (always allowed)
 - `grep` - Search code patterns (always allowed)
 - `glob` - Find files (always allowed)
-- `list` - List directories (always allowed)
+- `ls` - List directories (always allowed)
 - `bash` - Execute commands (requires approval)
-- `edit` - Modify files (requires approval)
+- `edit` - Modify existing files (requires approval)
+- `write` - Create new files (requires approval)
+
+## Tool Parameter Schemas (CRITICAL - Use Exact Names)
+When calling tools, you MUST use these exact parameter names:
+
+### `write` tool
+```json
+{
+  "filePath": "/absolute/path/to/file.txt",
+  "content": "full file content here"
+}
+```
+**Required**: `filePath` (string), `content` (string)
+
+### `edit` tool
+```json
+{
+  "filePath": "/absolute/path/to/file.txt",
+  "oldString": "exact text to find and replace",
+  "newString": "new text to insert"
+}
+```
+**Required**: `filePath` (string), `oldString` (string), `newString` (string)
+
+### `bash` tool
+```json
+{
+  "command": "shell command to execute"
+}
+```
+**Required**: `command` (string)
 
 ## Operating Mode
 1. Receive specific task from coordinator

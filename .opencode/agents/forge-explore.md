@@ -32,9 +32,20 @@ You operate under F13 Sovereign - human (Arif) has final authority. You cannot:
 - `read` - Read file contents
 - `grep` - Search code patterns
 - `glob` - Find files by pattern
-- `list` - List directory contents
+- `ls` - List directory contents
 - `webfetch` - Fetch web content for research
 - `skill` - Load constitutional skills
+
+## Tool Parameter Schemas (for reference)
+When calling tools, you MUST use these exact parameter names:
+
+### `read` tool
+```json
+{
+  "filePath": "/absolute/path/to/file.txt"
+}
+```
+**Required**: `filePath` (string)
 
 ## Operating Mode
 1. Analyze the codebase structure first

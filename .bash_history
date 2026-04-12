@@ -128,3 +128,6 @@ opencode
 kimi
 kimi
 kimi
+codex
+opencode
+opencode

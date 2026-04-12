@@ -1,5 +1,6 @@
 import { MockLlmProvider } from "./MockLlmProvider.js";
 import { OpenAIResponsesProvider } from "./OpenAIResponsesProvider.js";
+import { OllamaProvider } from "./OllamaProvider.js";
 export function createLlmProvider(config) {
     if (config.provider.kind === "openai_responses") {
         if (!config.provider.apiKey) {
@@ -7,6 +8,13 @@ export function createLlmProvider(config) {
         }
         return new OpenAIResponsesProvider({
             apiKey: config.provider.apiKey,
+            model: config.provider.model,
+            baseUrl: config.provider.baseUrl,
+            timeoutMs: config.provider.timeoutMs,
+        });
+    }
+    if (config.provider.kind === "ollama") {
+        return new OllamaProvider({
             model: config.provider.model,
             baseUrl: config.provider.baseUrl,
             timeoutMs: config.provider.timeoutMs,
