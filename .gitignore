@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 node_modules/
 dist/
 build/
@@ -37,3 +38,36 @@ arif-sites/temp/
 .local/
 arifOS/
 node_modules/
+=======
+# Python
+__pycache__/
+*.py[cod]
+*.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Node / JS
+node_modules/
+geox-gui/node_modules/
+.npm
+dist/
+geox-gui/dist/
+.env
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.bak
+
+# GEOX specific legacy backups
+server_legacy_v042.py.bak
+stashed_*.txt
+>>>>>>> upstream/main
