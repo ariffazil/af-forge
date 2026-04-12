@@ -27,12 +27,20 @@ except ImportError:
     CurrentContext = None
     ToolResult = None
 
-# Import critical fixes
-from .identity import IdentityAuthority, get_identity, set_identity, propagate_identity
-from .contract import ExecutionGovernanceContract, ExecutionStatus, GovernanceVerdict, ArtifactState
-from .kernel import KernelState, Stage, KernelResult, kernel_route
-from .vault import VaultOutcome, VaultResult, vault_seal
-from .mind import MindResult, mind_reason
+try:
+    # Import critical fixes
+    from .identity import IdentityAuthority, get_identity, set_identity, propagate_identity
+    from .contract import ExecutionGovernanceContract, ExecutionStatus, GovernanceVerdict, ArtifactState
+    from .kernel import KernelState, Stage, KernelResult, kernel_route
+    from .vault import VaultOutcome, VaultResult, vault_seal
+    from .mind import MindResult, mind_reason
+except ImportError:
+    # Direct execution
+    from identity import IdentityAuthority, get_identity, set_identity, propagate_identity
+    from contract import ExecutionGovernanceContract, ExecutionStatus, GovernanceVerdict, ArtifactState
+    from kernel import KernelState, Stage, KernelResult, kernel_route
+    from vault import VaultOutcome, VaultResult, vault_seal
+    from mind import MindResult, mind_reason
 
 
 # Create MCP server
