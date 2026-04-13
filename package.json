@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "start": "node dist/src/server.js",
     "test": "node dist/test/AgentEngine.test.js",
     "example:explore": "node dist/examples/runExploreExample.js"
   },

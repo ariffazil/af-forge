@@ -1,0 +1,20 @@
+# AF FORGE — Caddy Reverse Proxy
+# Public entrypoint for bridge server and operator endpoints
+
+:80 {
+	bind 0.0.0.0
+
+	# Health check
+	health /healthz
+
+	# Reverse proxy to AF FORGE bridge server
+	reverse_proxy /operator/* af-forge-bridge:7071
+	reverse_proxy /metrics af-forge-bridge:7071
+	reverse_proxy /sense af-forge-bridge:7071
+	reverse_proxy /human-expert/* af-forge-bridge:7071
+	reverse_proxy /health af-forge-bridge:7071
+	reverse_proxy /ready af-forge-bridge:7071
+
+	# Default respond
+	respond "AF FORGE Gateway" 200
+}

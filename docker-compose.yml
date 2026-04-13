@@ -1,0 +1,116 @@
+version: "3.8"
+
+services:
+  af-forge-bridge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: af-forge-bridge
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:7071:7071"
+    environment:
+      - NODE_ENV=production
+      - AF_FORGE_PORT=7071
+      - AGENT_WORKBENCH_PROVIDER=${AGENT_WORKBENCH_PROVIDER:-mock}
+      - AGENT_WORKBENCH_MODEL=${AGENT_WORKBENCH_MODEL:-gpt-5}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+      - HUMAN_ESCALATION_WEBHOOK_URL=${HUMAN_ESCALATION_WEBHOOK_URL:-}
+      - AGENT_WORKBENCH_TRUST_LOCAL_VPS=${AGENT_WORKBENCH_TRUST_LOCAL_VPS:-0}
+      - ENABLE_DANGEROUS_TOOLS=${ENABLE_DANGEROUS_TOOLS:-false}
+      - ENABLE_BACKGROUND_JOBS=${ENABLE_BACKGROUND_JOBS:-false}
+      - ENABLE_EXPERIMENTAL_TOOLS=${ENABLE_EXPERIMENTAL_TOOLS:-false}
+      - AGENT_WORKBENCH_MEMORY_PATH=/data/memory.json
+      - AGENT_WORKBENCH_SCOREBOARD_PATH=/data/scoreboard.json
+      - AGENT_WORKBENCH_RUN_METRICS_DIR=/data/metrics
+      - AGENT_WORKBENCH_DEFAULT_MODE=${AGENT_WORKBENCH_DEFAULT_MODE:-external}
+    volumes:
+      - af-forge-data:/data
+    networks:
+      - af-forge-internal
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:7071/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: af-forge-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-af_forge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-af_forge_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-af_forge}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - af-forge-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-af_forge} -d ${POSTGRES_DB:-af_forge}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: af-forge-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - af-forge-internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: af-forge-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - af-forge-internal
+    depends_on:
+      - af-forge-bridge
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: af-forge-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - af-forge-internal
+    ports:
+      - "127.0.0.1:9090:9090"
+
+volumes:
+  af-forge-data:
+  postgres-data:
+  redis-data:
+  caddy-data:
+  caddy-config:
+  prometheus-data:
+
+networks:
+  af-forge-internal:
+    driver: bridge
