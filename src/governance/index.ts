@@ -32,6 +32,16 @@ export { checkInjection, redactSecrets, type InjectionResult, type InjectionVerd
 // F11: Coherence (NEW)
 export { checkCoherence, checkResponseCoherence, type CoherenceResult, type CoherenceVerdict } from "./f11Coherence.js";
 
+// Governance Client abstraction
+export {
+  LocalGovernanceClient,
+  HttpGovernanceClient,
+  type GovernanceClient,
+  type GovernanceRequest,
+  type GovernanceResponse,
+  type GovernanceVerdict,
+} from "./GovernanceClient.js";
+
 /**
  * Unified governance check — runs all applicable floors.
  * Returns first non-PASS verdict or PASS if all clear.

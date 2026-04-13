@@ -29,6 +29,8 @@ import {
   checkToolHarm,
   countEvidence,
   type GovernanceCheck,
+  LocalGovernanceClient,
+  type GovernanceClient,
 } from "../governance/index.js";
 import { getAdaptiveThresholds } from "../governance/thresholds.js";
 import type { VaultClient, VaultSealRecord, VaultTelemetrySnapshot } from "../vault/index.js";
@@ -48,6 +50,7 @@ export type AgentEngineDependencies = {
   vaultClient?: VaultClient;
   escalationClient?: HumanEscalationClient;
   ticketStore?: TicketStore;
+  governanceClient?: GovernanceClient;
   apiPricing?: {
     inputCostPerMillionTokens: number;
     outputCostPerMillionTokens: number;
@@ -105,64 +108,26 @@ export class AgentEngine {
 
     const floorsTriggered: string[] = [];
 
-    // === F3: Input Clarity Check ===
-    const clarityCheck = validateInputClarity(options.task, adaptiveThresholds.f3);
-    if (clarityCheck.verdict === "SABAR") {
-      floorsTriggered.push("F3");
-      const { finalText: sealedText, sealError } = await this.sealTerminal(
-        options,
-        sessionId,
-        `SABAR: ${clarityCheck.message}`,
-        0,
-        this.profile.name,
-        floorsTriggered,
-        permissionContext,
-        1,
-        startedAt,
-      );
-      return {
-        sessionId,
-        finalText: sealedText,
-        turnCount: 0,
-        totalEstimatedTokens: 0,
-        transcript: [],
-        metrics: this.buildEmptyMetrics(options, startedAt, "F3", clarityCheck.reason, sealError),
-      };
-    }
+    // === Pre-execution Governance Check (F3/F6/F9) ===
+    // Ask the Governance plane for permission before executing.
+    // If no external governance client is wired, fall back to local floors.
+    const governanceClient =
+      this.dependencies.governanceClient ??
+      new LocalGovernanceClient({ f3: adaptiveThresholds.f3 });
 
-    // === F6: Harm/Dignity Check ===
-    const harmCheck = checkHarmDignity(options.task);
-    if (harmCheck.verdict === "VOID") {
-      floorsTriggered.push("F6");
-      const { finalText: sealedText, sealError } = await this.sealTerminal(
-        options,
-        sessionId,
-        `VOID: ${harmCheck.message}`,
-        0,
-        this.profile.name,
-        floorsTriggered,
-        permissionContext,
-        1,
-        startedAt,
-      );
-      return {
-        sessionId,
-        finalText: sealedText,
-        turnCount: 0,
-        totalEstimatedTokens: 0,
-        transcript: [],
-        metrics: this.buildEmptyMetrics(options, startedAt, "F6", harmCheck.reason, sealError),
-      };
-    }
+    const governanceResult = await governanceClient.evaluate({
+      task: options.task,
+      sessionId,
+      intentModel,
+      riskLevel,
+    });
 
-    // === F9: Injection Check ===
-    const injectionCheck = checkInjection(options.task);
-    if (injectionCheck.verdict === "VOID") {
-      floorsTriggered.push("F9");
+    if (governanceResult.verdict !== "SEAL") {
+      floorsTriggered.push(...governanceResult.floorsTriggered);
       const { finalText: sealedText, sealError } = await this.sealTerminal(
         options,
         sessionId,
-        `VOID: ${injectionCheck.message}`,
+        `${governanceResult.verdict}: ${governanceResult.message ?? "Governance check blocked execution"}`,
         0,
         this.profile.name,
         floorsTriggered,
@@ -176,7 +141,13 @@ export class AgentEngine {
         turnCount: 0,
         totalEstimatedTokens: 0,
         transcript: [],
-        metrics: this.buildEmptyMetrics(options, startedAt, "F9", injectionCheck.reason, sealError),
+        metrics: this.buildEmptyMetrics(
+          options,
+          startedAt,
+          governanceResult.floorsTriggered[0] ?? "F1",
+          governanceResult.message ?? "Blocked by governance",
+          sealError,
+        ),
       };
     }
 

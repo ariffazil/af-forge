@@ -23,6 +23,8 @@ import { runStage, recordHumanDecision, recordEscalationLatency, setOpenHolds } 
 import type { MetabolicStage } from "./types/aki.js";
 import { getTicketStore } from "./approval/index.js";
 import { FileVaultClient } from "./vault/index.js";
+import { LocalGovernanceClient } from "./governance/index.js";
+import { getAdaptiveThresholds } from "./governance/thresholds.js";
 
 const app = express();
 app.use(express.json());
@@ -131,6 +133,44 @@ app.post("/sense", async (req: Request, res: Response) => {
       ok: false,
       error: {
         type: "upstream_error",
+        message: error instanceof Error ? error.message : String(error),
+      },
+    });
+  }
+});
+
+/**
+ * POST /governance/evaluate
+ * Constitutional evaluation endpoint — can be called by AgentEngine
+ * or by external clients to get a SEAL/HOLD/SABAR/VOID verdict.
+ */
+app.post("/governance/evaluate", async (req: Request, res: Response) => {
+  try {
+    const { task, sessionId, intentModel, riskLevel } = req.body;
+    if (!task || typeof task !== "string") {
+      res.status(400).json({
+        ok: false,
+        error: { type: "invalid_request", message: "task is required and must be a string" },
+      });
+      return;
+    }
+
+    const adaptive = getAdaptiveThresholds(intentModel ?? "advisory", riskLevel ?? "medium");
+    const client = new LocalGovernanceClient({ f3: adaptive.f3 });
+    const result = await client.evaluate({
+      task,
+      sessionId: sessionId ?? "anon",
+      intentModel,
+      riskLevel,
+    });
+
+    res.json({ ok: true, ...result });
+  } catch (error) {
+    console.error("[AF-FORGE] /governance/evaluate error:", error);
+    res.status(500).json({
+      ok: false,
+      error: {
+        type: "internal_error",
         message: error instanceof Error ? error.message : String(error),
       },
     });

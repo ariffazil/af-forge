@@ -33,6 +33,7 @@ export type RuntimeConfig = {
   humanEscalationWebhookUrl?: string;
   postgresUrl?: string;
   redisUrl?: string;
+  arifosGovernanceUrl?: string;
 };
 
 function parseCsvEnv(name: string, fallback: string[]): string[] {
@@ -137,5 +138,6 @@ export function readRuntimeConfig(): RuntimeConfig {
     humanEscalationWebhookUrl: process.env.HUMAN_ESCALATION_WEBHOOK_URL,
     postgresUrl: process.env.POSTGRES_URL || process.env.DATABASE_URL,
     redisUrl: process.env.REDIS_URL,
+    arifosGovernanceUrl: process.env.ARIFOS_GOVERNANCE_URL,
   };
 }

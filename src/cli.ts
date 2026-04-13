@@ -16,6 +16,7 @@ import { RunReporter } from "./engine/RunReporter.js";
 import { FileVaultClient, PostgresVaultClient } from "./vault/index.js";
 import { WebhookHumanEscalationClient, NoOpHumanEscalationClient } from "./escalation/index.js";
 import { FileTicketStore, PostgresTicketStore } from "./approval/index.js";
+import { LocalGovernanceClient, HttpGovernanceClient } from "./governance/index.js";
 
 function buildToolRegistry(): ToolRegistry {
   const registry = new ToolRegistry();
@@ -26,6 +27,14 @@ function buildToolRegistry(): ToolRegistry {
   registry.register(new RunTestsTool());
   registry.register(new RunCommandTool());
   return registry;
+}
+
+function createGovernanceClient(runtimeConfig: RuntimeConfig) {
+  const url = process.env.ARIFOS_GOVERNANCE_URL || runtimeConfig.arifosGovernanceUrl;
+  if (url) {
+    return new HttpGovernanceClient(url);
+  }
+  return new LocalGovernanceClient();
 }
 
 function createVaultClient(runtimeConfig: RuntimeConfig) {
@@ -68,6 +77,7 @@ function createEngine(profile: AgentProfile): AgentEngine {
     ),
     vaultClient: createVaultClient(runtimeConfig),
     ticketStore: createTicketStore(runtimeConfig),
+    governanceClient: createGovernanceClient(runtimeConfig),
     escalationClient,
     featureFlags: runtimeConfig.featureFlags,
     toolPolicy: runtimeConfig.toolPolicy,

@@ -1,0 +1,109 @@
+/**
+ * Governance Client
+ *
+ * Abstracts constitutional evaluation so the Agent plane can ask
+ * the Governance plane for permission before executing.
+ *
+ * Design:
+ * - LocalGovernanceClient runs floors in-process (default/fallback)
+ * - HttpGovernanceClient delegates to an external arifOS governance service
+ */
+
+import {
+  validateInputClarity,
+  checkHarmDignity,
+  checkInjection,
+  type ClarityThresholds,
+} from "./index.js";
+
+export type GovernanceVerdict = "SEAL" | "HOLD" | "SABAR" | "VOID";
+
+export type GovernanceRequest = {
+  task: string;
+  sessionId: string;
+  intentModel?: string;
+  riskLevel?: string;
+  context?: Record<string, unknown>;
+};
+
+export type GovernanceResponse = {
+  verdict: GovernanceVerdict;
+  floorsTriggered: string[];
+  message?: string;
+};
+
+export interface GovernanceClient {
+  evaluate(request: GovernanceRequest): Promise<GovernanceResponse>;
+}
+
+export class LocalGovernanceClient implements GovernanceClient {
+  constructor(private readonly thresholds?: { f3?: ClarityThresholds }) {}
+
+  async evaluate(request: GovernanceRequest): Promise<GovernanceResponse> {
+    const floorsTriggered: string[] = [];
+
+    // F3: Input Clarity
+    const clarity = validateInputClarity(request.task, this.thresholds?.f3);
+    if (clarity.verdict === "SABAR") {
+      floorsTriggered.push("F3");
+      return { verdict: "SABAR", floorsTriggered, message: clarity.message };
+    }
+
+    // F6: Harm/Dignity
+    const harm = checkHarmDignity(request.task);
+    if (harm.verdict === "VOID") {
+      floorsTriggered.push("F6");
+      return { verdict: "VOID", floorsTriggered, message: harm.message };
+    }
+
+    // F9: Injection
+    const injection = checkInjection(request.task);
+    if (injection.verdict === "VOID") {
+      floorsTriggered.push("F9");
+      return { verdict: "VOID", floorsTriggered, message: injection.message };
+    }
+
+    return { verdict: "SEAL", floorsTriggered };
+  }
+}
+
+export class HttpGovernanceClient implements GovernanceClient {
+  constructor(private readonly baseUrl: string, private readonly timeoutMs = 5000) {}
+
+  async evaluate(request: GovernanceRequest): Promise<GovernanceResponse> {
+    const url = `${this.baseUrl.replace(/\/$/, "")}/governance/evaluate`;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(request),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timer);
+
+      if (!response.ok) {
+        throw new Error(`Governance service returned ${response.status}`);
+      }
+
+      const body = (await response.json()) as GovernanceResponse;
+      return {
+        verdict: body.verdict ?? "HOLD",
+        floorsTriggered: body.floorsTriggered ?? [],
+        message: body.message,
+      };
+    } catch (error) {
+      clearTimeout(timer);
+      const message = error instanceof Error ? error.message : String(error);
+      process.stderr.write(`[WARN] Governance service unreachable (${message}); failing closed to HOLD\n`);
+      return {
+        verdict: "HOLD",
+        floorsTriggered: ["F1"],
+        message: `Governance service unreachable: ${message}`,
+      };
+    }
+  }
+}
