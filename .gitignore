@@ -25,6 +25,8 @@ dist/
 .arifos/
 *.jsonl
 metrics/
+!src/metrics/
+!src/metrics/*.ts
 scoreboard.json
 memory.json
 
