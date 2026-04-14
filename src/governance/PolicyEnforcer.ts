@@ -9,12 +9,14 @@
  * All clear → AUTO_APPROVED
  */
 
+import type { PlannerOutput, ChangeOperation } from "../types/planner.js";
 import type {
-  PlannerOutput,
   PolicyConfig,
   EnforcementVerdict,
   RequireHumanIf,
 } from "../types/policy.js";
+
+export type { EnforcementVerdict } from "../types/policy.js";
 
 export function enforcePolicy(
   plannerOutput: PlannerOutput,

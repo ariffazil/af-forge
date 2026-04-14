@@ -97,6 +97,10 @@ export type { TaskMemoryRecord } from "./types/memory.js";
 export type { ForgeTaskType, ForgeWeeklySummary } from "./types/scoreboard.js";
 export type { BackgroundJobDefinition, BackgroundJobRegistrationResult } from "./types/jobs.js";
 
+// Approval Boundary + Router
+export { routeApproval } from "./approval/ApprovalRouter.js";
+export type { RouteApprovalOptions } from "./approval/ApprovalRouter.js";
+
 // Config
 export { readRuntimeConfig } from "./config/RuntimeConfig.js";
 

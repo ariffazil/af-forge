@@ -35,7 +35,7 @@ import { checkHarmDignity } from "../governance/f6HarmDignity.js";
 import { checkInjection } from "../governance/f9Injection.js";
 import { readRuntimeConfig } from "../config/RuntimeConfig.js";
 import { createLlmProvider } from "../llm/providerFactory.js";
-import { getApprovalBoundary } from "../approval/index.js";
+import { getApprovalBoundary, routeApproval } from "../approval/index.js";
 import { getMemoryContract } from "../memory-contract/index.js";
 import { telemetry } from "./telemetry.js";
 import { runStage, recordFloorViolation } from "../metrics/prometheus.js";
@@ -440,6 +440,125 @@ server.tool(
       return result;
     } catch (err) {
       await telemetryFailure("forge_approve", startedAt, err);
+      throw err;
+    }
+    });
+  }
+);
+
+/**
+ * forge_route_approval
+ * Run a PlannerOutput through PolicyEnforcer + ApprovalRouter.
+ *
+ * Takes a PlannerOutput JSON (from arifOS PlannerAgent), validates it against
+ * PolicyConfig, then stages it in ApprovalBoundary if HUMAN_APPROVAL_REQUIRED.
+ *
+ * Returns:
+ *   AUTO_APPLIED      — patches applied immediately
+ *   WAITING_FOR_HUMAN — staged in hold queue; poll / approve via forge_approve
+ *   REJECTED          — hard policy violation; no changes made
+ *
+ * This is the main entry point for the arifOS → AF-FORGE governed edit flow.
+ */
+server.tool(
+  "forge_route_approval",
+  "Run a PlannerOutput through PolicyEnforcer + ApprovalRouter. Validates proposed changes against policy, stages high-risk edits for 888_HOLD, auto-applies low-risk diffs. Returns holdId for human approval if WAITING_FOR_HUMAN.",
+  {
+    planner_output: z.record(z.string(), z.unknown()).describe("PlannerOutput JSON — intent, proposed_changes[], confidence, risk_score"),
+    policy_override: z.record(z.string(), z.unknown()).optional().describe("Optional PolicyConfig to override defaults"),
+    force_apply: z.boolean().optional().default(false).describe("Skip human-gate and apply directly (for replay after approval)"),
+  },
+  async ({ planner_output, policy_override, force_apply }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("forge_route_approval");
+    return runStage("888_JUDGE" as MetabolicStage, async () => {
+    try {
+      const { defaultPolicyConfig } = await import("../types/policy.js");
+      const { routeApproval } = await import("../approval/ApprovalRouter.js");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const plannerOutput = planner_output as any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const policy = (policy_override ?? defaultPolicyConfig) as any;
+
+      const outcome = await routeApproval(plannerOutput, policy, { forceApply: force_apply });
+
+      const auditAction = outcome.type === "AUTO_APPLIED"
+        ? "route_approved"
+        : outcome.type === "WAITING_FOR_HUMAN"
+          ? "route_waiting"
+          : "route_rejected";
+
+      await telemetry.logEvent({
+        epoch: new Date().toISOString(),
+        tool: "forge_route_approval",
+        action: auditAction,
+        metadata: {
+          outcome: outcome.type,
+          reason_codes: "reason_codes" in outcome ? outcome.reason_codes : [],
+          holdId: "holdId" in outcome ? outcome.holdId : undefined,
+          filesChanged: plannerOutput.proposed_changes?.length ?? 0,
+          durationMs: Date.now() - startedAt,
+        },
+      });
+
+      const result = {
+        content: [{ type: "text" as const, text: JSON.stringify(outcome, null, 2) }],
+      };
+      await telemetrySuccess("forge_route_approval", startedAt);
+      return result;
+    } catch (err) {
+      await telemetryFailure("forge_route_approval", startedAt, err);
+      throw err;
+    }
+    });
+  }
+);
+
+/**
+ * forge_apply_patches
+ * Directly apply a list of unified diffs without going through full routeApproval.
+ * Intended for low-risk patch application where the caller already has arifOS sign-off.
+ * For full governance, use forge_route_approval instead.
+ */
+server.tool(
+  "forge_apply_patches",
+  "Apply a list of unified diffs directly. For governed workflows, use forge_route_approval instead. Returns per-file applied status.",
+  {
+    patches: z.array(
+      z.object({
+        file_path: z.string().describe("Relative path to the target file"),
+        unified_diff: z.string().describe("Unified diff string"),
+      })
+    ).describe("Array of patches to apply"),
+  },
+  async ({ patches }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("forge_apply_patches");
+    return runStage("777_FORGE" as MetabolicStage, async () => {
+    try {
+      const { applyPatches } = await import("../tools/EditorTools.js");
+      const results = await applyPatches(patches);
+      const allApplied = results.every((r) => r.applied);
+
+      await telemetry.logEvent({
+        epoch: new Date().toISOString(),
+        tool: "forge_apply_patches",
+        action: allApplied ? "patches_applied" : "patches_partial",
+        metadata: { count: results.length, durationMs: Date.now() - startedAt },
+      });
+
+      const result = {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({ applied: allApplied, results }, null, 2),
+          },
+        ],
+      };
+      await telemetrySuccess("forge_apply_patches", startedAt);
+      return result;
+    } catch (err) {
+      await telemetryFailure("forge_apply_patches", startedAt, err);
       throw err;
     }
     });

@@ -355,33 +355,35 @@ AF-FORGE MCP / HTTP bridge (this repo, TypeScript)
 
 ## 7. Rollout Priority
 
-| Phase | What | Risk reduction | Effort |
-|-------|------|----------------|--------|
-| **Phase 0 (now)** | Wrap existing `write_file` with `PolicyEnforcer` pre-check + `EditorWorker.applyPatches` | High (blocks freeform writes) | Low |
-| **Phase 1** | Add `PlannerOutput` type + `PolicyConfig` + `enforcePolicy()` as standalone module | High | Medium |
-| **Phase 2** | Wire `ApprovalRouter` → `ApprovalBoundary` for `HUMAN_APPROVAL_REQUIRED` | High | Medium |
-| **Phase 3** | Add `ForgeExecutionManifest` type + `forge_apply_manifest` tool in MCP | Critical (ensures diff-only execution) | Medium |
-| **Phase 4** | Add zoo telemetry metrics to `src/metrics/prometheus.ts` | Medium (observability) | Low |
-| **Phase 5** | Add `detectDeletes()` + `touches_arch` + `confidence_lt` triggers | High | Low |
-| **Phase 6** | Chaos testing: inject failure modes, verify hold conditions fire | Critical | High |
+| Phase | What | Status | Risk reduction | Effort |
+|-------|------|--------|----------------|--------|
+| **Phase 0** | `PolicyEnforcer` + `EditorWorker.applyPatches()` + `apply_patches` tool | ✅ DONE | High (blocks freeform writes) | Low |
+| **Phase 1** | `PlannerOutput` + `PolicyConfig` + `enforcePolicy()` as standalone module | ✅ DONE | High | Medium |
+| **Phase 2** | Wire `ApprovalRouter` → `ApprovalBoundary` for `HUMAN_APPROVAL_REQUIRED` | ✅ DONE | High | Medium |
+| **Phase 3** | `forge_route_approval` + `forge_apply_patches` MCP tools | ✅ DONE | Critical (ensures diff-only execution) | Medium |
+| **Phase 4** | Add zoo telemetry metrics to `src/metrics/prometheus.ts` | ✅ DONE | Medium (observability) | Low |
+| **Phase 5** | Add `detectDeletes()` + `confidence_lt` triggers to F6/F4 | 🔲 TODO | High | Low |
+| **Phase 6** | Chaos testing: inject failure modes, verify hold conditions fire | 🔲 TODO | Critical | High |
 
 ---
 
 ## 8. Gap Analysis: Current vs. Matrix
 
-| What the matrix requires | Current state | File to modify |
-|-------------------------|--------------|---------------|
-| `ProposedChange`, `PlannerOutput`, `PolicyConfig` types | NOT EXISTS | New: `src/types/planner.ts`, `src/types/policy.ts` |
-| `PolicyEnforcer.enforcePolicy()` | NOT EXISTS — governance is inline in `AgentEngine` | New: `src/governance/PolicyEnforcer.ts` |
-| `EditorWorker.applyPatches()` | `write_file` does full-file writes | New: `src/tools/EditorTools.ts` |
-| `ForgeExecutionManifest` + `forge_apply_manifest` | NOT EXISTS | New: `src/types/forge.ts`, `src/tools/ForgeTools.ts` |
-| `ApprovalRouter` | `ApprovalBoundary` exists but not wired to policy output | New: `src/approval/ApprovalRouter.ts` |
-| Zoo Prometheus metrics | Only `arifos_metabolic_*`, `arifos_floor_violation_*` | `src/metrics/prometheus.ts` |
-| `detectDeletes()` in F6 | `checkToolHarm` exists but no delete detection | `src/governance/f6HarmDignity.ts` |
-| `touches_arch` detection | NOT EXISTS | `src/governance/f6HarmDignity.ts` or new `f6b.ts` |
-| Chaos testing suite | NOT EXISTS | New: `tests/chaos/` |
+| What the matrix requires | Current state | File |
+|-------------------------|--------------|------|
+| `ProposedChange`, `PlannerOutput`, `PolicyConfig` types | ✅ EXISTS | `src/types/planner.ts`, `src/types/policy.ts` |
+| `PolicyEnforcer.enforcePolicy()` | ✅ EXISTS | `src/governance/PolicyEnforcer.ts` |
+| `EditorWorker.applyPatches()` | ✅ EXISTS (`ApplyPatchesTool`) | `src/tools/EditorTools.ts` |
+| `ForgeExecutionManifest` type | ✅ EXISTS | `src/types/forge.ts` |
+| `forge_route_approval` MCP tool | ✅ EXISTS | `src/mcp/server.ts` |
+| `forge_apply_patches` MCP tool | ✅ EXISTS | `src/mcp/server.ts` |
+| `ApprovalRouter` + `routeApproval()` | ✅ EXISTS | `src/approval/ApprovalRouter.ts` |
+| Zoo Prometheus metrics | ✅ EXISTS (8 new counters + helpers) | `src/metrics/prometheus.ts` |
+| `detectDeletes()` in F6 | 🔲 TODO | `src/governance/f6HarmDignity.ts` |
+| `touches_arch` detection | ✅ EXISTS | `src/governance/PolicyEnforcer.ts` |
+| Chaos testing suite | 🔲 TODO | New: `tests/chaos/` |
 
 ---
 
-*Matrix version: 0.1 — for review and incremental adoption*
-*下一个: Phase 0 implementation — EditorWorker + PolicyEnforcer integration into ToolRegistry*
+*Matrix version: 0.4 — Phases 0–4 complete*
+*下一个: Phase 5 — `detectDeletes()` + `confidence_lt` triggers wired into governance floors*

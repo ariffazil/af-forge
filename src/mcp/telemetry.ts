@@ -11,10 +11,23 @@ import { homedir } from "node:os";
 import { resolve, dirname } from "node:path";
 import { appendFile, mkdir } from "node:fs/promises";
 
+export type AuditEventAction =
+  | "invoke"
+  | "success"
+  | "failure"
+  | "hold_created"
+  | "hold_approved"
+  | "memory_stored"
+  | "route_approved"
+  | "route_rejected"
+  | "route_waiting"
+  | "patches_applied"
+  | "patches_partial";
+
 export interface AuditEvent {
   epoch: string;
   tool: string;
-  action: "invoke" | "success" | "failure" | "hold_created" | "hold_approved" | "memory_stored";
+  action: AuditEventAction;
   outcome?: string;
   metadata?: Record<string, unknown>;
 }

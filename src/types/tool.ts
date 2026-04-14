@@ -2,7 +2,7 @@ export type ToolRiskLevel = "safe" | "guarded" | "dangerous";
 
 export type ToolSchemaProperty = {
   type: "string" | "number" | "boolean" | "array" | "object";
-  description: string;
+  description?: string;
   items?: ToolSchemaProperty;
   properties?: Record<string, ToolSchemaProperty>;
 };
