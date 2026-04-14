@@ -5,20 +5,38 @@
 	bind 0.0.0.0
 
 	# Health check for gateway itself
-	health /healthz
+	respond /healthz "OK" 200
 
 	# arifOS MCP governance kernel
-	reverse_proxy /mcp arifos-mcp:8080
-	reverse_proxy /arifos/* arifos-mcp:8080
+	handle /mcp {
+		reverse_proxy arifos-mcp:8080
+	}
+	handle /arifos/* {
+		reverse_proxy arifos-mcp:8080
+	}
 
 	# AF FORGE bridge server — operator, sense, metrics, human escalation
-	reverse_proxy /operator/* af-forge-bridge:7071
-	reverse_proxy /metrics af-forge-bridge:7071
-	reverse_proxy /sense af-forge-bridge:7071
-	reverse_proxy /human-expert/* af-forge-bridge:7071
-	reverse_proxy /health af-forge-bridge:7071
-	reverse_proxy /ready af-forge-bridge:7071
+	handle /operator/* {
+		reverse_proxy af-forge-bridge:7071
+	}
+	handle /metrics {
+		reverse_proxy af-forge-bridge:7071
+	}
+	handle /sense {
+		reverse_proxy af-forge-bridge:7071
+	}
+	handle /human-expert/* {
+		reverse_proxy af-forge-bridge:7071
+	}
+	handle /health {
+		reverse_proxy af-forge-bridge:7071
+	}
+	handle /ready {
+		reverse_proxy af-forge-bridge:7071
+	}
 
 	# Default respond
-	respond "AF FORGE Gateway" 200
+	handle {
+		respond "AF FORGE Gateway" 200
+	}
 }

@@ -16,7 +16,7 @@ services:
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
       - HUMAN_ESCALATION_WEBHOOK_URL=${HUMAN_ESCALATION_WEBHOOK_URL:-}
-      - ARIFOS_GOVERNANCE_URL=${ARIFOS_GOVERNANCE_URL:-}
+      - ARIFOS_GOVERNANCE_URL=${ARIFOS_GOVERNANCE_URL:-http://arifos-mcp:8080}
       - AGENT_WORKBENCH_TRUST_LOCAL_VPS=${AGENT_WORKBENCH_TRUST_LOCAL_VPS:-0}
       - ENABLE_DANGEROUS_TOOLS=${ENABLE_DANGEROUS_TOOLS:-false}
       - ENABLE_BACKGROUND_JOBS=${ENABLE_BACKGROUND_JOBS:-false}
@@ -37,29 +37,65 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:7071/health"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:7071/health"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
 
   arifos-mcp:
-    # Placeholder: build from arifOS repo or pull prebuilt image
-    # image: ghcr.io/ariffazil/arifos-mcp:latest
-    image: alpine:latest
+    image: ariffazil/arifosmcp:latest
     container_name: af-forge-arifos-mcp
     restart: unless-stopped
-    command: ["sh", "-c", "echo 'arifOS MCP placeholder — replace with real image' && sleep infinity"]
+    ports:
+      - "8080:8080"
     expose:
       - "8080"
+    environment:
+      - PORT=8080
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-af_forge}:${POSTGRES_PASSWORD:-af_forge_secret}@postgres:5432/${POSTGRES_DB:-af_forge}
+      - REDIS_URL=redis://redis:6379
+      - QDRANT_URL=http://qdrant:6333
+      - OLLAMA_URL=http://ollama:11434
+      - PYTHONPATH=/usr/src/project/arifosmcp:/usr/src/project
+    volumes:
+      - /root/arifOS-pr325/arifosmcp:/usr/src/project/arifosmcp:ro
+      - /root/arifOS-pr325/core:/usr/src/project/core:ro
     networks:
       - af-forge-internal
+    depends_on:
+      - postgres
+      - redis
+      - qdrant
+      - ollama
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: af-forge-qdrant
+    restart: unless-stopped
+    expose:
+      - "6333"
+      - "6334"
+    environment:
+      - QDRANT__STORAGE__STORAGE_PATH=/qdrant/storage
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
+      - QDRANT__LOG_LEVEL=WARN
+    volumes:
+      - qdrant-data:/qdrant/storage
+    networks:
+      - af-forge-internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:6333/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
 
   ollama:
     image: ollama/ollama:latest
@@ -73,18 +109,12 @@ services:
       - af-forge-internal
     # No public port: internal network only
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:11434/"]
+      test: ["CMD-SHELL", "ollama list > /dev/null 2>&1"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 30s
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+    # CPU-only deployment — no GPU reservations
 
   postgres:
     image: postgres:16-alpine
@@ -123,8 +153,7 @@ services:
     container_name: af-forge-caddy
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "8085:80"
     volumes:
       - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
@@ -135,51 +164,14 @@ services:
       - af-forge-bridge
       - arifos-mcp
 
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: af-forge-prometheus
-    restart: unless-stopped
-    volumes:
-      - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-      - '--web.enable-lifecycle'
-    networks:
-      - af-forge-internal
-    ports:
-      - "127.0.0.1:9090:9090"
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: af-forge-grafana
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
-      - GF_USERS_ALLOW_SIGN_UP=false
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./deploy/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml:ro
-    networks:
-      - af-forge-internal
-    depends_on:
-      - prometheus
-
 volumes:
   af-forge-data:
   ollama-data:
   postgres-data:
   redis-data:
+  qdrant-data:
   caddy-data:
   caddy-config:
-  prometheus-data:
-  grafana-data:
 
 networks:
   af-forge-internal:

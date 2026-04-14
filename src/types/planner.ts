@@ -1,0 +1,30 @@
+/**
+ * Planner output types for the arifOS → AF-FORGE governance pipeline.
+ *
+ * PlannerAgent (read-only LLM) emits ProposedChange[] which PolicyEnforcer
+ * validates before ApprovalRouter decides AUTO_APPROVED / HUMAN_APPROVAL_REQUIRED / REJECTED.
+ * Only then does ForgeExecutionManifest reach AF-FORGE for diff-only application.
+ */
+
+export type ChangeOperation = "patch_apply" | "append" | "create_new";
+
+export interface ProposedChange {
+  file_path: string;
+  operation: ChangeOperation;
+  unified_diff?: string;
+  append_text?: string;
+  new_file_initial_content?: string;
+  rationale: string;
+  retrieval_evidence: string[];
+}
+
+export interface PlannerOutput {
+  intent: string;
+  success_criteria?: string;
+  non_goals?: string[];
+  existing_targets: string[];
+  proposed_changes: ProposedChange[];
+  create_new_file_reason?: string;
+  risk_score: number;
+  confidence: number;
+}

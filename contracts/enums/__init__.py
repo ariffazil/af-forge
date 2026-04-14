@@ -1,0 +1,1 @@
+"""GEOX contracts enums package."""
