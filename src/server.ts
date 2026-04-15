@@ -235,6 +235,12 @@ app.get("/contract", (_req: Request, res: Response) => {
       background_jobs: process.env.ENABLE_BACKGROUND_JOBS === "1" || process.env.ENABLE_BACKGROUND_JOBS === "true",
       geox_log_interpreter: true,
     },
+    endpoints: {
+      geox_log_interpreter: "POST /geox/log_interpreter",
+      geox_contract: "GET /geox/contract",
+      python_mcp: "geox-mcp:8765",
+      bridge: "af-forge-bridge:7071",
+    },
     timestamp: new Date().toISOString(),
   });
 });
