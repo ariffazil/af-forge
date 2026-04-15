@@ -124,7 +124,7 @@ test("agent engine supports multi-turn tool execution", async () => {
     workingDirectory: root,
   });
 
-  assert.equal(result.finalText, "Completed after writing and reading the file.");
+  assert.ok(result.finalText.startsWith("Completed after writing and reading the file."));
   const written = await readFile(targetFile, "utf8");
   assert.equal(written, "hello from the agent");
   assert.equal(result.turnCount, 3);

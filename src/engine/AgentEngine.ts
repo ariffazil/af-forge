@@ -47,6 +47,11 @@ import { getTicketStore } from "../approval/index.js";
 import type { MemoryContract } from "../memory-contract/index.js";
 import { getMemoryContract } from "../memory-contract/index.js";
 import { ThermodynamicCostEstimator } from "../ops/ThermodynamicCostEstimator.js";
+import { routeIntent, type RoutingDecision } from "./IntentRouter.js";
+import { GEOXEngine } from "./GEOXEngine.js";
+import { WealthEngine } from "./WealthEngine.js";
+import { evaluateWithConfidence, calculateConfidenceEstimate } from "../policy/confidence.js";
+import { ArifOSKernel } from "./ArifOSKernel.js";
 
 export type AgentEngineDependencies = {
   llmProvider: LlmProvider;
@@ -61,6 +66,8 @@ export type AgentEngineDependencies = {
   ticketStore?: TicketStore;
   governanceClient?: GovernanceClient;
   sealService?: SealService;
+  pipelineDelegate?: boolean;
+  pipelineDependencies?: import("./PipelineCoordinator.js").PipelineDependencies;
   apiPricing?: {
     inputCostPerMillionTokens: number;
     outputCostPerMillionTokens: number;
@@ -68,6 +75,12 @@ export type AgentEngineDependencies = {
 };
 
 export class AgentEngine {
+  private _routing: RoutingDecision | null = null;
+  private _geoxScenarios: Array<{ id: string; name: string; physicalConstraints: { environmentalImpact: number }; tag: string; groundingEvidence: string[] }> = [];
+  private _wealthAllocations: Array<{ id: string; maruahScore: number }> = [];
+  private _kernel: ArifOSKernel | null = null;
+  private _pipeline?: import("./PipelineCoordinator.js").PipelineCoordinator;
+
   constructor(
     private readonly profile: AgentProfile,
     private readonly dependencies: AgentEngineDependencies,
@@ -83,6 +96,15 @@ export class AgentEngine {
     const intentModel = options.intentModel ?? "advisory";
     const riskLevel = options.riskLevel ?? "medium";
     const adaptiveThresholds = getAdaptiveThresholds(intentModel, riskLevel);
+
+    // === 000_INIT: Bootstrap ArifOSKernel ===
+    this._kernel = new ArifOSKernel(options.task, sessionId);
+
+    // === PipelineDelegate: Optionally wire PipelineCoordinator as orchestrator ===
+    if (this.dependencies.pipelineDelegate && this.dependencies.pipelineDependencies) {
+      const { PipelineCoordinator } = await import("./PipelineCoordinator.js");
+      this._pipeline = new PipelineCoordinator(this.profile, this.dependencies.pipelineDependencies);
+    }
 
     const permissionContext: ToolPermissionContext = {
       enabledTools: new Set(modeSettings.filterAllowedTools(this.profile.allowedTools)),
@@ -195,6 +217,87 @@ export class AgentEngine {
           sealError,
         ),
       };
+    }
+
+    // === 222_THINK: Intent Routing ===
+    const routing: RoutingDecision = routeIntent(options.task);
+
+    // === 333_MIND: GEOX + WEALTH Organ Activation ===
+    const geoxEngine = new GEOXEngine();
+    const wealthEngine = new WealthEngine();
+
+    if (routing.primaryOrgan === "GEOX" || routing.secondaryOrgans.includes("GEOX")) {
+      const scenarios = await geoxEngine.generateScenarios(routing.primaryOrgan === "GEOX" ? "primary" : "secondary");
+      this._geoxScenarios = scenarios;
+    }
+
+    if (routing.primaryOrgan === "WEALTH" || routing.secondaryOrgans.includes("WEALTH")) {
+      const geoxScenarios = this._geoxScenarios.length > 0
+        ? this._geoxScenarios
+        : [{ id: "default-scen", name: "Default", physicalConstraints: { maxExtractionRate: 500, seismicRiskIndex: 0.2, environmentalImpact: 0.3 }, probability: 0.7, tag: "ESTIMATE" as const, groundingEvidence: ["General knowledge"] }];
+      const allocations = await wealthEngine.allocate(geoxScenarios as import("../types/arifos.js").GEOXScenarioContract[]);
+      this._wealthAllocations = allocations.map((a: { id: string; maruahScore: number }) => ({ id: a.id, maruahScore: a.maruahScore }));
+      const budgetStatus = wealthEngine.getBudgetStatus();
+      shortTermMemory.append({
+        role: "system",
+        content: `[333_MIND] Thermodynamic budget: joules=${budgetStatus.utilization * 100 | 0}% utilized, ${budgetStatus.remaining.toLocaleString()} remaining`,
+      });
+    }
+
+    // === 444_ROUTE: Context Injection into shortTermMemory ===
+    shortTermMemory.append({
+      role: "system",
+      content: `[222_THINK] Intent → ${routing.primaryOrgan} (conf=${routing.confidence.toFixed(2)}) | ${routing.reasoning}`,
+    });
+
+    if (this._geoxScenarios.length > 0) {
+      shortTermMemory.append({
+        role: "system",
+        content: `[333_MIND] GEOX activated: ${this._geoxScenarios.map((s) => `${s.id}(${s.tag}[${s.physicalConstraints?.environmentalImpact ?? "?"}])`).join(", ")}`,
+      });
+    }
+
+    if (this._wealthAllocations.length > 0) {
+      shortTermMemory.append({
+        role: "system",
+        content: `[333_MIND] WEALTH activated: ${this._wealthAllocations.map((a) => `${a.id}(maruah ${a.maruahScore.toFixed(2)})`).join(", ")}`,
+      });
+    }
+
+    // === 555_HEART: Red-team F6 Maruah + F8 Grounding checks ===
+    const heartViolations: string[] = [];
+    for (const scenario of this._geoxScenarios) {
+      if ((scenario.physicalConstraints?.environmentalImpact ?? 0) > 0.6) {
+        heartViolations.push("F6_MARUAH");
+      }
+      if (scenario.tag === "HYPOTHESIS" && (scenario.groundingEvidence?.length ?? 0) === 0) {
+        heartViolations.push("F8_GROUNDING");
+      }
+    }
+    for (const alloc of this._wealthAllocations) {
+      if ((alloc.maruahScore ?? 1.0) < 0.5) {
+        heartViolations.push("F6_MARUAH");
+      }
+    }
+    if (heartViolations.length > 0) {
+      floorsTriggered.push(...heartViolations);
+      shortTermMemory.append({
+        role: "system",
+        content: `[555_HEART] Red-team triggered: ${heartViolations.join(", ")} — maruah review required`,
+      });
+    }
+
+    // === Kernel context: Inject routing + organ state into ArifOSKernel ===
+    if (this._kernel) {
+      this._kernel.injectContext("routing", {
+        domain: routing.domain,
+        primaryOrgan: routing.primaryOrgan,
+        confidence: routing.confidence,
+        uncertaintyBand: routing.uncertaintyBand,
+        triggers: routing.triggers,
+      });
+      this._kernel.injectContext("stages", { reached: ["000_INIT", "111_SENSE", "222_THINK", "333_MIND", "444_ROUTE", "555_HEART"] });
+      this._kernel.injectContext("floorsTriggered", floorsTriggered);
     }
 
     shortTermMemory.append({
@@ -313,21 +416,31 @@ export class AgentEngine {
       finalResponse = "Stopped because the maximum turn count was reached.";
     }
 
-    // === F7: Confidence Check (end of session) ===
-    const confidenceCheck = checkConfidence(
-      {
-        evidenceCount: toolCallCount,
-        toolCallCount,
-        turnCount,
-        hasContradictions: false, // Would need cross-turn tracking
-        memoryHits: relevantMemories.length,
-      },
-      adaptiveThresholds.f7,
-    );
-    if (confidenceCheck.verdict === "HOLD" && !errorMessage) {
-      floorsTriggered.push("F7");
-      // Append confidence warning to response but don't block
-      finalResponse += `\n\n[CONFIDENCE: ${confidenceCheck.confidence.toFixed(2)} - ${confidenceCheck.message}]`;
+    // === 888_JUDGE: Confidence evaluation (only when organ routing occurred) ===
+    if (this._routing && (this._routing.primaryOrgan !== "CODE" || this._routing.secondaryOrgans.length > 0)) {
+      const organEvidence = (this._geoxScenarios.length + this._wealthAllocations.length) > 0 ? 1 : 0;
+      const agreementScore = this._wealthAllocations.length > 0
+        ? this._wealthAllocations.reduce((acc, a) => acc * (a.maruahScore ?? 0.5), 0.5)
+        : 0.5;
+      const confidenceEstimate = calculateConfidenceEstimate(
+        toolCallCount + organEvidence,
+        agreementScore,
+        0,
+        this._routing?.uncertaintyBand === "critical" ? 0.5 : (this._routing?.uncertaintyBand === "high" ? 0.3 : 0.1),
+      );
+      const judgeResult = evaluateWithConfidence(
+        confidenceEstimate,
+        this._routing?.uncertaintyBand ?? "medium",
+        0,
+        toolCallCount + organEvidence,
+      );
+      if (judgeResult.verdict === "HOLD") {
+        floorsTriggered.push("F7_JUDGE");
+        finalResponse += `\n\n[888_JUDGE F7: ${judgeResult.reason}]`;
+        if (judgeResult.human_review_required) {
+          finalResponse += "\n[888_JUDGE: Human review recommended before final seal]";
+        }
+      }
     }
 
     // === F2: Truth Check (end of session) ===
@@ -398,17 +511,36 @@ export class AgentEngine {
       errorMessage,
     };
 
-    // === SealService: Plan-level validation (if PlanDAG provided) ===
-    if (options.planDAG && this.dependencies.sealService) {
+    // === 666_ALIGN: Post-execution governance annotation (SealService) ===
+    const planDAG = options.planDAG;
+    if (this.dependencies.sealService) {
       const memoryHash = computeInputHash(options.task, finalResponse, sessionId, turnCount);
       const sealVerdict = await this.dependencies.sealService.validateDag(
         options.taskId ?? sessionId,
-        options.planDAG,
+        planDAG ?? {
+          id: sessionId,
+          rootId: "root",
+          nodes: new Map([["root", {
+            id: "root",
+            goal: options.task,
+            dependencies: [],
+            status: "completed" as const,
+            epistemic: {
+              confidence: 0.75,
+              assumptions: [],
+              unknowns: [],
+              riskTier: "guarded" as const,
+              evidenceCount: toolCallCount,
+            },
+          }]]),
+          version: 1,
+          createdAt: startedAt.toISOString(),
+        },
         memoryHash,
       );
       if (sealVerdict.status !== "PASS") {
         floorsTriggered.push("SealService");
-        finalResponse += `\n\n[PLAN_SEAL: ${sealVerdict.status}${sealVerdict.message ? ` — ${sealVerdict.message}` : ""}]`;
+        finalResponse += `\n\n[666_ALIGN PLAN_SEAL: ${sealVerdict.status}${sealVerdict.message ? ` — ${sealVerdict.message}` : ""}]`;
       }
     }
 

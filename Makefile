@@ -18,11 +18,17 @@ test:
 	npm run build
 	npm test
 	node dist/test/PlanValidator.test.js
+	node dist/test/ParallelPlannerContract.test.js
 	node dist/test/confidence.test.js
 	node dist/test/sense.test.js
 	node dist/test/governanceViolation.test.js
 	node dist/test/ticketStore.test.js
 	node dist/test/operatorConsole.test.js
+	node dist/test/thermodynamic.test.js
+	node dist/test/operatorAuth.test.js
+	node dist/test/intentRouter.test.js
+	node dist/test/engine.test.js
+	node dist/test/goxWealthTools.test.js
 
 clean:
 	docker compose down -v

@@ -43,6 +43,8 @@ import type { MetabolicStage } from "../types/aki.js";
 import { FileVaultClient } from "../vault/index.js";
 import { WebhookHumanEscalationClient, NoOpHumanEscalationClient } from "../escalation/index.js";
 import { getTicketStore } from "../approval/index.js";
+import { GEOX_TOOLS } from "../tools/GEOXTools.js";
+import { WEALTH_TOOLS } from "../tools/WealthTools.js";
 
 // ── Server bootstrap ────────────────────────────────────────────────────────
 
@@ -271,10 +273,12 @@ server.tool(
       const { AgentEngine } = await import("../engine/AgentEngine.js");
       const { LongTermMemory } = await import("../memory/LongTermMemory.js");
       const { ToolRegistry } = await import("../tools/ToolRegistry.js");
-      const { ReadFileTool, WriteFileTool, ListFilesTool } = await import("../tools/FileTools.js");
-      const { GrepTextTool } = await import("../tools/SearchTools.js");
-      const { RunCommandTool, RunTestsTool } = await import("../tools/ShellTools.js");
-      const { buildExploreProfile } = await import("../agents/profiles.js");
+const { ReadFileTool, WriteFileTool, ListFilesTool } = await import("../tools/FileTools.js");
+        const { GrepTextTool } = await import("../tools/SearchTools.js");
+        const { RunCommandTool, RunTestsTool } = await import("../tools/ShellTools.js");
+        const { GEOX_TOOLS } = await import("../tools/GEOXTools.js");
+        const { WEALTH_TOOLS } = await import("../tools/WealthTools.js");
+        const { buildExploreProfile } = await import("../agents/profiles.js");
       const { tmpdir } = await import("node:os");
       const { resolve } = await import("node:path");
 
@@ -294,6 +298,8 @@ server.tool(
           registry.register(new RunCommandTool());
           registry.register(new RunTestsTool());
         }
+        for (const ToolClass of GEOX_TOOLS) registry.register(new ToolClass());
+        for (const ToolClass of WEALTH_TOOLS) registry.register(new ToolClass());
 
         const llmProvider = createLlmProvider(runtimeConfig);
         const providerName = runtimeConfig.provider.kind;
@@ -866,7 +872,249 @@ server.resource(
   }
 );
 
-// ── Main ────────────────────────────────────────────────────────────────────
+/**
+ * geox_check_hazard
+ * Check physical hazard risk for a location using GEOX earth intelligence.
+ * Tagged ESTIMATE/HYPOTHESIS/UNKNOWN per F8 Grounding.
+ */
+server.tool(
+  "geox_check_hazard",
+  "Check physical hazard risk for a location using GEOX earth intelligence. Returns hazard level (low/medium/high/critical), probability, intensity, confidence interval, and physical constraint envelopes. All outputs carry ESTIMATE/HYPOTHESIS/UNKNOWN uncertainty tag per F8.",
+  {
+    location: z.string().optional().describe("Location name or coordinates"),
+    latitude: z.number().optional().describe("Latitude of the location"),
+    longitude: z.number().optional().describe("Longitude of the location"),
+    hazard_types: z
+      .array(z.enum(["seismic", "volcanic", "flood", "landslide", "subsidence"]))
+      .optional()
+      .describe("Types of hazard to assess"),
+    scenario: z.string().optional().describe("Scenario context (e.g., 'extraction', 'construction')"),
+  },
+  async ({ location, latitude, longitude, hazard_types, scenario }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("geox_check_hazard");
+    return runStage("333_MIND" as MetabolicStage, async () => {
+    try {
+      const tool = new GEOX_TOOLS[0]();
+      const result = await tool.run(
+        { location, latitude, longitude, hazard_types, scenario },
+        { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" }
+      );
+      const parsed = JSON.parse(result.output as string);
+      const response = {
+        content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }],
+      };
+      await telemetrySuccess("geox_check_hazard", startedAt);
+      return response;
+    } catch (err) {
+      await telemetryFailure("geox_check_hazard", startedAt, err);
+      throw err;
+    }
+    });
+  }
+);
+
+/**
+ * geox_subsurface_model
+ * Compute subsurface geological model (porosity, permeability, pressure) at a location/depth.
+ */
+server.tool(
+  "geox_subsurface_model",
+  "Compute subsurface geological model for a formation at given depth/location. Returns porosity, permeability, formation pressure, fracture gradient, and injection rate limits. Tagged ESTIMATE/HYPOTHESIS/UNKNOWN per F8.",
+  {
+    latitude: z.number().optional().describe("Latitude"),
+    longitude: z.number().optional().describe("Longitude"),
+    depth: z.number().optional().describe("Target depth in meters"),
+    formation_type: z.enum(["sandstone", "carbonate", "shale", "granite", "volcanic"]).optional().describe("Rock formation type"),
+    scenario: z.string().optional().describe("extraction, storage, injection"),
+  },
+  async ({ latitude, longitude, depth, formation_type, scenario }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("geox_subsurface_model");
+    return runStage("333_MIND" as MetabolicStage, async () => {
+    try {
+      const tool = new GEOX_TOOLS[1]();
+      const result = await tool.run(
+        { latitude, longitude, depth, formation_type, scenario },
+        { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" }
+      );
+      const parsed = JSON.parse(result.output as string);
+      const response = {
+        content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }],
+      };
+      await telemetrySuccess("geox_subsurface_model", startedAt);
+      return response;
+    } catch (err) {
+      await telemetryFailure("geox_subsurface_model", startedAt, err);
+      throw err;
+    }
+    });
+  }
+);
+
+/**
+ * geox_seismic_interpret
+ * Interpret seismic survey data to infer subsurface structure and formation.
+ */
+server.tool(
+  "geox_seismic_interpret",
+  "Interpret seismic survey data to infer subsurface structure, formation type, and fault patterns. Returns velocity, impedance contrast, reflectivity, and interpreted formation. Tagged ESTIMATE/HYPOTHESIS/UNKNOWN per F8.",
+  {
+    latitude: z.number().optional().describe("Latitude of survey center"),
+    longitude: z.number().optional().describe("Longitude of survey center"),
+    depth_range: z.array(z.number()).optional().describe("[minDepth, maxDepth] in meters"),
+    frequency_hz: z.number().optional().describe("Dominant frequency in Hz"),
+    survey_type: z.enum(["2d", "3d", "4d"]).optional().describe("Survey type"),
+    scenario: z.string().optional().describe("exploration, monitoring, reservoir"),
+  },
+  async ({ latitude, longitude, depth_range, frequency_hz, survey_type, scenario }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("geox_seismic_interpret");
+    return runStage("333_MIND" as MetabolicStage, async () => {
+    try {
+      const tool = new GEOX_TOOLS[2]();
+      const result = await tool.run(
+        { latitude, longitude, depth_range, frequency_hz, survey_type, scenario },
+        { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" }
+      );
+      const parsed = JSON.parse(result.output as string);
+      const response = {
+        content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }],
+      };
+      await telemetrySuccess("geox_seismic_interpret", startedAt);
+      return response;
+    } catch (err) {
+      await telemetryFailure("geox_seismic_interpret", startedAt, err);
+      throw err;
+    }
+    });
+  }
+);
+
+/**
+ * geox_prospect_score
+ * Score a geological prospect for hydrocarbon potential.
+ */
+server.tool(
+  "geox_prospect_score",
+  "Score a geological prospect for hydrocarbon potential. Returns OOIP, GIP, chance factor, and risk breakdown (structural/stratigraphic/charge/seal). Tagged ESTIMATE/HYPOTHESIS/UNKNOWN per F8.",
+  {
+    latitude: z.number().optional().describe("Latitude"),
+    longitude: z.number().optional().describe("Longitude"),
+    formation_type: z.string().optional().describe("Reservoir lithology"),
+    trap_type: z.enum(["structural", "stratigraphic", "combination", "unconformity"]).optional().describe("Trap type"),
+    reservoir_quality: z.number().optional().describe("Porosity × permeability quality (0-1)"),
+    scenario: z.string().optional().describe("exploration, appraisal, development"),
+  },
+  async ({ latitude, longitude, formation_type, trap_type, reservoir_quality, scenario }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("geox_prospect_score");
+    return runStage("333_MIND" as MetabolicStage, async () => {
+    try {
+      const tool = new GEOX_TOOLS[3]();
+      const result = await tool.run(
+        { latitude, longitude, formation_type, trap_type, reservoir_quality, scenario },
+        { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" }
+      );
+      const parsed = JSON.parse(result.output as string);
+      const response = {
+        content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }],
+      };
+      await telemetrySuccess("geox_prospect_score", startedAt);
+      return response;
+    } catch (err) {
+      await telemetryFailure("geox_prospect_score", startedAt, err);
+      throw err;
+    }
+    });
+  }
+);
+
+/**
+ * geox_physical_constraint
+ * Return physical constraint envelope (pressure, temperature, mud weight) for drilling or injection.
+ */
+server.tool(
+  "geox_physical_constraint",
+  "Return physical constraint envelope (pressure, temperature, mud weight) for drilling or injection at a given depth/location. Computes safe operating window with fracture gradient and pore pressure. Tagged ESTIMATE/HYPOTHESIS/UNKNOWN per F8.",
+  {
+    latitude: z.number().optional().describe("Latitude"),
+    longitude: z.number().optional().describe("Longitude"),
+    depth: z.number().optional().describe("Target depth in meters"),
+    temperature_c: z.number().optional().describe("Bottom hole temperature in °C"),
+    pressure_mpa: z.number().optional().describe("Target pressure in MPa"),
+    scenario: z.string().optional().describe("drilling or injection"),
+  },
+  async ({ latitude, longitude, depth, temperature_c, pressure_mpa, scenario }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("geox_physical_constraint");
+    return runStage("333_MIND" as MetabolicStage, async () => {
+    try {
+      const tool = new GEOX_TOOLS[4]();
+      const result = await tool.run(
+        { latitude, longitude, depth, temperature_c, pressure_mpa, scenario },
+        { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" }
+      );
+      const parsed = JSON.parse(result.output as string);
+      const response = {
+        content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }],
+      };
+      await telemetrySuccess("geox_physical_constraint", startedAt);
+      return response;
+    } catch (err) {
+      await telemetryFailure("geox_physical_constraint", startedAt, err);
+      throw err;
+    }
+    });
+  }
+);
+
+/**
+ * wealth_evaluate_ROI
+ * Evaluate investment ROI against WEALTH objective function and thermodynamic cost.
+ * Returns PROCEED/HOLD/VOID based on EMV, NPV, maruah score, and OPS/777 band.
+ */
+server.tool(
+  "wealth_evaluate_ROI",
+  "Evaluate an investment or resource allocation against the WEALTH objective function. Returns decision (PROCEED/HOLD/VOID), EMV, NPV, maruah score (F6), reversibility coefficient, thermodynamic band, and violation list. Use this before committing significant resources.",
+  {
+    domain: z.enum(["GEOX", "WEALTH", "CODE"]).optional().describe("Domain of the investment"),
+    initial_investment: z.number().describe("Initial cost or investment (positive number)"),
+    scenarios: z
+      .array(
+        z.object({
+          probability: z.number().describe("Probability of this scenario (0-1)"),
+          cash_flow: z.number().describe("Net cash flow if this scenario occurs"),
+          label: z.string().optional().describe("Human-readable label"),
+        })
+      )
+      .describe("Array of investment scenarios with probabilities"),
+    joules: z.number().optional().describe("Thermodynamic resource cost in joules"),
+    reasoning: z.string().optional().describe("Context or goal for the investment"),
+  },
+  async ({ domain, initial_investment, scenarios, joules, reasoning }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("wealth_evaluate_ROI");
+    return runStage("777_FORGE" as MetabolicStage, async () => {
+    try {
+      const tool = new WEALTH_TOOLS[0]();
+      const result = await tool.run(
+        { domain, initial_investment, scenarios, joules, reasoning },
+        { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" }
+      );
+      const parsed = JSON.parse(result.output as string);
+      const response = {
+        content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }],
+      };
+      await telemetrySuccess("wealth_evaluate_ROI", startedAt);
+      return response;
+    } catch (err) {
+      await telemetryFailure("wealth_evaluate_ROI", startedAt, err);
+      throw err;
+    }
+    });
+  }
+);
 
 async function main() {
   await approvalBoundary.initialize();
