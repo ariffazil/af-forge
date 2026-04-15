@@ -67,3 +67,41 @@ export function parseArgs(argv: string[]): ParsedCliArgs {
 
   return { command, options };
 }
+
+export function parseServeArgs(argv: string[]): {
+  organ: string;
+  transport: "stdio" | "sse" | "streamable-http";
+  port?: number;
+  mode: "internal_mode" | "external_safe_mode";
+} {
+  const args = argv.slice(1);
+  let organ = "forge";
+  let transport: "stdio" | "sse" | "streamable-http" = "stdio";
+  let port: number | undefined;
+  let mode: "internal_mode" | "external_safe_mode" = "external_safe_mode";
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === "--organ" && args[i + 1]) {
+      organ = args[i + 1];
+      i++;
+    } else if (arg === "--transport" && args[i + 1]) {
+      const t = args[i + 1];
+      if (t === "stdio" || t === "sse" || t === "streamable-http") {
+        transport = t;
+      }
+      i++;
+    } else if (arg === "--port" && args[i + 1]) {
+      port = parseInt(args[i + 1], 10);
+      i++;
+    } else if (arg === "--mode" && args[i + 1]) {
+      const m = args[i + 1];
+      if (m === "internal_mode" || m === "external_safe_mode") {
+        mode = m;
+      }
+      i++;
+    }
+  }
+
+  return { organ, transport, port, mode };
+}
