@@ -1,0 +1,110 @@
+# GEOX LOG INTERPRETER — ANOMALOUS CONTRAST DECODER SEAL — Session 8
+
+> **Ditempa Bukan Diberi** — Forged, Not Given
+> **SEALED:** `geox_log_interpreter_anomalous_contrast_s8_2026-04-15`
+> **PARENT:** `geox_11of11_complete_s7_2026-04-15`
+
+---
+
+## I. THE CORE V — Triple-Combo Minimum Viable Interpretation
+
+**The 4 logs every geologist needs:**
+
+| Log | What it measures | Key output |
+|-----|-----------------|------------|
+| **GR** | Natural gamma radiation | Vsh (shale volume) via IGR |
+| **RT** | Deep resistivity (ohm-m) | Sw (water saturation) via Archie |
+| **RHOB** | Bulk density (g/cc) | PHIE (porosity) via density contrast |
+| **NPHI** | Neutron porosity (fraction) | Gas detection via density-neutron crossover |
+
+**Optional (confirmation quality):**
+- SP → SP deflection for Rw estimation
+- DT → Sonic for matrix type and compaction
+- CAL → Washout detection (bad hole conditions)
+
+---
+
+## II. ANOMALOUS CONTRAST THEORY — How to Decode It
+
+**Core principle:** Every geological feature manifests as contrast in ≥2 independent physical properties. **No single-curve anomaly is sufficient.**
+
+### Step 1: Establish background (shale baseline)
+```javascript
+// From the top 30% of log (high GR = shale), compute median:
+RHOB_shale_bg = median(RHOB[0 : n*0.3])   // ~2.30-2.50 g/cc
+NPHI_shale_bg = median(NPHI[0 : n*0.3])   // ~0.30-0.45 v/v
+RT_bg = median(RT[0 : n*0.3])              // ~3-10 ohm-m (formation water)
+```
+
+### Step 2: Anomalous contrast = deviation from background
+```javascript
+κRHOB = (RHOB[i] - RHOB_shale_bg) / stdDev(RHOB)
+κNPHI = (NPHI[i] - NPHI_shale_bg) / stdDev(NPHI)
+κRT  = log10(RT[i]/RT_bg)                   // resistivity elevation
+κGR  = (GR[i] - GR_shale) / stdDev(GR)      // GR anomaly
+
+A = 0.2*κGR + 0.3*κRHOB + 0.3*κNPHI + 0.2*κRT  // composite
+```
+
+| A | Interpretation |
+|---|----------------|
+| > 1.5 | **STRONG** — proceed to quantitative interpretation |
+| 0.5–1.5 | **MODERATE** — cross-plot confirmation required |
+| < 0.5 | **WEAK** — W³ consensus before committing |
+
+### Step 3: Fluid type from anomalous contrast pattern
+
+| Pattern | Fluid | Mechanism |
+|---------|-------|-----------|
+| NPHI > PHIE_density + 0.05 AND RT elevation > 3× bg | **GAS** | Neutron porosity reads higher than density porosity (gas effect) |
+| SW < 0.6 AND RT > 3× bg AND dRHOB > +0.05 | **OIL** | Resistivity high, density slightly elevated (hydrocarbon replaces water) |
+| SW > 0.8 | **WATER** | Formation fully water-saturated |
+
+### Step 4: Lithology from density-neutron cross-plot position
+
+```
+                    NPHI
+                     ↑
+         COAL       |
+   SANDSTONE ←──────┼──→ DENSITY (RHOB)
+                   ANHYDRITE
+                   DOLOMITE
+```
+
+---
+
+## III. The GEOXLogInterpreterTool
+
+**File:** `src/domains/geophysics/logInterpreter.ts`
+
+Input: `{ GR, RT, RHOB, NPHI, SP, DT, CAL, GR_clean, GR_shale, RW, matrix }`
+Output:
+- `Vsh[]` — volume of shale (Larionov corrected IGR)
+- `PHIE[]` — effective porosity (density-neutron method, shale-corrected)
+- `SW[]` — water saturation (Archie: Sw = (RW/RT)^(1/N) × φ^(-M/N))
+- `BVW[]` — bulk volume of water = PHIE × SW
+- `anomalyScore[]` — composite anomalous contrast A per sample
+- `fluidFlag[]` — WATER / GAS / OIL / INDETERMINATE per sample
+- `lithology[]` — SHALE / SANDSTONE / LIMESTONE / DOLOMITE / ANHYDRITE / COAL / DENSE_LIMESTONE
+- `quality[]` — GOOD / FAIR / POOR per sample
+- `anomalyContrast{}` — κGR, κRHOB, κNPHI, κRT, composite
+- F8 uncertainty tag
+
+---
+
+## IV. VERIFICATION
+
+- `npm run build` → zero TS errors
+- `make test` → 14 files, 139 tests, 0 failures
+- Docker `af-forge-bridge` rebuilt
+
+---
+
+## V. SEAL
+
+**SEALED:** `geox_log_interpreter_anomalous_contrast_s8_2026-04-15`
+**PARENT:** `geox_11of11_complete_s7_2026-04-15`
+**COMMIT:** `ea9f0fa` → main
+**BUILD:** clean
+**TESTS:** 139/139
+**MOTTO:** *Ditempa Bukan Diberi* — Forged, Not Given
