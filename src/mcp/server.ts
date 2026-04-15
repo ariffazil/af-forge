@@ -1070,6 +1070,185 @@ server.tool(
 );
 
 /**
+ * geox_uncertainty_tag
+ * Tag any GEOX output claim with F8 uncertainty classification.
+ */
+server.tool(
+  "geox_uncertainty_tag",
+  "Tag any GEOX output claim with F8 uncertainty classification. Returns ESTIMATE/HYPOTHESIS/UNKNOWN, confidence score, uncertainty band, and recommended pipeline stage.",
+  {
+    sourceTool: z.string().optional(),
+    evidenceCount: z.number().optional(),
+    confidenceInterval: z.array(z.number()).optional(),
+    claimType: z.enum(["hazard", "formation", "pressure", "temperature", "reserve", "emission"]).optional(),
+    localDataQuality: z.enum(["high", "medium", "low"]).optional(),
+  },
+  async ({ sourceTool, evidenceCount, confidenceInterval, claimType, localDataQuality }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("geox_uncertainty_tag");
+    return runStage("333_MIND" as MetabolicStage, async () => {
+    try {
+      const tool = new GEOX_TOOLS[5]();
+      const result = await tool.run({ sourceTool, evidenceCount, confidenceInterval, claimType, localDataQuality }, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
+      const parsed = JSON.parse(result.output as string);
+      const response = { content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }] };
+      await telemetrySuccess("geox_uncertainty_tag", startedAt);
+      return response;
+    } catch (err) { await telemetryFailure("geox_uncertainty_tag", startedAt, err); throw err; }
+    });
+  }
+);
+
+/**
+ * geox_witness_triad
+ * Verify a physical claim using Tri-Witness W³ consensus.
+ */
+server.tool(
+  "geox_witness_triad",
+  "Verify a physical claim using Tri-Witness W³ consensus. Three independent methods must agree within threshold to reach consensus. Returns W³ score, verdict, and recommended action.",
+  {
+    claim: z.string(),
+    method1: z.object({ type: z.string(), result: z.string(), confidence: z.number() }).optional(),
+    method2: z.object({ type: z.string(), result: z.string(), confidence: z.number() }).optional(),
+    method3: z.object({ type: z.string(), result: z.string(), confidence: z.number() }).optional(),
+  },
+  async ({ claim, method1, method2, method3 }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("geox_witness_triad");
+    return runStage("333_MIND" as MetabolicStage, async () => {
+    try {
+      const tool = new GEOX_TOOLS[6]();
+      const result = await tool.run({ claim, method1, method2, method3 }, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
+      const parsed = JSON.parse(result.output as string);
+      const response = { content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }] };
+      await telemetrySuccess("geox_witness_triad", startedAt);
+      return response;
+    } catch (err) { await telemetryFailure("geox_witness_triad", startedAt, err); throw err; }
+    });
+  }
+);
+
+/**
+ * geox_ground_truth
+ * Check F8 Grounding for a physical claim.
+ */
+server.tool(
+  "geox_ground_truth",
+  "Check F8 Grounding for a physical claim. Verifies that assertions have sufficient independent evidence. Returns grounded boolean, grounding score, missing evidence list, and F8 verdict.",
+  {
+    claim: z.string(),
+    evidenceSources: z.array(z.string()).optional(),
+    claimedConfidence: z.number().optional(),
+    claimType: z.enum(["hazard", "reserve", "formation", "emission", "climate"]).optional(),
+  },
+  async ({ claim, evidenceSources, claimedConfidence, claimType }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("geox_ground_truth");
+    return runStage("333_MIND" as MetabolicStage, async () => {
+    try {
+      const tool = new GEOX_TOOLS[7]();
+      const result = await tool.run({ claim, evidenceSources, claimedConfidence, claimType }, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
+      const parsed = JSON.parse(result.output as string);
+      const response = { content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }] };
+      await telemetrySuccess("geox_ground_truth", startedAt);
+      return response;
+    } catch (err) { await telemetryFailure("geox_ground_truth", startedAt, err); throw err; }
+    });
+  }
+);
+
+/**
+ * geox_maraoh_impact
+ * Assess community dignity and cultural heritage impact (F6 maruah).
+ */
+server.tool(
+  "geox_maraoh_impact",
+  "Assess community dignity and cultural heritage impact (F6 maruah) of a physical operation. Returns maruah score, dignity impact, cultural heritage risk, stakeholder concern, and mitigation.",
+  {
+    location: z.string().optional(),
+    latitude: z.number().optional(),
+    operationType: z.enum(["extraction", "injection", "storage", "construction"]).optional(),
+    distance_km: z.number().optional(),
+    population_density: z.number().optional(),
+  },
+  async ({ location, latitude, operationType, distance_km, population_density }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("geox_maraoh_impact");
+    return runStage("333_MIND" as MetabolicStage, async () => {
+    try {
+      const tool = new GEOX_TOOLS[8]();
+      const result = await tool.run({ location, latitude, operationType, distance_km, population_density }, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
+      const parsed = JSON.parse(result.output as string);
+      const response = { content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }] };
+      await telemetrySuccess("geox_maraoh_impact", startedAt);
+      return response;
+    } catch (err) { await telemetryFailure("geox_maraoh_impact", startedAt, err); throw err; }
+    });
+  }
+);
+
+/**
+ * geox_extraction_limits
+ * Compute maximum safe extraction rate and cumulative production limits.
+ */
+server.tool(
+  "geox_extraction_limits",
+  "Compute maximum safe extraction rate and cumulative production limits for a reservoir. Returns maxSafeRate, maxCumulative, rateStability, and depletion%.",
+  {
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+    depth: z.number().optional(),
+    formation_type: z.string().optional(),
+    currentRate: z.number().optional(),
+    scenario: z.string().optional(),
+  },
+  async ({ latitude, longitude, depth, formation_type, currentRate, scenario }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("geox_extraction_limits");
+    return runStage("333_MIND" as MetabolicStage, async () => {
+    try {
+      const tool = new GEOX_TOOLS[9]();
+      const result = await tool.run({ latitude, longitude, depth, formation_type, currentRate, scenario }, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
+      const parsed = JSON.parse(result.output as string);
+      const response = { content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }] };
+      await telemetrySuccess("geox_extraction_limits", startedAt);
+      return response;
+    } catch (err) { await telemetryFailure("geox_extraction_limits", startedAt, err); throw err; }
+    });
+  }
+);
+
+/**
+ * geox_climate_bounds
+ * Compute climate bounds (temperature rise, sea level, carbon budget).
+ */
+server.tool(
+  "geox_climate_bounds",
+  "Compute climate bounds (temperature rise, sea level, carbon budget) for an emissions scenario. Returns optimistic/pessimistic bounds with uncertainty tag.",
+  {
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+    scenario: z.string().optional(),
+    emission_kg_co2: z.number().optional(),
+    time_horizon_years: z.number().optional(),
+  },
+  async ({ latitude, longitude, scenario, emission_kg_co2, time_horizon_years }) => {
+    const startedAt = Date.now();
+    await telemetryInvoke("geox_climate_bounds");
+    return runStage("333_MIND" as MetabolicStage, async () => {
+    try {
+      const tool = new GEOX_TOOLS[10]();
+      const result = await tool.run({ latitude, longitude, scenario, emission_kg_co2, time_horizon_years }, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
+      const parsed = JSON.parse(result.output as string);
+      const response = { content: [{ type: "text" as const, text: JSON.stringify(parsed, null, 2) }] };
+      await telemetrySuccess("geox_climate_bounds", startedAt);
+      return response;
+    } catch (err) { await telemetryFailure("geox_climate_bounds", startedAt, err); throw err; }
+    });
+  }
+);
+
+/**
  * wealth_evaluate_ROI
  * Evaluate investment ROI against WEALTH objective function and thermodynamic cost.
  * Returns PROCEED/HOLD/VOID based on EMV, NPV, maruah score, and OPS/777 band.

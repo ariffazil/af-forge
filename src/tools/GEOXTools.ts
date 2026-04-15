@@ -741,4 +741,380 @@ export class GEOXPhysicalConstraintTool extends BaseTool {
   }
 }
 
-export const GEOX_TOOLS = [GEOXCheckHazardTool, GEOXSubsurfaceModelTool, GEOXSeismicInterpretTool, GEOXProspectScoreTool, GEOXPhysicalConstraintTool];
+// ── GEOX Tool 6: Uncertainty Tag ────────────────────────────────────────────
+
+export interface UncertaintyTagArgs {
+  sourceTool?: string;
+  evidenceCount?: number;
+  confidenceInterval?: [number, number];
+  claimType?: "hazard" | "formation" | "pressure" | "temperature" | "reserve" | "emission";
+  localDataQuality?: "high" | "medium" | "low";
+}
+
+export interface UncertaintyTagResult {
+  tag: "ESTIMATE" | "HYPOTHESIS" | "UNKNOWN";
+  confidenceScore: number;
+  uncertaintyBand: "low" | "medium" | "high" | "critical";
+  evidenceRequired: number;
+  evidenceProvided: number;
+  groundingScore: number;
+  recommended_next_stage: "333_MIND" | "555_HEART" | "888_JUDGE" | "SEAL";
+  reasoning: string;
+}
+
+export class GEOXUncertaintyTagTool extends BaseTool {
+  readonly name = "geox_uncertainty_tag";
+  readonly description = "Tag any GEOX output claim with F8 uncertainty classification. Returns ESTIMATE/HYPOTHESIS/UNKNOWN, confidence score, uncertainty band, and recommended pipeline stage.";
+  readonly riskLevel = "guarded" as const;
+
+  readonly parameters = {
+    type: "object" as const,
+    properties: {
+      sourceTool: { type: "string" as const, description: "Name of the tool that produced the claim" },
+      evidenceCount: { type: "number" as const, description: "Number of independent evidence sources" },
+      confidenceInterval: { type: "array" as const, items: { type: "number" as const }, description: "[lower, upper] confidence bounds" },
+      claimType: { type: "string" as const, enum: ["hazard", "formation", "pressure", "temperature", "reserve", "emission"] },
+      localDataQuality: { type: "string" as const, enum: ["high", "medium", "low"] },
+    },
+    additionalProperties: false,
+  } as const;
+
+  async run(args: Record<string, unknown>, _context: ToolExecutionContext): Promise<ToolResult> {
+    const evidenceCount = (args.evidenceCount as number) ?? 0;
+    const ci = (args.confidenceInterval as number[]) ?? [0.5, 0.9];
+    const claimType = (args.claimType as string) ?? "formation";
+    const dataQuality = (args.localDataQuality as string) ?? "medium";
+
+    const ciWidth = Math.abs(ci[1] - ci[0]);
+    const ciCenter = (ci[0] + ci[1]) / 2;
+    let confidenceScore = Math.max(0, Math.min(1, ciCenter - ciWidth * 0.5));
+    if (dataQuality === "high") confidenceScore = Math.min(1, confidenceScore + 0.15);
+    else if (dataQuality === "low") confidenceScore = Math.max(0, confidenceScore - 0.2);
+
+    let evidenceRequired = 2;
+    if (claimType === "reserve" || claimType === "emission") evidenceRequired = 3;
+
+    const groundingScore = Math.min(1, evidenceCount / evidenceRequired);
+    let tag: UncertaintyTagResult["tag"] = "UNKNOWN";
+    let uncertaintyBand: UncertaintyTagResult["uncertaintyBand"] = "critical";
+    let recommended_next_stage: UncertaintyTagResult["recommended_next_stage"] = "888_JUDGE";
+
+    if (evidenceCount === 0) {
+      tag = "UNKNOWN"; uncertaintyBand = "critical"; recommended_next_stage = "555_HEART";
+    } else if (groundingScore >= 0.8 && ciWidth < 0.3) {
+      tag = "ESTIMATE"; uncertaintyBand = "low"; recommended_next_stage = "333_MIND";
+    } else if (groundingScore >= 0.4 || ciWidth < 0.5) {
+      tag = "HYPOTHESIS"; uncertaintyBand = "medium"; recommended_next_stage = "555_HEART";
+    } else {
+      tag = "UNKNOWN"; uncertaintyBand = "high"; recommended_next_stage = "888_JUDGE";
+    }
+
+    const output: UncertaintyTagResult = {
+      tag,
+      confidenceScore: Math.round(confidenceScore * 100) / 100,
+      uncertaintyBand,
+      evidenceRequired,
+      evidenceProvided: evidenceCount,
+      groundingScore: Math.round(groundingScore * 100) / 100,
+      recommended_next_stage,
+      reasoning: `Claim "${claimType}": evidence=${evidenceCount}/${evidenceRequired}, CI=[${ci[0].toFixed(2)},${ci[1].toFixed(2)}], quality=${dataQuality} → TAG: ${tag} (${uncertaintyBand}) → ${recommended_next_stage}`,
+    };
+
+    return { ok: true, output: JSON.stringify(output, null, 2) };
+  }
+}
+
+// ── GEOX Tool 7: Tri-Witness W³ ─────────────────────────────────────────────
+
+export class GEOXWitnessTriadTool extends BaseTool {
+  readonly name = "geox_witness_triad";
+  readonly description = "Verify a physical claim using Tri-Witness W³ consensus. Three independent methods must agree within threshold to reach consensus. Returns W³ score, consensus verdict, and recommended action.";
+  readonly riskLevel = "guarded" as const;
+
+  readonly parameters = {
+    type: "object" as const,
+    properties: {
+      claim: { type: "string" as const, description: "Physical claim to verify" },
+      method1: { type: "object" as const, properties: { type: { type: "string" as const }, result: { type: "string" as const }, confidence: { type: "number" as const } } },
+      method2: { type: "object" as const, properties: { type: { type: "string" as const }, result: { type: "string" as const }, confidence: { type: "number" as const } } },
+      method3: { type: "object" as const, properties: { type: { type: "string" as const }, result: { type: "string" as const }, confidence: { type: "number" as const } } },
+    },
+    required: ["claim"],
+    additionalProperties: false,
+  };
+
+  async run(args: Record<string, unknown>, _context: ToolExecutionContext): Promise<ToolResult> {
+    const claim = (args.claim as string) ?? "";
+    const methods = [args.method1, args.method2, args.method3].filter(Boolean) as Array<{ type: string; result: string; confidence: number }>;
+
+    if (methods.length < 2) {
+      return { ok: true, output: JSON.stringify({ w3Score: 0, consensusReached: false, verdict: "VOID", witnesses: [], disagreements: ["Insufficient witnesses (<2)"], recommendedAction: "888_HOLD" }) };
+    }
+
+    let agreementSum = 0, pairCount = 0;
+    const disagreements: string[] = [];
+    for (let i = 0; i < methods.length; i++) {
+      for (let j = i + 1; j < methods.length; j++) {
+        const diff = Math.abs(parseFloat(methods[i].result) - parseFloat(methods[j].result)) / Math.max(0.1, parseFloat(methods[j].result));
+        const agreement = Math.max(0, 1 - diff);
+        agreementSum += agreement * methods[i].confidence * methods[j].confidence;
+        pairCount++;
+        if (diff > 0.2) disagreements.push(`${methods[i].type} vs ${methods[j].type}: ${(diff * 100).toFixed(0)}%`);
+      }
+    }
+
+    const avgPairAgreement = pairCount > 0 ? agreementSum / pairCount : 0;
+    const avgConfidence = methods.reduce((s, m) => s + m.confidence, 0) / methods.length;
+    const w3Score = avgPairAgreement * avgConfidence;
+    const consensusReached = w3Score >= 0.7;
+    const verdict = w3Score >= 0.85 ? "SEAL" : w3Score < 0.4 ? "VOID" : "HOLD";
+
+    const output = {
+      w3Score: Math.round(w3Score * 1000) / 1000,
+      consensusReached,
+      verdict,
+      witnesses: methods.map((m, i) => ({ method: m.type, result: m.result, weight: m.confidence })),
+      disagreements,
+      recommendedAction: verdict === "SEAL" ? "Proceed to 777_FORGE" : verdict === "HOLD" ? "888_HOLD" : "VOID — contradictive",
+      reasoning: `W³=${w3Score.toFixed(3)} (pairAgree=${avgPairAgreement.toFixed(2)} × conf=${avgConfidence.toFixed(2)}) → ${verdict}`,
+    };
+
+    return { ok: true, output: JSON.stringify(output, null, 2) };
+  }
+}
+
+// ── GEOX Tool 8: Ground Truth F8 ────────────────────────────────────────────
+
+export class GEOXGroundTruthTool extends BaseTool {
+  readonly name = "geox_ground_truth";
+  readonly description = "Check F8 Grounding for a physical claim. Verifies that assertions have sufficient independent evidence. Returns grounded boolean, grounding score, missing evidence list, and F8 verdict.";
+  readonly riskLevel = "guarded" as const;
+
+  readonly parameters = {
+    type: "object" as const,
+    properties: {
+      claim: { type: "string" as const },
+      evidenceSources: { type: "array" as const, items: { type: "string" as const } },
+      claimedConfidence: { type: "number" as const },
+      claimType: { type: "string" as const, enum: ["hazard", "reserve", "formation", "emission", "climate"] },
+    },
+    required: ["claim"],
+    additionalProperties: false,
+  };
+
+  async run(args: Record<string, unknown>, _context: ToolExecutionContext): Promise<ToolResult> {
+    const claim = (args.claim as string) ?? "";
+    const evidenceSources = (args.evidenceSources as string[]) ?? [];
+    const claimedConfidence = (args.claimedConfidence as number) ?? 0.5;
+    const claimType = (args.claimType as string) ?? "formation";
+    const minEvidence: Record<string, number> = { hazard: 2, reserve: 3, formation: 2, emission: 3, climate: 3 };
+    const requiredEvidence = minEvidence[claimType] ?? 2;
+    const groundingScore = Math.min(1, evidenceSources.length / requiredEvidence);
+    const missingEvidence: string[] = [];
+    if (evidenceSources.length < requiredEvidence) {
+      const types = ["seismic survey", "well log", "core sample", "production test"];
+      const existing = evidenceSources.map((e) => e.toLowerCase());
+      for (const t of types) {
+        if (!existing.some((e) => e.includes(t.split(" ")[0]))) missingEvidence.push(`Independent ${t}`);
+        if (missingEvidence.length >= requiredEvidence - evidenceSources.length) break;
+      }
+    }
+    let f8Verdict = evidenceSources.length === 0 ? "VOID" : (groundingScore < 0.8 || claimedConfidence > 0.9 ? "HOLD" : "PASS");
+
+    const output = {
+      grounded: groundingScore >= 1,
+      groundingScore: Math.round(groundingScore * 100) / 100,
+      missingEvidence,
+      f8Verdict,
+      recommendedEvidenceCount: requiredEvidence,
+      reasoning: `Claim "${claim}" (${claimType}): ${evidenceSources.length}/${requiredEvidence} evidence. Grounding=${groundingScore.toFixed(2)}, claimed=${claimedConfidence.toFixed(2)} → F8: ${f8Verdict}`,
+    };
+    return { ok: true, output: JSON.stringify(output, null, 2) };
+  }
+}
+
+// ── GEOX Tool 9: Maruah Impact ───────────────────────────────────────────────
+
+export class GEOXMaruahImpactTool extends BaseTool {
+  readonly name = "geox_maraoh_impact";
+  readonly description = "Assess community dignity and cultural heritage impact (F6 maruah) of a physical operation. Returns maruah score, dignity impact, cultural heritage risk, stakeholder concern, and mitigation.";
+  readonly riskLevel = "guarded" as const;
+
+  readonly parameters = {
+    type: "object" as const,
+    properties: {
+      location: { type: "string" as const },
+      latitude: { type: "number" as const },
+      operationType: { type: "string" as const, enum: ["extraction", "injection", "storage", "construction"] },
+      distance_km: { type: "number" as const },
+      population_density: { type: "number" as const },
+    },
+    additionalProperties: false,
+  } as const;
+
+  async run(args: Record<string, unknown>, _context: ToolExecutionContext): Promise<ToolResult> {
+    const operationType = (args.operationType as string) ?? "extraction";
+    const distance_km = (args.distance_km as number) ?? 5;
+    const population_density = (args.population_density as number) ?? 100;
+    const lat = (args.latitude as number) ?? 0;
+    const baseImpact: Record<string, number> = { extraction: 0.6, injection: 0.4, storage: 0.2, construction: 0.5 };
+    const bi = baseImpact[operationType] ?? 0.5;
+    const distanceFactor = Math.max(0.1, 1 - distance_km / 50);
+    const populationFactor = Math.min(1.5, 1 + population_density / 500);
+    const indigenousFactor = (Math.abs(lat) < 30 && population_density < 50) ? 1.3 : 1.0;
+    const maruahScore = Math.max(0, Math.min(1, 1 - bi * distanceFactor * populationFactor * indigenousFactor * 0.5));
+    const dignityImpact = maruahScore >= 0.8 ? "none" : maruahScore >= 0.6 ? "low" : maruahScore >= 0.4 ? "moderate" : "severe";
+    const culturalHeritageRisk = maruahScore < 0.4 ? "high" : maruahScore < 0.7 ? "medium" : "low";
+    const stakeholderConcernLevel = maruahScore < 0.3 ? "critical" : maruahScore < 0.5 ? "high" : maruahScore < 0.7 ? "medium" : "low";
+    const recommendedMitigation: string[] = [];
+    if (distance_km < 2) recommendedMitigation.push("Mandatory exclusion zone — minimum 2km buffer");
+    if (population_density > 200) recommendedMitigation.push("Community notification and consent required");
+    if (culturalHeritageRisk === "high") recommendedMitigation.push("Heritage impact assessment required");
+    if (stakeholderConcernLevel === "critical") recommendedMitigation.push("F13 SOVEREIGN: Human approval mandatory");
+    const violations: string[] = [];
+    if (maruahScore < 0.5) violations.push("F6_MARUAH: Low maruah score");
+    if (stakeholderConcernLevel === "critical") violations.push("F6: Critical stakeholder concern");
+
+    const ms = maruahScore;
+    const output = {
+      maruahScore: Math.round(ms * 100) / 100,
+      dignityImpact,
+      affectedCommunities: Math.round(population_density * Math.PI * (distance_km ** 2)),
+      culturalHeritageRisk,
+      stakeholderConcernLevel,
+      recommendedMitigation,
+      violations,
+      reasoning: `${operationType} at ${distance_km}km, pop=${population_density}/km²: maruah=${maruahScore.toFixed(2)}, dignity=${dignityImpact}, heritage=${culturalHeritageRisk}`,
+    };
+    return { ok: true, output: JSON.stringify(output, null, 2) };
+  }
+}
+
+// ── GEOX Tool 10: Extraction Limits ─────────────────────────────────────────
+
+export class GEOXExtractionLimitsTool extends BaseTool {
+  readonly name = "geox_extraction_limits";
+  readonly description = "Compute maximum safe extraction rate and cumulative production limits for a reservoir. Returns maxSafeRate, maxCumulative, rateStability, and depletion%.";
+  readonly riskLevel = "guarded" as const;
+
+  readonly parameters = {
+    type: "object" as const,
+    properties: {
+      latitude: { type: "number" as const },
+      longitude: { type: "number" as const },
+      depth: { type: "number" as const },
+      formation_type: { type: "string" as const },
+      currentRate: { type: "number" as const },
+      scenario: { type: "string" as const },
+    },
+    additionalProperties: false,
+  } as const;
+
+  async run(args: Record<string, unknown>, _context: ToolExecutionContext): Promise<ToolResult> {
+    const depth = (args.depth as number) ?? 3000;
+    const formationType = (args.formation_type as string) ?? "sandstone";
+    const currentRate = (args.currentRate as number) ?? 500;
+    const cap: Record<string, { baseRate: number; baseCumulative: number; stabilityFactor: number }> = {
+      sandstone: { baseRate: 2000, baseCumulative: 5000000, stabilityFactor: 0.9 },
+      carbonate: { baseRate: 1500, baseCumulative: 3000000, stabilityFactor: 0.75 },
+      shale: { baseRate: 500, baseCumulative: 1000000, stabilityFactor: 0.6 },
+      granite: { baseRate: 200, baseCumulative: 500000, stabilityFactor: 0.5 },
+      volcanic: { baseRate: 300, baseCumulative: 800000, stabilityFactor: 0.55 },
+    };
+    const c = cap[formationType] ?? cap["sandstone"];
+    const depthFactor = Math.max(0.3, 1 - (depth - 2000) / 6000);
+    const maxSafeRate_m3_day = Math.round(c.baseRate * depthFactor * c.stabilityFactor);
+    const lat = (args.latitude as number) ?? 0;
+    const locationFactor = Math.abs(lat) < 25 ? 1.2 : 1.0;
+    const maxCumulative_m3 = Math.round(c.baseCumulative * depthFactor * locationFactor);
+    const rateStability = currentRate > maxSafeRate_m3_day * 0.9 ? "unstable" : currentRate > maxSafeRate_m3_day * 0.7 ? "declining" : "stable";
+    const depletionPercent = Math.round((currentRate * 365 / maxCumulative_m3) * 1000) / 10;
+    const uncertaintyTag: "ESTIMATE" | "HYPOTHESIS" | "UNKNOWN" = c.stabilityFactor > 0.8 ? "ESTIMATE" : c.stabilityFactor > 0.6 ? "HYPOTHESIS" : "UNKNOWN";
+    const violations: string[] = [];
+    if (currentRate > maxSafeRate_m3_day) violations.push("F4: Rate exceeds safe maximum");
+    if (rateStability === "unstable") violations.push("F6: Unstable rate — reservoir damage risk");
+
+    const output = {
+      maxSafeRate_m3_day,
+      maxCumulative_m3,
+      rateStability,
+      depletionPercent,
+      uncertaintyTag,
+      violations,
+      reasoning: `${formationType} at ${depth}m: maxRate=${maxSafeRate_m3_day}m³/day, maxCum=${(maxCumulative_m3 / 1e6).toFixed(2)}MMm³, current=${currentRate}m³/day (${(currentRate / maxSafeRate_m3_day * 100).toFixed(0)}%) → ${rateStability}`,
+    };
+    return { ok: true, output: JSON.stringify(output, null, 2) };
+  }
+}
+
+// ── GEOX Tool 11: Climate Bounds ────────────────────────────────────────────
+
+export class GEOXClimateBoundsTool extends BaseTool {
+  readonly name = "geox_climate_bounds";
+  readonly description = "Compute climate bounds (temperature rise, sea level, carbon budget) for an emissions scenario. Returns optimistic/pessimistic bounds with uncertainty tag.";
+  readonly riskLevel = "guarded" as const;
+
+  readonly parameters = {
+    type: "object" as const,
+    properties: {
+      latitude: { type: "number" as const },
+      longitude: { type: "number" as const },
+      scenario: { type: "string" as const },
+      emission_kg_co2: { type: "number" as const },
+      time_horizon_years: { type: "number" as const },
+    },
+    additionalProperties: false,
+  } as const;
+
+  async run(args: Record<string, unknown>, _context: ToolExecutionContext): Promise<ToolResult> {
+    const scenario = (args.scenario as string) ?? "ndc";
+    const emission_kg_co2 = (args.emission_kg_co2 as number) ?? 0;
+    const time_horizon_years = (args.time_horizon_years as number) ?? 50;
+    const lat = (args.latitude as number) ?? 0;
+    const sm: Record<string, { temp: number; sea: number; budget: number }> = {
+      baseline: { temp: 1.5, sea: 0.5, budget: 500 }, ndc: { temp: 1.3, sea: 0.4, budget: 600 },
+      "1.5c": { temp: 0.8, sea: 0.2, budget: 800 }, "2c": { temp: 1.1, sea: 0.3, budget: 700 },
+      high_emission: { temp: 2.5, sea: 0.8, budget: 300 },
+    };
+    const s = sm[scenario] ?? sm["ndc"];
+    const emission_Mt = emission_kg_co2 / 1e9;
+    const warmingFactor = Math.log(1 + emission_Mt) / 10;
+    const temperatureRise_c = Math.round(s.temp * (1 + warmingFactor) * (time_horizon_years / 50) * 100) / 100;
+    const polarFactor = Math.abs(lat) > 60 ? 1.5 : 1.0;
+    const seaLevelRise_m = Math.round(s.sea * polarFactor * (time_horizon_years / 50) * 100) / 100;
+    const carbonBudget_remaining_Gt = Math.max(0, s.budget - emission_Mt / 1000);
+    const uncertaintyTag: "ESTIMATE" | "HYPOTHESIS" | "UNKNOWN" = scenario === "1.5c" || scenario === "2c" ? "ESTIMATE" : scenario === "high_emission" ? "HYPOTHESIS" : "UNKNOWN";
+    const recommendations: string[] = [];
+    if (temperatureRise_c > 1.5) recommendations.push("CRITICAL: Warming exceeds 1.5°C — F6 maruah review required");
+    if (seaLevelRise_m > 0.3) recommendations.push("HIGH RISK: Significant sea level rise");
+    if (carbonBudget_remaining_Gt < 400) recommendations.push("CARBON BUDGET CRITICAL: <400Gt — 888_HOLD");
+
+    const output = {
+      temperatureRise_c,
+      seaLevelRise_m,
+      carbonBudget_remaining_Gt: Math.round(carbonBudget_remaining_Gt * 10) / 10,
+      uncertaintyTag,
+      bounds: {
+        optimistic: { tempRise: Math.round(temperatureRise_c * 0.7 * 100) / 100, seaRise: Math.round(seaLevelRise_m * 0.6 * 100) / 100 },
+        pessimistic: { tempRise: Math.round(temperatureRise_c * 1.4 * 100) / 100, seaRise: Math.round(seaLevelRise_m * 1.3 * 100) / 100 },
+      },
+      recommendations,
+      reasoning: `${scenario} over ${time_horizon_years}y, ${emission_Mt.toFixed(1)}Mt CO2, lat=${lat}° → ΔT=${temperatureRise_c}°C, ΔSea=${seaLevelRise_m}m, Budget=${carbonBudget_remaining_Gt.toFixed(0)}Gt`,
+    };
+    return { ok: true, output: JSON.stringify(output, null, 2) };
+  }
+}
+
+export const GEOX_TOOLS = [
+  GEOXCheckHazardTool,
+  GEOXSubsurfaceModelTool,
+  GEOXSeismicInterpretTool,
+  GEOXProspectScoreTool,
+  GEOXPhysicalConstraintTool,
+  GEOXUncertaintyTagTool,
+  GEOXWitnessTriadTool,
+  GEOXGroundTruthTool,
+  GEOXMaruahImpactTool,
+  GEOXExtractionLimitsTool,
+  GEOXClimateBoundsTool,
+];
