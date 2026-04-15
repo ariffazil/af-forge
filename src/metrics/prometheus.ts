@@ -38,6 +38,12 @@ const holdOpenTotal = new Gauge({
   help: "Current number of open approval holds.",
 });
 
+const bridgeContractMismatchTotal = new Counter({
+  name: "arifos_bridge_contract_mismatch_total",
+  help: "Count of AF-FORGE / arifOS bridge contract mismatches.",
+  labelNames: ["reason"],
+});
+
 export async function runStage<T>(stage: MetabolicStage, fn: () => Promise<T>): Promise<T> {
   const end = metabolicStageDuration.startTimer({ stage });
   try {
@@ -73,4 +79,8 @@ export function recordEscalationLatency(seconds: number, domain: string): void {
 
 export function setOpenHolds(count: number): void {
   holdOpenTotal.set(count);
+}
+
+export function recordBridgeContractMismatch(reason: string): void {
+  bridgeContractMismatchTotal.inc({ reason });
 }

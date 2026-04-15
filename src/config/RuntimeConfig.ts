@@ -60,7 +60,7 @@ export function readRuntimeConfig(): RuntimeConfig {
         ? "ollama"
         : "mock";
 
-  return {
+  const config: RuntimeConfig = {
     provider: {
       kind: providerKind,
       model: process.env.AGENT_WORKBENCH_MODEL ?? (providerKind === "ollama" ? "llama3.2" : "gpt-5"),
@@ -77,11 +77,9 @@ export function readRuntimeConfig(): RuntimeConfig {
         process.env.ENABLE_DANGEROUS_TOOLS === "1" ||
         process.env.ENABLE_DANGEROUS_TOOLS === "true",
       ENABLE_BACKGROUND_JOBS:
-        trustLocalVps ||
         process.env.ENABLE_BACKGROUND_JOBS === "1" ||
         process.env.ENABLE_BACKGROUND_JOBS === "true",
       ENABLE_EXPERIMENTAL_TOOLS:
-        trustLocalVps ||
         process.env.ENABLE_EXPERIMENTAL_TOOLS === "1" ||
         process.env.ENABLE_EXPERIMENTAL_TOOLS === "true",
     }),
@@ -142,4 +140,10 @@ export function readRuntimeConfig(): RuntimeConfig {
     arifosGovernanceUrl: process.env.ARIFOS_GOVERNANCE_URL,
     operatorApiToken: process.env.OPERATOR_API_TOKEN,
   };
+
+  if (config.trustLocalVps) {
+    console.error("[WARN] AGENT_WORKBENCH_TRUST_LOCAL_VPS is active — dangerous tools enabled and command prefix filtering disabled. Use only in isolated environments.");
+  }
+
+  return config;
 }

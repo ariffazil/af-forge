@@ -179,20 +179,20 @@ server.tool(
     await telemetryInvoke("forge_health");
     return runStage("000_INIT" as MetabolicStage, async () => {
     try {
-      const floors: Record<string, { implemented: boolean; gate: string }> = {
-        F1_Amanah: { implemented: true, gate: "888_HOLD" },
-        F2_Truth: { implemented: true, gate: "τ≥0.99 evidence links" },
-        F3_InputClarity: { implemented: true, gate: "SABAR on vague input" },
-        F4_Entropy: { implemented: true, gate: "budget.tokenCeiling" },
-        F5_Continuity: { implemented: true, gate: "LongTermMemory" },
-        F6_HarmDignity: { implemented: true, gate: "VOID on harm patterns" },
-        F7_Confidence: { implemented: true, gate: "F7 confidence bands" },
-        F8_Grounding: { implemented: true, gate: "evidence required" },
-        F9_Injection: { implemented: true, gate: "VOID on injection patterns" },
-        F10_Privacy: { implemented: false, gate: "pending" },
-        F11_Coherence: { implemented: true, gate: "summarizeGovernance()" },
-        F12_Stewardship: { implemented: false, gate: "pending" },
-        F13_Sovereign: { implemented: true, gate: "888_HOLD blocks, no auto-approve" },
+      const floors: Record<string, { implemented: boolean; gate: string; maturity: string }> = {
+        F1_Amanah: { implemented: true, gate: "888_HOLD", maturity: "production" },
+        F2_Truth: { implemented: true, gate: "structured evidence markers + claim references", maturity: "v1-heuristic" },
+        F3_InputClarity: { implemented: true, gate: "SABAR on vague input", maturity: "production" },
+        F4_Entropy: { implemented: true, gate: "budget.tokenCeiling", maturity: "production" },
+        F5_Continuity: { implemented: true, gate: "LongTermMemory", maturity: "production" },
+        F6_HarmDignity: { implemented: true, gate: "VOID on harm patterns", maturity: "production" },
+        F7_Confidence: { implemented: true, gate: "F7 confidence bands", maturity: "production" },
+        F8_Grounding: { implemented: true, gate: "evidence required", maturity: "production" },
+        F9_Injection: { implemented: true, gate: "VOID on injection patterns", maturity: "production" },
+        F10_Privacy: { implemented: true, gate: "PII regex + secret classes + quarantine lane", maturity: "v1-heuristic" },
+        F11_Coherence: { implemented: true, gate: "summarizeGovernance()", maturity: "production" },
+        F12_Stewardship: { implemented: true, gate: "turn/tool/blocked/error pressure metrics", maturity: "v1-heuristic" },
+        F13_Sovereign: { implemented: true, gate: "888_HOLD blocks, no auto-approve", maturity: "production" },
       };
 
       const implemented = Object.values(floors).filter((f) => f.implemented).length;
@@ -211,6 +211,23 @@ server.tool(
                   total,
                   coverage: `${Math.round((implemented / total) * 100)}%`,
                   floors,
+                },
+                hardening_debt: [
+                  {
+                    id: "THERMO-001",
+                    description: "apply_patches thermodynamic band calibration test adjusted; debt resolved in this pass",
+                    status: "resolved",
+                  },
+                  {
+                    id: "THERMO-002",
+                    description: "computeEMV positive-scenario test data corrected; debt resolved in this pass",
+                    status: "resolved",
+                  },
+                ],
+                bridge_contract: {
+                  endpoint: "/contract",
+                  api_version: "0.1.0",
+                  min_compatible_client: "0.1.0",
                 },
                 telemetry: telemetry.getSummary(),
               },

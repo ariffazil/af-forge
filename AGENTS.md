@@ -1,4 +1,5 @@
 <!-- AGENTS.md — AF-FORGE Agent Workbench -->
+<!-- Generated from actual project contents. Read this first before modifying code. -->
 
 # AF-FORGE Agent Workbench — AGENTS.md
 
@@ -9,7 +10,7 @@
 
 ## Project Overview
 
-AF-FORGE is a **constitutional, event-sourced agent runtime** written in TypeScript. It implements a **Planner/Executor/Verifier triad** architecture with built-in policy gates, governed memory, and human sovereignty controls (`888_HOLD`).
+AF-FORGE is a **constitutional, event-sourced agent runtime** written in TypeScript. It implements a **Planner/Executor/Verifier triad** architecture with built-in policy gates, governed memory, and `888_HOLD` human sovereignty controls.
 
 **Key Philosophy:**
 - State is explicit (state machine, not chat loop)
@@ -21,13 +22,14 @@ AF-FORGE is a **constitutional, event-sourced agent runtime** written in TypeScr
 
 The project includes:
 - A **Sense/Judge policy layer** (`111`/`888`) with F7 confidence estimation
-- An **Approval Boundary** system with first-class hold queues and ticket stores
+- An **Approval Boundary** system with first-class hold queues, ticket stores, and an **ApprovalRouter** for planner outputs
 - A **Memory Contract** with 5 memory tiers
-- A **PlanValidator** for structural validation of agent plan DAGs
-- An **MCP stdio server** exposing governance and agent tools
-- An **HTTP bridge server** (Express) for Sense/Judge, operator, and human-expert operations
+- A **PlanValidator** and **ParallelPlannerContract** for structural validation of agent plan DAGs
+- An **MCP stdio server** exposing governance, agent, and patch-application tools
+- An **HTTP bridge server** (Express) for Sense/Judge, operator, human-expert, and governance evaluation operations
 - A **Personal OS v2** with a 6-verb human interface
 - A **Vault999** client for append-only terminal verdict sealing
+- A **ThermodynamicCostEstimator** (OPS/777) enforcing Landauer-gate cost bounds on tool execution
 
 ---
 
@@ -40,7 +42,7 @@ The project includes:
 **Sibling directories are separate subprojects** and are not governed by this `AGENTS.md`:
 - `arifOS/` — Python constitutional kernel (F1–F13) and VAULT999
 - `GEOX/` — Wrapper/launcher layer for geospatial services
-- `geox/` — Shared geospatial contracts and domain logic
+- `geox/` — Shared geospatial contracts and domain logic (Python, with its own `pyproject.toml`)
 - `geox-gui/` — React cockpit UI
 - `geox-site/` — Static web presence
 - `control_plane/` — Routing and coordination services
@@ -93,15 +95,16 @@ npm test
 make test
 
 # Run other AF-FORGE test files manually
+node dist/test/AgentEngine.test.js
 node dist/test/PlanValidator.test.js
+node dist/test/ParallelPlannerContract.test.js
 node dist/test/confidence.test.js
 node dist/test/governanceViolation.test.js
 node dist/test/sense.test.js
 node dist/test/ticketStore.test.js
 node dist/test/operatorConsole.test.js
-
-# Run a single test and filter output
-node dist/test/AgentEngine.test.js 2>&1 | grep -A5 "test name"
+node dist/test/operatorAuth.test.js
+node dist/test/thermodynamic.test.js
 
 # Run example
 npm run example:explore
@@ -116,7 +119,7 @@ node dist/src/server.js
 # Start MCP stdio server
 node dist/src/mcp/server.js
 
-# Docker Compose stack (includes Postgres, Redis, Ollama, Prometheus, Grafana, Caddy)
+# Docker Compose stack (includes Postgres, Redis, Ollama, Qdrant, Prometheus, Grafana, Caddy)
 docker compose up -d --build --remove-orphans
 
 # Full trust mode (root-key equivalent — disables all sandboxing)
@@ -143,6 +146,7 @@ src/
 │   └── profiles.ts            # Profile builders (explore, fix, test, coordinator, worker)
 ├── approval/            # P0.5 Approval Boundary system
 │   ├── ApprovalBoundary.ts    # Hold queue, previews, execution records
+│   ├── ApprovalRouter.ts      # Routes PlannerOutput through policy gates
 │   ├── TicketStore.ts         # File-backed JSONL ticket store
 │   ├── PostgresTicketStore.ts # PostgreSQL ticket store implementation
 │   └── index.ts
@@ -171,6 +175,8 @@ src/
 │   └── modes.ts               # internal_mode vs external_safe_mode
 ├── governance/          # arifOS 13 Floors constitutional enforcement
 │   ├── index.ts               # Governance module exports
+│   ├── GovernanceClient.ts    # Local + HTTP governance clients
+│   ├── PolicyEnforcer.ts      # Policy enforcement for planner outputs
 │   ├── SealService.ts         # VAULT999 plan-level validation on PlanDAG nodes
 │   ├── thresholds.ts          # Context-adaptive F3/F7/F13 thresholds
 │   ├── f3InputClarity.ts      # F3: Input clarity validation
@@ -200,6 +206,10 @@ src/
 │   └── index.ts
 ├── metrics/             # Prometheus instrumentation
 │   └── prometheus.ts          # Counters, histograms, gauges for floors and escalations
+├── middleware/          # HTTP middleware
+│   └── operatorAuth.ts        # Bearer-token auth for operator/human-expert endpoints
+├── ops/                 # Operational cost estimation
+│   └── ThermodynamicCostEstimator.ts  # OPS/777 Landauer gate enforcement
 ├── personal/            # Personal OS v1 (SovereignLoop, DailyLoop, HumanCLI)
 │   ├── DailyLoop.ts
 │   ├── HumanCLI.ts
@@ -211,7 +221,9 @@ src/
 │   ├── index.ts
 │   └── README.md
 ├── planner/             # Plan structural validation
-│   └── PlanValidator.ts       # Validates plan DAGs (acyclic, reachable, etc.)
+│   ├── ParallelPlannerContract.ts  # Parallel planning contract
+│   ├── PlanValidator.ts       # Validates plan DAGs (acyclic, reachable, etc.)
+│   └── index.ts
 ├── policy/              # Sense (111) and Judge (888/F7) policy layer
 │   ├── confidence.ts          # F7 confidence proxy + evaluateWithConfidence
 │   ├── index.ts
@@ -223,18 +235,23 @@ src/
 ├── tools/               # Tool implementations
 │   ├── base.ts                # BaseTool abstract class + Tool interface
 │   ├── ToolRegistry.ts        # Tool registration and dispatch
+│   ├── EditorTools.ts         # Patch application (applyPatches)
 │   ├── FileTools.ts           # read_file, write_file, list_files
 │   ├── SearchTools.ts         # grep_text
 │   └── ShellTools.ts          # run_tests, run_command
 ├── types/               # TypeScript type definitions
 │   ├── agent.ts               # Agent messages, profiles, results
 │   ├── aki.ts                 # AKI transport contract types
+│   ├── forge.ts               # Core forge types
 │   ├── jobs.ts                # Job types
 │   ├── memory.ts              # Memory record types
 │   ├── plan.ts                # Plan DAG and validation types
+│   ├── planner.ts             # Planner contract types
+│   ├── policy.ts              # Policy config types
 │   ├── scoreboard.ts          # Scoreboard types
 │   ├── session.ts             # Session state and sense types
-│   └── tool.ts                # Tool schemas, permissions, results
+│   ├── tool.ts                # Tool schemas, permissions, results
+│   └── wealth.ts              # Thermodynamic cost types
 ├── utils/               # Utilities
 │   ├── fs.ts                  # Filesystem helpers
 │   └── paths.ts               # Path resolution (sandboxing)
@@ -244,23 +261,40 @@ src/
     └── index.ts
 
 test/
-├── AgentEngine.test.ts        # Main test suite (node:test)
-├── PlanValidator.test.ts      # Plan DAG validation tests
-├── confidence.test.ts         # Confidence estimation tests
-├── governanceViolation.test.ts # F3/F6 governance blocking tests
-├── operatorConsole.test.ts    # Operator console + vault query tests
-├── sense.test.ts              # Sense/latency space tests
-└── ticketStore.test.ts        # Ticket store lifecycle tests
+├── AgentEngine.test.ts           # Main engine tests (node:test)
+├── PlanValidator.test.ts         # Plan DAG validation tests
+├── ParallelPlannerContract.test.ts  # Parallel planner contract tests
+├── confidence.test.ts            # Confidence estimation tests
+├── governanceViolation.test.ts   # F3/F6 governance blocking tests
+├── operatorAuth.test.ts          # Operator auth middleware tests
+├── operatorConsole.test.ts       # Operator console + vault query tests
+├── sense.test.ts                 # Sense/latency space tests
+├── thermodynamic.test.ts         # Thermodynamic cost estimator tests
+└── ticketStore.test.ts           # Ticket store lifecycle tests
 
 examples/
 └── runExploreExample.ts       # Example usage
 
+scripts/
+├── ingest-eureka-capsule.ts   # Script to ingest sacred constitutional memories
+└── start-af-forge-mcp.sh      # Shell wrapper to start the MCP server
+
+deploy/
+├── caddy/                     # Caddy reverse-proxy configuration
+├── docker-compose.yml         # Extended deployment compose file
+├── grafana/                   # Grafana dashboard provisioning
+├── prometheus/                # Prometheus scrape configs
+└── systemd/                   # systemd service units
+
 dist/                  # Compiled JavaScript output (gitignored)
 package.json           # NPM manifest
-tsconfig.json          # TypeScript configuration (ES2022, NodeNext)
+/tsconfig.json         # TypeScript configuration (ES2022, NodeNext)
 Makefile               # Convenient build/test/docker targets
-docker-compose.yml     # Full stack deployment (bridge, ollama, postgres, redis, caddy, prometheus, grafana)
+docker-compose.yml     # Full stack deployment (bridge, arifos-mcp, geox-mcp, ollama, postgres, redis, qdrant, caddy, prometheus, grafana)
+.env.example           # Example environment configuration
 ```
+
+**Note on `src/.archive/`:** This directory contains dated snapshots of earlier module implementations (e.g., `approval_20260411/`, `continuity_20260411/`, `personal_20260411/`). These are **not active source** — consult the top-level directories under `src/` for current implementations.
 
 ---
 
@@ -289,7 +323,7 @@ import { AgentEngine } from "../engine/AgentEngine.ts";
 - **Declaration:** true (generates .d.ts files)
 - **OutDir:** `dist/`
 - **RootDir:** `.`
-- **Include:** `src/**/*.ts`, `examples/**/*.ts`, `test/**/*.ts`
+- **Include:** `src/**/*.ts`, `examples/**/*.ts`, `test/**/*.ts`, `scripts/**/*.ts`
 
 ### Naming Conventions
 
@@ -383,16 +417,16 @@ test("test name", async () => {
 
 1. **CLI** (`src/cli.ts`) parses args → selects an `AgentProfile`
 2. **AgentEngine** (`src/engine/AgentEngine.ts`) drives the loop:
-   - Runs constitutional governance checks (F3, F6, F9 before execution)
-   - Injects relevant `LongTermMemory` entries as system messages
+   - Runs constitutional governance checks (F3, F6, F9 before execution) via `GovernanceClient`
+   - Injects sacred `MemoryContract` entries (eureka capsules) and relevant `LongTermMemory` entries as system messages
    - Calls `LlmProvider.completeTurn()` each turn
    - Passes tool calls through `ToolRegistry.runTool()` with permission + policy checks
-   - Runs per-tool governance (F4, F6, F8 during tool execution)
+   - Runs per-tool governance (F4, F6, F8, OPS/777 thermodynamic checks during tool execution)
    - Runs post-tool-batch governance (F11 after each turn's tools finish)
    - Runs post-execution governance (F7 after completion)
    - Appends results to `ShortTermMemory` (in-session transcript)
 3. On completion, stores summary in `LongTermMemory` and reports metrics via `RunReporter` → `ForgeScoreboard` + `RunMetricsLogger`
-4. Terminal verdicts (SEAL, HOLD, SABAR, VOID) are persisted via `VaultClient` to the VAULT999 ledger
+4. Terminal verdicts (`SEAL`, `HOLD`, `SABAR`, `VOID`) are persisted via `VaultClient` to the VAULT999 ledger
 
 ### Governance Floors (arifOS F1–F13)
 
@@ -405,12 +439,13 @@ test("test name", async () => {
 | F8 | Grounding | `src/governance/f8Grounding.ts` | Per-tool | PASS, HOLD | ✅ Active |
 | F9 | Injection | `src/governance/f9Injection.ts` | Pre-execution | PASS, VOID | ✅ Active |
 | F11 | Coherence | `src/governance/f11Coherence.ts` | Post-tool batch | PASS, HOLD | ✅ Active (warning only) |
+| OPS/777 | Thermodynamic | `src/ops/ThermodynamicCostEstimator.ts` | Per-tool | PASS, HOLD, VOID | ✅ Active |
 | F1 | Amanah | `ToolRegistry.runTool()` | Per-tool dangerous execution | 888_HOLD | ⚠️ Enforced via gate |
 | F5 | Continuity | `src/continuity/ContinuityStore.ts` | Session persistence | — | ⚠️ Implemented outside governance dir |
 | F13 | Sovereign | `AgentEngine` permission context | Dangerous tool approval | 888_HOLD | ⚠️ Enforced via `holdEnabled` |
-| F2 | Truth | — | — | — | ⏳ Pending |
-| F10 | Privacy | — | — | — | ⏳ Pending |
-| F12 | Stewardship | — | — | — | ⏳ Pending |
+| F2 | Truth | `src/governance/index.ts` | — | — | ⏳ Stub present |
+| F10 | Privacy | `src/governance/index.ts` | — | — | ⏳ Stub present |
+| F12 | Stewardship | `src/governance/index.ts` | — | — | ⏳ Stub present |
 
 **Note:** `SealService.ts` performs plan-level VAULT999 validation on `PlanDAG` nodes, but it is **not yet wired into `AgentEngine`**. Terminal verdict sealing via `VaultClient` (`FileVaultClient` / `NoOpVaultClient` / `PostgresVaultClient`) **is** integrated into the `AgentEngine.run()` post-judge path.
 
@@ -418,7 +453,7 @@ test("test name", async () => {
 
 - **`src/policy/sense.ts`** — Lite/Deep/Auto query classification. Returns `SenseResult` with `uncertainty_band`, `evidence_count`, `risk_indicators`, and `recommended_next_stage`.
 - **`src/policy/confidence.ts`** — F7 proxy confidence calculation (`calculateConfidenceEstimate`) and Judge evaluation (`evaluateWithConfidence`) producing `SEAL`, `HOLD`, or `VOID` verdicts.
-- **`src/server.ts`** — HTTP bridge exposing `POST /sense` which runs Sense + Judge and returns structured JSON.
+- **`src/server.ts`** — HTTP bridge exposing `POST /sense` which runs Sense + Judge and returns structured JSON. Also exposes `POST /governance/evaluate` for direct constitutional evaluation.
 
 ### PlanValidator
 
@@ -448,11 +483,12 @@ The **888_HOLD** is a human sovereignty circuit breaker:
 - Maps to constitutional principle **F13 Sovereign** (Arif holds final authority)
 - Required for `dangerous` risk tools
 - Implemented in `ToolRegistry.runTool()`: if `permissionContext.holdEnabled` is false, dangerous tools return a hold error instead of executing
+- High/critical `riskLevel` forces `888_HOLD` on dangerous tools regardless of `holdEnabled`
 
 ### External Safe Mode
 
 When in `external_safe_mode`:
-- `run_command` tool is **disabled**
+- `run_command` tool is **disabled** (only `run_tests` is permitted among shell tools)
 - Both outgoing task text and incoming LLM responses are **redacted** (strips tokens matching `sk-…` patterns and `https://…` references)
 
 ### Trust Local VPS Flag
@@ -493,8 +529,13 @@ All runtime configuration is in `src/config/RuntimeConfig.ts` via `readRuntimeCo
 | `ENABLE_BACKGROUND_JOBS` | Enable background jobs | `false` |
 | `ENABLE_EXPERIMENTAL_TOOLS` | Enable experimental tools | `false` |
 | `HUMAN_ESCALATION_WEBHOOK_URL` | Webhook URL for 888_HOLD human expert escalation | — |
+| `ARIFOS_GOVERNANCE_URL` | Optional external governance endpoint | — |
+| `OPERATOR_API_TOKEN` | Bearer token for `/operator` and `/human-expert` endpoints | — |
 | `POSTGRES_URL` | PostgreSQL connection string (optional) | — |
+| `REDIS_URL` | Redis connection string (optional) | — |
 | `AF_FORGE_PORT` | HTTP bridge server port | `7071` |
+
+See `.env.example` for the complete variable list and suggested defaults.
 
 ---
 
@@ -535,6 +576,11 @@ agent operator vault [--verdict <verdict>] [--sessionId <id>] [--since <iso>] [-
 - MCP tools: `forge_hold`, `forge_approve`
 - MCP resources: `forge://approvals/pending`, `forge://approvals/tickets`
 
+### Approval Router (`src/approval/ApprovalRouter.ts`)
+- Takes a `PlannerOutput` (from arifOS PlannerAgent), validates it against `PolicyConfig`, and either auto-applies low-risk changes or stages high-risk edits for `888_HOLD`
+- Outcomes: `AUTO_APPLIED`, `WAITING_FOR_HUMAN`, `REJECTED`
+- MCP tool: `forge_route_approval`
+
 ### Memory Contract (`src/memory-contract/`)
 - 5 memory tiers: `ephemeral`, `working`, `canon`, `sacred`, `quarantine`
 - Actions: `store`, `correct`, `pin`, `forget`, `downgrade`, `verify`
@@ -566,8 +612,11 @@ agent operator vault [--verdict <verdict>] [--sessionId <id>] [--since <iso>] [-
   - `forge_run` — Execute a governed agent task (explore profile, real LLM)
   - `forge_hold` — Stage an action for 888_HOLD approval
   - `forge_approve` — Approve a held action
+  - `forge_route_approval` — Route a PlannerOutput through policy gates
+  - `forge_apply_patches` — Directly apply unified diffs
   - `forge_remember` — Store a memory in the MemoryContract
   - `forge_recall` — Query memories from the MemoryContract
+  - `forge_ticket_status` — Query an approval ticket by ID
 - Resources:
   - `forge://governance/floors` — Constitutional floor definitions (F1–F13)
   - `forge://approvals/pending` — Pending approval queue
@@ -578,9 +627,11 @@ agent operator vault [--verdict <verdict>] [--sessionId <id>] [--since <iso>] [-
 - Port 7071 (configurable via `AF_FORGE_PORT`)
 - Endpoints:
   - `POST /sense` — Run Sense Lite/Deep + F7 confidence evaluation
+  - `POST /governance/evaluate` — Direct constitutional evaluation with adaptive thresholds
   - `GET /health` — Service health check
   - `GET /ready` — Readiness probe
   - `GET /metrics` — Prometheus metrics (`arifos_metabolic_stage_duration_seconds`, `arifos_floor_violation_total`, `arifos_human_escalation_total`, `arifos_human_decision_total`, `arifos_human_escalation_latency_seconds`, `arifos_hold_open_total`)
+  - `GET /contract` — Runtime contract for arifOS bridge negotiation
   - `GET /human-expert/tickets` — List escalation tickets
   - `GET /human-expert/tickets/:ticketId` — Get a single ticket
   - `POST /human-expert/decision` — Submit a human decision
@@ -589,6 +640,7 @@ agent operator vault [--verdict <verdict>] [--sessionId <id>] [--since <iso>] [-
   - `GET /operator/approvals/:ticketId` — Get a single approval ticket
   - `GET /operator/vault` — Search vault seals with optional filters (`sessionId`, `verdict`, `since`, `until`, `limit`)
   - `GET /operator/vault/:sealId` — Get a single vault seal record
+- Operator and human-expert endpoints are protected by `OPERATOR_API_TOKEN` bearer-token middleware when the token is configured. In production, missing `OPERATOR_API_TOKEN` causes a fatal exit.
 
 ### Personal OS v2 (`src/personal-v2/`)
 - `PersonalOS` class with 6-verb human interface:
@@ -606,77 +658,27 @@ agent operator vault [--verdict <verdict>] [--sessionId <id>] [--since <iso>] [-
 - `PostgresVaultClient` writes to PostgreSQL when `POSTGRES_URL` is configured
 - Integrated into `AgentEngine.run()` post-judge path
 
+### Thermodynamic Cost Estimator (`src/ops/ThermodynamicCostEstimator.ts`)
+- OPS/777 Landauer gate enforcement
+- Evaluates every tool call for predicted thermodynamic cost (κᵣ, blast radius, dS)
+- Verdicts: `PASS`, `HOLD`, `VOID`
+- Integrated into `AgentEngine` per-tool execution path
+
 ---
 
 ## Deployment & CI
 
-- **Deployment Blueprint:** `APEX/OPERATION/deployment-blueprint.md` — Engineering spec for AKI transport contract, K8s topology, state persistence (VAULT999 + MemoryContract), and Prometheus observability.
 - **AKI Types:** `src/types/aki.ts` — TypeScript contracts for the Arif Kernel Interface envelope, verdicts, and JSON-RPC error shapes.
-- **Prometheus Metrics:** `src/metrics/prometheus.ts` — `runStage()` instrumentation and `recordFloorViolation()` hooks used in the MCP server and HTTP bridge.
-- **Docker Compose:** `docker-compose.yml` at the repo root defines the full local/VPS stack:
-  - `af-forge-bridge` — The main Node.js runtime
-  - `arifos-mcp` — Placeholder for the arifOS MCP server
-  - `ollama` — Local LLM inference (with optional GPU reservations)
-  - `postgres` — Relational store for tickets and vault
-  - `redis` — Caching / message broker
-  - `caddy` — Reverse proxy / TLS termination
-  - `prometheus` — Metrics collection (exposed on `127.0.0.1:9090`)
-  - `grafana` — Dashboards (exposed on `127.0.0.1:3000`)
-- **Makefile:** Provides `build`, `up`, `down`, `logs`, `test`, `clean`, `install` targets.
-- **MCP Registry:** `smithery.yaml` and `fastmcp.json` configure MCP server registry deployment.
-- **CI/CD:** `.github/workflows/ci.yml` runs on every push and PR:
-  1. `npm ci`
-  2. `npm run build`
-  3. `npm test`
-  4. `node dist/test/PlanValidator.test.js`
-  5. `node dist/test/confidence.test.js`
-  6. `node dist/test/sense.test.js`
-  7. `node dist/test/governanceViolation.test.js`
-  8. `node dist/test/ticketStore.test.js`
-  9. `node dist/test/operatorConsole.test.js`
+- **Docker:** Multi-stage `Dockerfile` builds the bridge server. `docker-compose.yml` brings up the full stack.
+- **GitHub Actions:** `.github/workflows/ci.yml` runs the test suite on push/PR.
+- **Systemd:** `deploy/systemd/af-forge.service` provides a service unit template for Linux deployments.
 
 ---
 
-## Constitutional Principles (arifOS F1–F13)
+## When You Modify This Codebase
 
-AF-FORGE implements constitutional constraints from arifOS:
-
-| Floor | Principle | Implementation |
-|-------|-----------|----------------|
-| F1 | Amanah | No irreversible action without VAULT999 seal → `888_HOLD` gate / `dangerous` risk tools |
-| F2 | Truth | No ungrounded claims (τ ≥ 0.99) → pending |
-| F3 | Input Clarity | Clear task definition required → Pre-execution SABAR check |
-| F4 | Entropy | Risk accumulation tracking across tool calls |
-| F5 | Continuity | Session persistence → `ContinuityStore` |
-| F6 | Harm/Dignity | No harm to humans/dignity → VOID check on task and tools |
-| F7 | Confidence | Humility in uncertainty → Post-execution confidence estimate |
-| F8 | Grounding | Evidence-based reasoning → Per-tool evidence counting |
-| F9 | Anti-Hantu | No deception/manipulation → Injection detection + VOID |
-| F10 | Privacy | Protect personal data → pending |
-| F11 | Coherence | Internal consistency → Post-tool coherence check |
-| F12 | Stewardship | Long-horizon resource care → pending |
-| F13 | Sovereign | Human (Arif) holds final authority → `888_HOLD` gates must block |
-
----
-
-## Notes for AI Agents
-
-1. **The repo root is the active AF-FORGE runtime.** Do not create or edit files under `agent-workbench/`; that directory is a stale copy.
-2. **Always use `.js` extensions in imports** — even for `.ts` source files.
-3. **Rebuild before testing** — no watch mode available.
-4. **Respect risk levels** — dangerous tools require explicit flags.
-5. **Test in isolation** — use temp directories, don't pollute the working directory.
-6. **Follow constitutional principles** — F1, F2, F9, F13 are non-negotiable.
-7. **Use ScriptedProvider for deterministic tests** — see existing tests for patterns.
-8. **Keep mode-aware** — `internal_mode` vs `external_safe_mode` have different capabilities.
-9. **Governance is enforced** — F3, F4, F6, F7, F8, F9, F11 floors are active in the engine.
-10. **Project root is `/root`** — source code is in `src/` directly.
-11. **MCP server uses `zod`** — schema validation is required for MCP tool definitions.
-12. **The CI workflow runs all TypeScript tests** — verify locally with `make test` before pushing.
-13. **SealService is not wired into AgentEngine** — plan-level VAULT999 validation on PlanDAG nodes exists but is not currently invoked by the runtime loop. Terminal verdict sealing via `VaultClient` is active in `AgentEngine.run()`.
-14. **When older docs reference `AF-FORGE/`, they mean the repo root** — do not create a nested `AF-FORGE/` directory.
-15. **PostgreSQL is optional** — if `POSTGRES_URL` is absent, the system falls back to local JSONL files for tickets and vault records.
-
----
-
-*Last updated: 2026-04-13*
+1. **Rebuild before testing:** `npm run build`
+2. **Respect `.js` imports:** Every internal import must end in `.js` for NodeNext resolution.
+3. **Keep tests in `node:test` style:** No external test frameworks.
+4. **Update `AGENTS.md`** if you change build commands, add new CLI commands, add new tools, or change the governance surface.
+5. **Do not commit `dist/`** — it is gitignored.

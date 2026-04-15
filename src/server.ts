@@ -19,7 +19,7 @@ import {
   classifyUncertaintyBand,
 } from "./policy/confidence.js";
 import { register } from "prom-client";
-import { runStage, recordHumanDecision, recordEscalationLatency, setOpenHolds } from "./metrics/prometheus.js";
+import { runStage, recordHumanDecision, recordEscalationLatency, setOpenHolds, recordBridgeContractMismatch } from "./metrics/prometheus.js";
 import type { MetabolicStage } from "./types/aki.js";
 import { getTicketStore } from "./approval/index.js";
 import { FileVaultClient } from "./vault/index.js";
@@ -38,7 +38,12 @@ app.use((req, _res, next) => {
 
 // Operator / Human-expert auth middleware
 const OPERATOR_API_TOKEN = process.env.OPERATOR_API_TOKEN;
+const isProduction = process.env.NODE_ENV === "production" || process.env.AF_FORGE_ENV === "production";
 if (!OPERATOR_API_TOKEN) {
+  if (isProduction) {
+    console.error("[FATAL] OPERATOR_API_TOKEN is required in production mode; /operator and /human-expert endpoints cannot be exposed without authentication");
+    process.exit(1);
+  }
   console.error("[WARN] OPERATOR_API_TOKEN is not set; /operator and /human-expert endpoints are unauthenticated");
 }
 
@@ -53,7 +58,10 @@ app.use("/human-expert", requireOperatorAuth);
 app.post("/sense", async (req: Request, res: Response) => {
   try {
     return await runStage("111_SENSE" as MetabolicStage, async () => {
-    const { session_id, prompt, context } = req.body;
+    const { version: clientVersion, session_id, prompt, context } = req.body;
+    if (clientVersion && clientVersion !== "0.1.0" && clientVersion !== "1") {
+      recordBridgeContractMismatch(`client_version_${clientVersion}`);
+    }
 
     if (!prompt || typeof prompt !== "string") {
       res.status(400).json({
@@ -206,6 +214,31 @@ app.get("/metrics", async (_req: Request, res: Response) => {
 });
 
 /**
+ * GET /contract
+ * Runtime contract for arifOS bridge negotiation
+ */
+app.get("/contract", (_req: Request, res: Response) => {
+  res.json({
+    ok: true,
+    api_version: "0.1.0",
+    min_compatible_client: "0.1.0",
+    service: "af-forge",
+    governance_surface: "HTTP bridge + MCP stdio",
+    capabilities: {
+      sense: true,
+      judge: true,
+      governance_evaluate: true,
+      operator_console: true,
+      human_expert: true,
+      seal_service: true,
+      dangerous_tools: process.env.ENABLE_DANGEROUS_TOOLS === "1" || process.env.ENABLE_DANGEROUS_TOOLS === "true",
+      background_jobs: process.env.ENABLE_BACKGROUND_JOBS === "1" || process.env.ENABLE_BACKGROUND_JOBS === "true",
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
+/**
  * GET /health
  * Service health check
  */
@@ -215,6 +248,7 @@ app.get("/health", (_req: Request, res: Response) => {
     service: "af-forge-sense",
     status: "healthy",
     version: "0.1.0",
+    contract_url: "/contract",
     timestamp: new Date().toISOString(),
   });
 });
@@ -231,6 +265,7 @@ app.get("/ready", (_req: Request, res: Response) => {
       policy: true,
       sense: true,
       judge: true,
+      contract: true,
     },
   });
 });

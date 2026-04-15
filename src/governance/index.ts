@@ -32,6 +32,9 @@ export { checkInjection, redactSecrets, type InjectionResult, type InjectionVerd
 // F11: Coherence (NEW)
 export { checkCoherence, checkResponseCoherence, type CoherenceResult, type CoherenceVerdict } from "./f11Coherence.js";
 
+// Seal Service
+export { SealService, type SealContext, type SealVerdict, type SealStatus, type EpistemicVerdict, type EpistemicThresholds } from "./SealService.js";
+
 // Governance Client abstraction
 export {
   LocalGovernanceClient,
@@ -75,6 +78,138 @@ export interface GovernanceSummary {
 /**
  * Get unified verdict from all checks.
  */
+// ═══════════════════════════════════════════════════════════════════════════════
+// F2, F10, F12 — Minimal hardened implementations (no new files)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface TruthResult {
+  verdict: "PASS" | "HOLD";
+  message?: string;
+  ungroundedClaims: number;
+  evidenceMarkers: string[];
+  certaintyMatches: string[];
+  claimReferences: Array<{ claim: string; evidence: boolean }>;
+}
+
+export function checkTruth(text: string, evidenceCount: number): TruthResult {
+  const certaintyPatterns = /\b(definitely|absolutely|certainly|without a doubt|undeniably|irrefutably|100% sure)\b/gi;
+  const evidenceMarkers = /\b(according to|evidence shows|source:|citation|referenced in|as reported by)\b/gi;
+  const certaintyMatches = Array.from(text.matchAll(certaintyPatterns)).map((m) => m[0]);
+  const evidenceMarkerMatches = Array.from(text.matchAll(evidenceMarkers)).map((m) => m[0]);
+  const ungroundedClaims = Math.max(0, certaintyMatches.length - evidenceMarkerMatches.length);
+  const claimReferences = certaintyMatches.map((claim) => ({
+    claim,
+    evidence: evidenceMarkerMatches.length > 0,
+  }));
+  if (ungroundedClaims > 0 && evidenceCount < 2) {
+    return {
+      verdict: "HOLD",
+      message: `F2 Truth: ${ungroundedClaims} ungrounded claim(s) detected with insufficient evidence (${evidenceCount})`,
+      ungroundedClaims,
+      evidenceMarkers: evidenceMarkerMatches,
+      certaintyMatches,
+      claimReferences,
+    };
+  }
+  return {
+    verdict: "PASS",
+    ungroundedClaims,
+    evidenceMarkers: evidenceMarkerMatches,
+    certaintyMatches,
+    claimReferences,
+  };
+}
+
+export interface PrivacyResult {
+  verdict: "PASS" | "VOID";
+  message?: string;
+  patternsFound: string[];
+  secretClasses: Array<{ class: string; count: number }>;
+  redactionRequired: boolean;
+  quarantineRecommended: boolean;
+}
+
+export function checkPrivacy(text: string): PrivacyResult {
+  const patterns: Array<{ name: string; regex: RegExp; secretClass: string; quarantine: boolean }> = [
+    { name: "EMAIL", regex: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, secretClass: "contact", quarantine: false },
+    { name: "PHONE", regex: /\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/g, secretClass: "contact", quarantine: false },
+    { name: "SSN", regex: /\b\d{3}-\d{2}-\d{4}\b/g, secretClass: "identity", quarantine: true },
+    { name: "CREDIT_CARD", regex: /\b(?:\d{4}[-\s]?){3}\d{4}\b/g, secretClass: "financial", quarantine: true },
+  ];
+  const found: string[] = [];
+  const secretClasses: Array<{ class: string; count: number }> = [];
+  let quarantineRecommended = false;
+  for (const p of patterns) {
+    const matches = Array.from(text.matchAll(p.regex));
+    if (matches.length > 0) {
+      found.push(p.name);
+      const existing = secretClasses.find((s) => s.class === p.secretClass);
+      if (existing) {
+        existing.count += matches.length;
+      } else {
+        secretClasses.push({ class: p.secretClass, count: matches.length });
+      }
+      if (p.quarantine) quarantineRecommended = true;
+    }
+  }
+  if (found.length > 0) {
+    return {
+      verdict: "VOID",
+      message: `F10 Privacy: Potential PII detected (${found.join(", ")})`,
+      patternsFound: found,
+      secretClasses,
+      redactionRequired: true,
+      quarantineRecommended,
+    };
+  }
+  return {
+    verdict: "PASS",
+    patternsFound: [],
+    secretClasses: [],
+    redactionRequired: false,
+    quarantineRecommended: false,
+  };
+}
+
+export interface StewardshipResult {
+  verdict: "PASS" | "HOLD";
+  message?: string;
+  resourceScore: number;
+  metrics: {
+    turnPressure: number;
+    toolPressure: number;
+    blockedPressure: number;
+    errorPressure: number;
+  };
+}
+
+export function checkStewardship(
+  turnCount: number,
+  toolCallCount: number,
+  maxTurns: number,
+  blockedCommands: number,
+  errorMessage?: string,
+): StewardshipResult {
+  const turnPressure = turnCount > maxTurns * 0.8 ? 0.4 : 0;
+  const toolPressure = toolCallCount > 20 ? 0.3 : 0;
+  const blockedPressure = blockedCommands > 0 ? 0.2 : 0;
+  const errorPressure = errorMessage ? 0.1 : 0;
+  const resourceScore = turnPressure + toolPressure + blockedPressure + errorPressure;
+  if (resourceScore > 0.5) {
+    return {
+      verdict: "HOLD",
+      message: `F12 Stewardship: Resource pressure detected (turns=${turnCount}, tools=${toolCallCount}, blocked=${blockedCommands})`,
+      resourceScore,
+      metrics: { turnPressure, toolPressure, blockedPressure, errorPressure },
+    };
+  }
+  return {
+    verdict: "PASS",
+    resourceScore,
+    metrics: { turnPressure, toolPressure, blockedPressure, errorPressure },
+  };
+}
+
 export function summarizeGovernance(checks: GovernanceCheck[]): GovernanceSummary {
   const priority: FloorVerdict[] = ["VOID", "HOLD", "SABAR", "PASS"];
 

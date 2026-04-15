@@ -74,6 +74,7 @@ export type EngineRunOptions = {
   riskLevel?: "low" | "medium" | "high" | "critical";
   humanApprovedTicketId?: string;
   metadata?: Record<string, unknown>;
+  planDAG?: import("./plan.js").PlanDAG;
 };
 
 export type AgentRunResult = {

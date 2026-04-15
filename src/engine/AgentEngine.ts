@@ -28,19 +28,25 @@ import {
   checkEntropy,
   checkToolHarm,
   countEvidence,
+  checkTruth,
+  checkPrivacy,
+  checkStewardship,
   type GovernanceCheck,
   LocalGovernanceClient,
   type GovernanceClient,
+  SealService,
 } from "../governance/index.js";
 import { getAdaptiveThresholds } from "../governance/thresholds.js";
 import type { VaultClient, VaultSealRecord, VaultTelemetrySnapshot } from "../vault/index.js";
 import { computeInputHash, generateSealId } from "../vault/index.js";
 import type { HumanEscalationClient } from "../escalation/index.js";
-import { recordHumanEscalation } from "../metrics/prometheus.js";
+import { recordHumanEscalation, recordFloorViolation, runStage } from "../metrics/prometheus.js";
+import type { MetabolicStage } from "../types/aki.js";
 import type { TicketStore, ApprovalTicket } from "../approval/index.js";
 import { getTicketStore } from "../approval/index.js";
 import type { MemoryContract } from "../memory-contract/index.js";
 import { getMemoryContract } from "../memory-contract/index.js";
+import { ThermodynamicCostEstimator } from "../ops/ThermodynamicCostEstimator.js";
 
 export type AgentEngineDependencies = {
   llmProvider: LlmProvider;
@@ -54,6 +60,7 @@ export type AgentEngineDependencies = {
   escalationClient?: HumanEscalationClient;
   ticketStore?: TicketStore;
   governanceClient?: GovernanceClient;
+  sealService?: SealService;
   apiPricing?: {
     inputCostPerMillionTokens: number;
     outputCostPerMillionTokens: number;
@@ -154,6 +161,42 @@ export class AgentEngine {
       };
     }
 
+    // === F10: Privacy Check (pre-execution) ===
+    const privacyCheck = checkPrivacy(options.task);
+    if (privacyCheck.verdict === "VOID") {
+      floorsTriggered.push("F10");
+      const privacyDetail = JSON.stringify({
+        patterns: privacyCheck.patternsFound,
+        secretClasses: privacyCheck.secretClasses,
+        quarantine: privacyCheck.quarantineRecommended,
+      });
+      const { finalText: sealedText, sealError } = await this.sealTerminal(
+        options,
+        sessionId,
+        `VOID: ${privacyCheck.message} | detail=${privacyDetail}`,
+        0,
+        this.profile.name,
+        floorsTriggered,
+        permissionContext,
+        1,
+        startedAt,
+      );
+      return {
+        sessionId,
+        finalText: sealedText,
+        turnCount: 0,
+        totalEstimatedTokens: 0,
+        transcript: [],
+        metrics: this.buildEmptyMetrics(
+          options,
+          startedAt,
+          "F10",
+          privacyCheck.message ?? "Privacy violation detected",
+          sealError,
+        ),
+      };
+    }
+
     shortTermMemory.append({
       role: "system",
       content: this.profile.systemPrompt,
@@ -242,7 +285,8 @@ export class AgentEngine {
         for (const call of turnResponse.toolCalls) {
           toolCallsByType[call.toolName] = (toolCallsByType[call.toolName] ?? 0) + 1;
         }
-        const toolExecution = await this.executeToolCalls(
+        const toolExecution = await runStage("777_FORGE" as MetabolicStage, () =>
+          this.executeToolCalls(
           turnResponse,
           shortTermMemory,
           permissionContext,
@@ -250,6 +294,7 @@ export class AgentEngine {
           workingDirectory,
           relevantMemories.length,
           floorsTriggered,
+          ),
         );
         pendingMessages = toolExecution.messages;
         blockedDangerousActions += toolExecution.blockedDangerousActions;
@@ -257,12 +302,10 @@ export class AgentEngine {
         timeoutEvents += toolExecution.timeoutEvents;
         restrictedPathAttempts += toolExecution.restrictedPathAttempts;
         if (toolExecution.blockedDangerousActions > 0) floorsTriggered.push("F1");
-        if (toolExecution.blockedCommands > 0) floorsTriggered.push("F12");
         if (toolExecution.restrictedPathAttempts > 0) floorsTriggered.push("F13");
       }
     } catch (error) {
       errorMessage = error instanceof Error ? error.message : String(error);
-      floorsTriggered.push("F12");
       finalResponse = `Run failed: ${errorMessage}`;
     }
 
@@ -285,6 +328,32 @@ export class AgentEngine {
       floorsTriggered.push("F7");
       // Append confidence warning to response but don't block
       finalResponse += `\n\n[CONFIDENCE: ${confidenceCheck.confidence.toFixed(2)} - ${confidenceCheck.message}]`;
+    }
+
+    // === F2: Truth Check (end of session) ===
+    const truthCheck = checkTruth(finalResponse, toolCallCount);
+    if (truthCheck.verdict === "HOLD" && !errorMessage) {
+      floorsTriggered.push("F2");
+      const truthDetail = JSON.stringify({
+        ungroundedClaims: truthCheck.ungroundedClaims,
+        evidenceMarkers: truthCheck.evidenceMarkers,
+        claimReferences: truthCheck.claimReferences,
+      });
+      finalResponse += `\n\n[TRUTH: ${truthCheck.message} | detail=${truthDetail}]`;
+    }
+
+    // === F12: Stewardship Check (end of session) ===
+    const stewardshipCheck = checkStewardship(
+      turnCount,
+      toolCallCount,
+      this.profile.budget.maxTurns,
+      blockedCommands,
+      errorMessage,
+    );
+    if (stewardshipCheck.verdict === "HOLD") {
+      floorsTriggered.push("F12");
+      const stewardshipDetail = JSON.stringify(stewardshipCheck.metrics);
+      finalResponse += `\n\n[STEWARDSHIP: ${stewardshipCheck.message} | detail=${stewardshipDetail}]`;
     }
 
     await this.dependencies.longTermMemory.store({
@@ -328,6 +397,20 @@ export class AgentEngine {
       testsPassed,
       errorMessage,
     };
+
+    // === SealService: Plan-level validation (if PlanDAG provided) ===
+    if (options.planDAG && this.dependencies.sealService) {
+      const memoryHash = computeInputHash(options.task, finalResponse, sessionId, turnCount);
+      const sealVerdict = await this.dependencies.sealService.validateDag(
+        options.taskId ?? sessionId,
+        options.planDAG,
+        memoryHash,
+      );
+      if (sealVerdict.status !== "PASS") {
+        floorsTriggered.push("SealService");
+        finalResponse += `\n\n[PLAN_SEAL: ${sealVerdict.status}${sealVerdict.message ? ` — ${sealVerdict.message}` : ""}]`;
+      }
+    }
 
     // === 999 VAULT: Seal terminal verdict ===
     const sealResult = await this.sealTerminal(
@@ -474,6 +557,40 @@ export class AgentEngine {
       }
       cumulativeRisk = entropyCheck.riskAfter;
 
+      // === OPS/777: Thermodynamic Cost Estimation (Landauer Gate) ===
+      const thermo = new ThermodynamicCostEstimator();
+      const thermoCheck = thermo.estimateWithWealth(call.toolName, call.args);
+      if (thermoCheck.verdict === "VOID") {
+        floorsTriggered.push("OPS");
+        recordFloorViolation("OPS", "hard");
+        toolMessage = {
+          role: "tool",
+          toolCallId: call.id,
+          toolName: call.toolName,
+          content: `VOID [OPS/777 Thermo]: ${thermoCheck.cost.thermodynamicBand} band | κᵣ=${thermoCheck.cost.kappa_r.toFixed(2)} | blast=${thermoCheck.cost.blastRadius.toFixed(2)} | dS=${thermoCheck.cost.dS_predict.toFixed(2)} | ${thermoCheck.violations.join(" | ")}`,
+        };
+        shortTermMemory.append(toolMessage);
+        toolMessages.push(toolMessage);
+        blockedDangerousActions += 1;
+        callIndex++;
+        continue;
+      }
+      if (thermoCheck.verdict === "HOLD") {
+        floorsTriggered.push("OPS");
+        recordFloorViolation("OPS", "soft");
+        toolMessage = {
+          role: "tool",
+          toolCallId: call.id,
+          toolName: call.toolName,
+          content: `HOLD [OPS/777 Thermo]: ${thermoCheck.cost.thermodynamicBand} | κᵣ=${thermoCheck.cost.kappa_r.toFixed(2)} | blast=${thermoCheck.cost.blastRadius.toFixed(2)} | dS=${thermoCheck.cost.dS_predict.toFixed(2)} | ${thermoCheck.violations.join(" | ")} — 888_HOLD before decode`,
+        };
+        shortTermMemory.append(toolMessage);
+        toolMessages.push(toolMessage);
+        blockedDangerousActions += 1;
+        callIndex++;
+        continue;
+      }
+
       try {
         const toolResult = await this.dependencies.toolRegistry.runTool(
           call.toolName,
@@ -489,6 +606,28 @@ export class AgentEngine {
 
         // Track for grounding check
         toolResults.push({ ok: toolResult.ok, output: toolResult.output });
+
+        // === F10: Privacy Check (per-tool output) ===
+        const toolPrivacyCheck = checkPrivacy(toolResult.output ?? "");
+        if (toolPrivacyCheck.verdict === "VOID") {
+          floorsTriggered.push("F10");
+          const toolPrivacyDetail = JSON.stringify({
+            patterns: toolPrivacyCheck.patternsFound,
+            secretClasses: toolPrivacyCheck.secretClasses,
+            quarantine: toolPrivacyCheck.quarantineRecommended,
+          });
+          toolMessage = {
+            role: "tool",
+            toolCallId: call.id,
+            toolName: call.toolName,
+            content: `VOID: ${toolPrivacyCheck.message} | detail=${toolPrivacyDetail}`,
+          };
+          shortTermMemory.append(toolMessage);
+          toolMessages.push(toolMessage);
+          blockedDangerousActions += 1;
+          callIndex++;
+          continue;
+        }
 
         // === F8: Grounding Check ===
         // Skip if tool was already blocked by a higher-priority floor (F1/F13)

@@ -65,6 +65,39 @@ export class SealService {
   }
 
   /**
+   * Validate an entire PlanDAG by authorizing every node.
+   * Returns the first non-PASS verdict, or PASS if all nodes pass.
+   */
+  public async validateDag(goalId: string, dag: PlanDAG, memoryHash: string): Promise<SealVerdict> {
+    const structural = this.validator.validate(dag);
+    if (!structural.isValid) {
+      return this.createVerdict('VOID', this.computeSealId({ goalId, dag, node: dag.nodes.get(dag.rootId)!, memoryHash, timestamp: new Date().toISOString() }), dag.rootId, 1.0, {
+        structural,
+        epistemic: { status: 'HOLD', reason: 'Structural failure' }
+      }, `Structural failure: ${structural.errors.join('; ')}`);
+    }
+
+    for (const [, node] of dag.nodes) {
+      const context: SealContext = {
+        goalId,
+        dag,
+        node,
+        memoryHash,
+        timestamp: new Date().toISOString(),
+      };
+      const verdict = await this.authorizeNode(context);
+      if (verdict.status !== 'PASS') {
+        return verdict;
+      }
+    }
+
+    return this.createVerdict('PASS', this.computeSealId({ goalId, dag, node: dag.nodes.get(dag.rootId)!, memoryHash, timestamp: new Date().toISOString() }), dag.rootId, 0.0, {
+      structural,
+      epistemic: { status: 'PASS' }
+    }, 'All nodes authorized');
+  }
+
+  /**
    * Hardened Authorization Loop
    * Phases 0-4 implementation
    */
