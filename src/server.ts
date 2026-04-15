@@ -233,9 +233,141 @@ app.get("/contract", (_req: Request, res: Response) => {
       seal_service: true,
       dangerous_tools: process.env.ENABLE_DANGEROUS_TOOLS === "1" || process.env.ENABLE_DANGEROUS_TOOLS === "true",
       background_jobs: process.env.ENABLE_BACKGROUND_JOBS === "1" || process.env.ENABLE_BACKGROUND_JOBS === "true",
+      geox_log_interpreter: true,
     },
     timestamp: new Date().toISOString(),
   });
+});
+
+/**
+ * GET /geox/contract
+ * GEOX capabilities manifest — exposes AF-FORGE GEOX tools to external callers
+ * including the GEOX Python MCP and well-desk app.
+ */
+app.get("/geox/contract", (_req: Request, res: Response) => {
+  res.json({
+    ok: true,
+    service: "af-forge-geox",
+    version: "0.1.0",
+    namespace: "GEOX",
+    tools: [
+      {
+        name: "geox_log_interpreter",
+        description: "Interpret triple-combo wireline logs (GR, RT, RHOB, NPHI, SP, DT, CAL) → Vsh, PHIE, SW, fluid type, lithology. Anomalous contrast theory.",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        required_logs: ["GR", "RHOB", "NPHI"],
+        optional_logs: ["RT", "SP", "DT", "CAL", "depth"],
+        output: ["Vsh", "PHIE", "SW", "BVW", "anomalyScore", "fluidFlag", "lithology", "quality", "anomalyContrast"],
+        uncertainty_tag: ["ESTIMATE", "HYPOTHESIS", "UNKNOWN"],
+        risk_level: "guarded",
+        gates: ["F8_Grounding", "F7_Confidence"],
+      },
+      {
+        name: "geox_check_hazard",
+        description: "Assess physical hazard (seismic, volcanic, flood, slope, anthropogenic) at a location",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        risk_level: "guarded",
+      },
+      {
+        name: "geox_subsurface_model",
+        description: "Generate 3D subsurface geological model with structural framework and property volumes",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        risk_level: "guarded",
+      },
+      {
+        name: "geox_seismic_interpret",
+        description: "Structural and stratigraphic interpretation of seismic data",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        risk_level: "guarded",
+      },
+      {
+        name: "geox_prospect_score",
+        description: "Compute composite prospect score (PP, TR, CHARGE) with uncertainty",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        risk_level: "guarded",
+      },
+      {
+        name: "geox_physical_constraint",
+        description: "Apply physical constraints (pressure, temperature, stress, porosity) to scenario",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        risk_level: "guarded",
+      },
+      {
+        name: "geox_uncertainty_tag",
+        description: "Assign ESTIMATE/HYPOTHESIS/UNKNOWN tag to observation based on evidence quality",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        risk_level: "guarded",
+      },
+      {
+        name: "geox_witness_triad",
+        description: "W³ — Triple-witness check: three independent methods confirm observation",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        risk_level: "guarded",
+      },
+      {
+        name: "geox_ground_truth",
+        description: "Cross-validate observation against ground truth (analog, test, simulation)",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        risk_level: "guarded",
+      },
+      {
+        name: "geox_maraoh_impact",
+        description: "Assess community dignity and cultural heritage impact (F6 maruah)",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        risk_level: "guarded",
+      },
+      {
+        name: "geox_extraction_limits",
+        description: "Compute maximum safe extraction rate and cumulative production limits",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        risk_level: "guarded",
+      },
+      {
+        name: "geox_climate_bounds",
+        description: "Compute climate envelope (CO2 storage, water production) for operation",
+        domain: "geophysics",
+        pipeline_stage: "333_MIND",
+        risk_level: "guarded",
+      },
+    ],
+    python_mcp_route: "geox-mcp:8765",
+    bridge_route: "af-forge-bridge:7071/geox/*",
+    note: "geox_log_interpreter is executed by AF-FORGE TypeScript runtime; Python MCP geox_well_compute_petrophysics is a separate sibling service",
+  });
+});
+
+/**
+ * POST /geox/log_interpreter
+ * Execute GEOXLogInterpreterTool — triple-combo anomalous contrast decoder.
+ * Accessible to Python MCP via internal HTTP call.
+ */
+app.post("/geox/log_interpreter", async (req: Request, res: Response) => {
+  try {
+    return await runStage("333_MIND" as MetabolicStage, async () => {
+      const { GEOXLogInterpreterTool } = await import("./domains/geophysics/logInterpreter.js");
+      const tool = new GEOXLogInterpreterTool();
+      const result = await tool.run(req.body, { sessionId: "geox-bridge", workingDirectory: "/tmp", modeName: "internal_mode" });
+      if (!result.ok) {
+        res.status(400).json({ ok: false, error: result.output });
+        return;
+      }
+      res.json({ ok: true, result: JSON.parse(result.output as string) });
+    });
+  } catch (error) {
+    console.error("[AF-FORGE] /geox/log_interpreter error:", error);
+    res.status(500).json({ ok: false, error: { type: "internal_error", message: String(error) } });
+  }
 });
 
 /**
