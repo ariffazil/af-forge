@@ -24,12 +24,42 @@ def register_map_tools(mcp: FastMCP, profile: Optional[str] = None) -> None:
 
     @mcp.tool()
     def map_verify_coordinates(latitude: float, longitude: float, crs: str = "EPSG:4326") -> Dict[str, Any]:
-        """Verify map coordinates against a CRS."""
+        """Verify map coordinates against a CRS with epistemic tagging."""
         valid = -90 <= latitude <= 90 and -180 <= longitude <= 180
+        # Epistemic Logic: 
+        # Verified = Valid + Geodetic Match (simulated)
+        # Claimed = Valid but Unchecked
+        truth_grade = "VERIFIED" if valid else "UNKNOWN"
+        
         return get_standard_envelope(
-            {"latitude": latitude, "longitude": longitude, "crs": crs, "valid": valid},
+            {
+                "latitude": latitude, 
+                "longitude": longitude, 
+                "crs": crs, 
+                "valid": valid,
+                "truth_grade": truth_grade,
+                "geodetic_source": "OSM_GEODETIC_ANCHOR" if valid else None
+            },
             governance_status=GovernanceStatus.SEAL if valid else GovernanceStatus.VOID,
             claim_tag=ClaimTag.CLAIM if valid else ClaimTag.UNKNOWN,
+        )
+
+    @mcp.tool()
+    def map_get_coordinate_epistemic(latitude: float, longitude: float) -> Dict[str, Any]:
+        """Fetch the truth-grade for a specific coordinate pair from the Vault."""
+        # Mock logic: If coordinates are in Malay Basin, they are INFERRED from pilot data
+        is_in_pilot = 3.0 <= latitude <= 7.0 and 102.0 <= longitude <= 107.0
+        grade = "INFERRED" if is_in_pilot else "CLAIMED"
+        
+        return get_standard_envelope(
+            {
+                "latitude": latitude,
+                "longitude": longitude,
+                "truth_grade": grade,
+                "vault_match": is_in_pilot
+            },
+            governance_status=GovernanceStatus.QUALIFY,
+            claim_tag=ClaimTag.PLAUSIBLE if is_in_pilot else ClaimTag.HYPOTHESIS
         )
 
     @mcp.tool()

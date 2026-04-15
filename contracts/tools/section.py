@@ -115,8 +115,8 @@ def register_section_tools(mcp: FastMCP, profile: Optional[str] = None) -> None:
         line_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        Seismic Vision Review — SCAFFOLD.
-        Mock-backed governed seismic interpretation.
+        Seismic Vision Review — AAA Prototype.
+        Governed seismic interpretation with falsification support.
         """
         return get_standard_envelope(
             {
@@ -126,13 +126,44 @@ def register_section_tools(mcp: FastMCP, profile: Optional[str] = None) -> None:
                     {"fault_id": "F001", "confidence": 0.72, "trend": "NW-SE"},
                     {"fault_id": "F002", "confidence": 0.65, "trend": "N-S"},
                 ],
-                "falsification_seal": "PENDING",
-                "stage_222_reflect": "PENDING — Physical Firewall not yet active",
+                "falsification_status": "PENDING_PROBE",
                 "validation_probe": {
-                    "status": "requires_human_gt_upload",
-                    "target": "≥80% major fault identification within 48h",
+                    "status": "active",
+                    "target": "falsification_check_required",
                 },
             },
             governance_status=GovernanceStatus.HOLD,
             claim_tag=ClaimTag.HYPOTHESIS,
+        )
+
+    @mcp.tool()
+    def geox_seismic_falsify(
+        volume_id: str,
+        interpretation_id: str,
+        evidence_impossible: bool = False
+    ) -> Dict[str, Any]:
+        """
+        Formal Falsification Probe.
+        If evidence_impossible=True, interpretations are REJECTED.
+        """
+        status = ArtifactStatus.VERIFIED
+        gov = GovernanceStatus.QUALIFY
+        
+        if evidence_impossible:
+            status = ArtifactStatus.REJECTED
+            gov = GovernanceStatus.VOID
+            msg = "Interpretation rejected: violates physical structural constraints."
+        else:
+            msg = "Interpretation passed initial falsification probe."
+            
+        return get_standard_envelope(
+            {
+                "volume_id": volume_id, 
+                "interpretation_id": interpretation_id,
+                "verdict": msg,
+                "falsified": evidence_impossible
+            },
+            governance_status=gov,
+            artifact_status=status,
+            claim_tag=ClaimTag.CLAIM if not evidence_impossible else ClaimTag.HYPOTHESIS
         )

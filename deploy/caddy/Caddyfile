@@ -40,3 +40,29 @@
 		respond "AF FORGE Gateway" 200
 	}
 }
+
+# MCP Hub — mcp.arif-fazil.com
+# All MCP servers under one subdomain with automatic TLS
+mcp.arif-fazil.com {
+	bind 0.0.0.0
+
+	# arifOS MCP
+	handle_path /arifos/* {
+		reverse_proxy arifos-mcp:8080
+	}
+
+	# GEOX MCP
+	handle_path /geox/* {
+		reverse_proxy geox-mcp:8765
+	}
+
+	# Root MCP endpoint → arifOS MCP (default)
+	handle /* {
+		reverse_proxy arifos-mcp:8080
+	}
+
+	# Auto TLS via Let's Encrypt
+	tls {
+		protocols tls1.2 tls1.3
+	}
+}

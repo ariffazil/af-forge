@@ -75,6 +75,30 @@ services:
       retries: 3
       start_period: 10s
 
+  geox-mcp:
+    build:
+      context: ./geox
+      dockerfile: Dockerfile
+    container_name: af-forge-geox-mcp
+    restart: unless-stopped
+    ports:
+      - "8765:8765"
+    expose:
+      - "8765"
+    environment:
+      - PYTHONPATH=/app/geox
+      - STARLETTE_ALLOWED_HOSTS=*
+    volumes:
+      - ./geox:/app/geox:ro
+    networks:
+      - af-forge-internal
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8765/health')\" 2>/dev/null || python3 -c \"import socket; s=socket.create_connection(('localhost',8765),2); s.close()\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
   qdrant:
     image: qdrant/qdrant:latest
     container_name: af-forge-qdrant
@@ -92,7 +116,7 @@ services:
     networks:
       - af-forge-internal
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:6333/healthz || exit 1"]
+      test: ["CMD-SHELL", "bash -c 'echo >/dev/tcp/localhost/6333' 2>/dev/null"]
       interval: 15s
       timeout: 5s
       retries: 3
