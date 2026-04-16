@@ -248,3 +248,15 @@ GNU Affero General Public License v3.0
 ## Canon note
 
 AF FORGE follows arifOS constitutional governance but is a separate runtime artifact. For doctrine, Floors, and canonical law, refer to the `arifOS` repository.
+
+---
+
+## AAA Federation & Execution Adapter (SOT v2026-04-16)
+
+AF-FORGE now acts as the "Headed Transition" execution adapter for the arifOS federation:
+- **AAA-Agent**: Federal Coordinator routing intents to Specialist Organs (GEOX/WEALTH).
+- **ARCHIVIST-Agent**: Automatically persists every SEAL into the `arifos.canon_records` immutable ledger.
+- **NOTIFIER-Agent**: Manages human-loop escalation via webhook (port 9001) for `888_HOLD`.
+
+*(Note: Core primitives `LoopController`, `TaskGraphPlanner`, `AgentHandoff`, and `EvalHarness` remain in **HOLD** per canon).*
+

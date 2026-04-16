@@ -682,3 +682,20 @@ agent operator vault [--verdict <verdict>] [--sessionId <id>] [--since <iso>] [-
 3. **Keep tests in `node:test` style:** No external test frameworks.
 4. **Update `AGENTS.md`** if you change build commands, add new CLI commands, add new tools, or change the governance surface.
 5. **Do not commit `dist/`** — it is gitignored.
+
+---
+
+## 9-Agent Federation (SOT v2026-04-16)
+
+AF-FORGE now physically integrates the **Central Nervous System** of the arifOS federation:
+
+1. **APEX** (Sovereign): External human authority (Arif).
+2. **AAA-Agent** (ASI): Federal Coordinator. Receives all inter-agent routing requests and holds the `888_HOLD` escalation path.
+3. **AUDITOR-Agent** (AGI): Constitution and Floors evaluation.
+4. **VALIDATOR-Agent** (AGI): FK integrity and schema drift.
+5. **ENGINEER-Agent** (AGI): Infrastructure, runtime, and stack execution.
+6. **GEOX-Agent** (AGI): Earth, anomaly, and subsurface specialist.
+7. **WEALTH-Agent** (AGI): Capital, transactions, and NAV specialist.
+8. **ARCHIVIST-Agent** (AGI): Canon and Memory Keeper. Automatically writes every `SEAL` to the `arifos.canon_records` immutable ledger.
+9. **NOTIFIER-Agent** (TOOL): Human-loop delivery. Bridges `888_HOLD` to external webhooks (e.g., Telegram sidecar on port 9001).
+
