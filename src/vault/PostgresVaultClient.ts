@@ -52,22 +52,28 @@ export class PostgresVaultClient implements VaultClient {
     if (this.initialized) return;
     const client = await this.pool.connect();
     try {
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS vault_seals (
-          seal_id TEXT PRIMARY KEY,
-          session_id TEXT NOT NULL,
-          verdict TEXT NOT NULL,
-          timestamp TIMESTAMPTZ NOT NULL,
-          data JSONB NOT NULL
-        )
+      const tableCheck = await client.query(`
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = 'vault_seals' AND column_name = 'session_id'
+        LIMIT 1
       `);
-      await client.query(`CREATE INDEX IF NOT EXISTS idx_vault_session ON vault_seals(session_id)`);
-      await client.query(`CREATE INDEX IF NOT EXISTS idx_vault_verdict ON vault_seals(verdict)`);
-      await client.query(`CREATE INDEX IF NOT EXISTS idx_vault_timestamp ON vault_seals(timestamp DESC)`);
-    } catch (e) {
-      // vault_seals may already exist with a different schema (e.g., from a prior migration).
-      // In that case, skip the index creation and continue — the table's columns are already set.
-      process.stderr.write(`[VaultClient] initialize: skipped table/index creation (table may already exist): ${e}\n`);
+      if (tableCheck.rows.length === 0) {
+        await client.query(`
+          CREATE TABLE IF NOT EXISTS vault_seals (
+            seal_id TEXT PRIMARY KEY,
+            session_id TEXT NOT NULL,
+            verdict TEXT NOT NULL,
+            timestamp TIMESTAMPTZ NOT NULL,
+            data JSONB NOT NULL
+          )
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_vault_session ON vault_seals(session_id)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_vault_verdict ON vault_seals(verdict)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_vault_timestamp ON vault_seals(timestamp DESC)`);
+      }
+    } catch {
+      // vault_seals may already exist with a different schema (from a prior migration).
+      // Skip table/index creation and continue — vault_seals is unrelated to arifos.* tables.
     } finally {
       client.release();
     }

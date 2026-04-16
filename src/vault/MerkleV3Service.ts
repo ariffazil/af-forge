@@ -20,6 +20,7 @@ import type { VaultVerdict } from "./VaultClient.js";
 export interface TelemetryRow {
   id: number;
   epoch: Date;
+  epoch_text?: string | null;
   session_id: string | null;
   agent_id: string | null;
   ds: number | null;
@@ -54,9 +55,21 @@ export class MerkleV3Service {
    * Does NOT include prev_hash or row_hash themselves.
    */
   computeRowHash(row: TelemetryRow): string {
+    const epochText = row.epoch_text ?? (() => {
+      const d = new Date(row.epoch);
+      const year = d.getUTCFullYear();
+      const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(d.getUTCDate()).padStart(2, "0");
+      const hour = String(d.getUTCHours()).padStart(2, "0");
+      const min = String(d.getUTCMinutes()).padStart(2, "0");
+      const sec = String(d.getUTCSeconds()).padStart(2, "0");
+      const msFull = d.getUTCMilliseconds();
+      const us = msFull < 1000 ? String(msFull).padStart(3, "0") + "000" : String(msFull) + "000";
+      return `${year}-${month}-${day} ${hour}:${min}:${sec}.${us.slice(0, 6)}+00`;
+    })();
     const content = [
       row.id,
-      row.epoch.toISOString(),
+      epochText,
       row.session_id ?? "",
       row.agent_id ?? "",
       String(row.ds ?? ""),
@@ -99,7 +112,7 @@ export class MerkleV3Service {
    */
   async loadRowsForDate(date: Date): Promise<TelemetryRow[]> {
     const result = await this.vault.queryDb<TelemetryRow>(
-      `SELECT id, epoch, session_id, agent_id, ds, peace2, kappa_r, shadow,
+      `SELECT id, epoch, epoch::text as epoch_text, session_id, agent_id, ds, peace2, kappa_r, shadow,
               confidence, psi_le, verdict, witness_human, witness_ai, witness_earth,
               qdf, prev_hash, row_hash
        FROM arifos.agent_telemetry
