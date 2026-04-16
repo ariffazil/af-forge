@@ -23,9 +23,36 @@ import { runStage, recordHumanDecision, recordEscalationLatency, setOpenHolds, r
 import type { MetabolicStage } from "./types/aki.js";
 import { getTicketStore } from "./approval/index.js";
 import { FileVaultClient } from "./vault/index.js";
+import { getPostgresVaultClient, type FloorRule } from "./vault/index.js";
 import { LocalGovernanceClient } from "./governance/index.js";
 import { getAdaptiveThresholds } from "./governance/thresholds.js";
 import { createOperatorAuthMiddleware } from "./middleware/operatorAuth.js";
+
+let cachedConstitution: FloorRule[] = [];
+
+async function loadConstitution(): Promise<void> {
+  const postgresUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+  if (!postgresUrl) {
+    console.error("[WARN] No POSTGRES_URL — constitution loaded from static defaults");
+    return;
+  }
+  try {
+    const vault = getPostgresVaultClient(postgresUrl);
+    cachedConstitution = await vault.loadConstitution();
+    const count = cachedConstitution.length;
+    console.error(`[INIT] Constitution loaded from VAULT999: ${count} floor rules`);
+    if (count === 13) {
+      const f13 = cachedConstitution.find((f) => f.floor_id === "F13");
+      if (f13) console.error(`[INIT] F13 seal_threshold=${f13.threshold_value}`);
+    }
+  } catch (err) {
+    console.error(`[WARN] Failed to load constitution from vault: ${err} — using static defaults`);
+  }
+}
+
+export function getConstitution(): FloorRule[] {
+  return cachedConstitution;
+}
 
 const app = express();
 app.use(express.json());
@@ -666,7 +693,8 @@ app.use((err: Error, _req: Request, res: Response, _next: express.NextFunction) 
 
 const port = process.env.AF_FORGE_PORT ? parseInt(process.env.AF_FORGE_PORT, 10) : 7071;
 
-app.listen(port, "0.0.0.0", () => {
+app.listen(port, "0.0.0.0", async () => {
+  await loadConstitution();
   console.error(`═══════════════════════════════════════════════════════════`);
   console.error(`  AF-FORGE Sense Bridge Server`);
   console.error(`  Listening on 0.0.0.0:${port}`);

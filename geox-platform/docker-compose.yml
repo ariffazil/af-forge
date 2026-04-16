@@ -51,16 +51,21 @@ services:
   # ─── GEOX Unified Backend ───
   geox-unified:
     build:
-      context: ../GEOX
+      context: ../geox
       dockerfile: Dockerfile
     container_name: geox-unified
     environment:
       - TRANSPORT=sse
       - PORT=8000
       - HOST=0.0.0.0
+      - DATABASE_URL=postgresql://arifos_admin:ArifPostgresVault2026!@postgres:5432/arifos_vault
+      - ARIFOS_AGENT_ID=GEOX-Agent
+      - ARIFOS_CONSTITUTION_HASH=SEAL20260413RESOURCECONSOLIDATION
+      - GEOX_SCHEMA=geox
     ports:
       - "8000:8000"
     networks:
+      - arifos_core_network
       - geox-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -110,3 +115,5 @@ services:
 networks:
   geox-net:
     driver: bridge
+  arifos_core_network:
+    external: true

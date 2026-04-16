@@ -39,7 +39,7 @@ import {
   type FloorScores13,
 } from "../governance/index.js";
 import { getAdaptiveThresholds } from "../governance/thresholds.js";
-import type { VaultClient, VaultSealRecord, VaultTelemetrySnapshot } from "../vault/index.js";
+import type { VaultClient, VaultSealRecord, VaultTelemetrySnapshot, PostgresVaultClient } from "../vault/index.js";
 import { computeInputHash, generateSealId } from "../vault/index.js";
 import type { HumanEscalationClient } from "../escalation/index.js";
 import { recordHumanEscalation, recordFloorViolation, runStage } from "../metrics/prometheus.js";
@@ -682,7 +682,10 @@ export class AgentEngine {
     const messageTexts: string[] = [];
 
     let callIndex = 0;
+    let toolCallStartLength = floorsTriggered.length;
     for (const call of turnResponse.toolCalls) {
+      toolCallStartLength = floorsTriggered.length;
+      const runId = randomUUID();
       let toolMessage: AgentMessage;
 
       // === F6: Tool-level Harm Check ===
@@ -754,8 +757,9 @@ export class AgentEngine {
         continue;
       }
 
+      let toolResult;
       try {
-        const toolResult = await this.dependencies.toolRegistry.runTool(
+        toolResult = await this.dependencies.toolRegistry.runTool(
           call.toolName,
           call.args,
           {
@@ -842,6 +846,38 @@ export class AgentEngine {
           toolName: call.toolName,
           content: `Tool error: ${message}`,
         };
+      }
+
+      // === GO 3: Log every tool call to arifos.tool_calls ===
+      const toolFloors = floorsTriggered.slice(toolCallStartLength);
+      let toolVerdict = "PASS";
+      if (!toolResult?.ok) {
+        if (toolResult?.metadata?.hold || toolResult?.output?.startsWith("[888_HOLD]")) {
+          toolVerdict = "HOLD";
+        } else if (toolResult?.output?.startsWith("VOID")) {
+          toolVerdict = "VOID";
+        } else {
+          toolVerdict = "HOLD";
+        }
+      }
+      if (toolFloors.includes("VOID")) toolVerdict = "VOID";
+      else if (toolFloors.includes("HOLD")) toolVerdict = "HOLD";
+
+      if (this.dependencies.vaultClient && "logToolCall" in this.dependencies.vaultClient) {
+        const vault = this.dependencies.vaultClient as unknown as PostgresVaultClient;
+        vault.logToolCall({
+          run_id: runId,
+          session_id: sessionId,
+          tool_name: call.toolName,
+          tool_args: call.args,
+          tool_result: toolMessage.content,
+          verdict: toolVerdict,
+          latency_ms: 0,
+          floors_triggered: toolFloors,
+          called_at: new Date().toISOString(),
+        }).catch((err: unknown) => {
+          process.stderr.write(`[WARN] logToolCall failed: ${err}\n`);
+        });
       }
 
       // Track message text for coherence check

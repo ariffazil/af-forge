@@ -1,12 +1,48 @@
 import { Pool, type PoolConfig } from "pg";
 import type { VaultClient, VaultSealRecord, VaultVerdict } from "./VaultClient.js";
 
+export interface FloorRule {
+  floor_id: string;
+  floor_name: string;
+  floor_type: "hard" | "soft";
+  threshold_value: number | string;
+  description: string;
+}
+
+export interface SessionRecord {
+  session_id: string;
+  agent_id: string;
+  constitution_hash: string;
+  started_at: string;
+  final_verdict?: string;
+  final_text?: string;
+  turn_count?: number;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ToolCallRecord {
+  run_id?: string;
+  session_id: string;
+  tool_name: string;
+  organ?: string;
+  tool_args?: Record<string, unknown>;
+  tool_result?: string;
+  verdict: string;
+  latency_ms?: number;
+  floors_triggered: string[];
+  called_at?: string;
+}
+
 export class PostgresVaultClient implements VaultClient {
   private pool: Pool;
   private initialized = false;
 
   constructor(connectionString: string, poolConfig?: Omit<PoolConfig, "connectionString">) {
     this.pool = new Pool({ ...poolConfig, connectionString });
+  }
+
+  getPool(): Pool {
+    return this.pool;
   }
 
   async initialize(): Promise<void> {
@@ -91,5 +127,79 @@ export class PostgresVaultClient implements VaultClient {
 
   async close(): Promise<void> {
     await this.pool.end();
+  }
+
+  async queryDb<T = Record<string, unknown>>(text: string, params: unknown[] = []): Promise<{ rows: T[] }> {
+    await this.initialize();
+    const result = await this.pool.query(text, params);
+    return { rows: result.rows as T[] };
+  }
+
+  async loadConstitution(): Promise<FloorRule[]> {
+    await this.initialize();
+    const result = await this.pool.query<FloorRule>(
+      `SELECT floor_id, floor_name, floor_type, threshold_value, description
+       FROM arifos.floor_rules
+       ORDER BY floor_id`,
+    );
+    return result.rows;
+  }
+
+  async openSession(params: {
+    sessionId: string;
+    agentId: string;
+    constitutionHash: string;
+    metadata?: Record<string, unknown>;
+  }): Promise<void> {
+    await this.initialize();
+    await this.pool.query(
+      `INSERT INTO arifos.sessions (session_id, agent_id, constitution_hash, initiated_at, risk_tier, declared_intent, metadata)
+       VALUES ($1, $2, $3, NOW(), $4, $5, $6)
+       ON CONFLICT (session_id) DO NOTHING`,
+      [
+        params.sessionId,
+        params.agentId,
+        params.constitutionHash,
+        (params.metadata?.risk_tier as string) ?? "medium",
+        (params.metadata?.declared_intent as string) ?? "",
+        JSON.stringify(params.metadata ?? {}),
+      ],
+    );
+  }
+
+  async logToolCall(record: ToolCallRecord): Promise<void> {
+    await this.initialize();
+    await this.pool.query(
+      `INSERT INTO arifos.tool_calls
+       (run_id, session_id, tool_name, organ, input_hash, output_hash, duration_ms, floor_triggered, verdict, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [
+        record.run_id ?? null,
+        record.session_id,
+        record.tool_name,
+        record.organ ?? null,
+        record.tool_args ? JSON.stringify(record.tool_args) : null,
+        record.tool_result ?? null,
+        record.latency_ms ?? 0,
+        JSON.stringify(record.floors_triggered),
+        record.verdict,
+        record.called_at ?? new Date().toISOString(),
+      ],
+    );
+  }
+
+  async sealSession(params: {
+    sessionId: string;
+    finalVerdict: string;
+    finalText: string;
+    turnCount: number;
+  }): Promise<void> {
+    await this.initialize();
+    await this.pool.query(
+      `UPDATE arifos.sessions
+       SET final_verdict = $2, closed_at = NOW()
+       WHERE session_id = $1`,
+      [params.sessionId, params.finalVerdict],
+    );
   }
 }
