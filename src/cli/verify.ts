@@ -10,6 +10,7 @@
  *   4. Tool calls — rows exist (proves GO 3 is live)
  *   5. Agent telemetry — recent SEAL rows
  *   6. Vault root — daily_roots anchored
+ *   7. Tool lattice — 33 organ + 17 substrate = 52 total (from registry.json)
  *
  * Usage:
  *   node dist/src/cli/verify.js
@@ -17,6 +18,8 @@
  */
 
 import { getPostgresVaultClient, MerkleV3Service } from "../vault/index.js";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const pgUrl = process.env.POSTGRES_URL ?? process.env.DATABASE_URL ?? "";
 
@@ -115,6 +118,34 @@ async function main() {
   } catch (e) {
     checks.ok = false;
     checks.items.push(`❌ Vault root: ${e}`);
+  }
+
+  // 7. Tool lattice — 33 organ + 17 substrate = 52
+  try {
+    const regPath = resolve(process.env.REGISTRY_PATH ?? "/root/WEALTH/registry.json");
+    const reg = JSON.parse(readFileSync(regPath, "utf8"));
+    const toolCounts = reg.tool_counts ?? {};
+
+    const organAxis = toolCounts.organ_axis ?? 0;
+    const substrates = toolCounts.substrates ?? 0;
+    const total = toolCounts.total_live ?? 0;
+
+    if (organAxis === 33 && substrates === 17 && total === 52) {
+      checks.items.push(`✅ Tool lattice: ${organAxis} organ + ${substrates} substrate = ${total} total (33+17=52)`);
+    } else {
+      checks.ok = false;
+      checks.items.push(`❌ Tool lattice: organ=${organAxis}/33, substrate=${substrates}/17, total=${total}/52`);
+    }
+
+    if (reg.orthogonal_bands?.length === 11) {
+      checks.items.push(`✅ Orthogonal bands: ${reg.orthogonal_bands.length}/11 confirmed`);
+    } else {
+      checks.ok = false;
+      checks.items.push(`❌ Orthogonal bands: ${reg.orthogonal_bands?.length ?? 0}/11`);
+    }
+  } catch (e) {
+    checks.ok = false;
+    checks.items.push(`❌ Tool lattice: ${e}`);
   }
 
   // Print results
