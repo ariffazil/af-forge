@@ -30,28 +30,28 @@ Tools are ordered by **Cognitive Layer**, not by department.
 | **01** | **Perception** | 16–30 | **Sensing:** What is the state of the world? |
 | **02** | **Physics** | 31–45 | **GEOX:** How do the laws of the Earth apply? |
 | **03** | **Economics** | 46–60 | **WEALTH:** How is capital/energy distributed? |
-| **04** | **Risk** | 61–70 | **Heart/Entropy:** What are the costs of error? |
+| **04** | **Risk** | 61–70 | **Heart/Bias:** What are the costs of error? |
 | **05** | **Execution** | 71–80 | **Forge:** Controlled real-world action. |
 | **06** | **Stewardship** | 81–89 | **Civilization:** What are the long-term impacts? |
 | **07** | **Reflection** | 90–99 | **Mind:** Metacognition and task-graph planning. |
 
 ---
 
-## 🔁 III. AGI TOOL ROUTING DAG
+## 🔁 III. AGI TOOL ROUTING DAG (9-STAGE METABOLISM)
 
 ```mermaid
 graph TD
-    T00[Tier 00: IDENTITY] --> T01[Tier 01: SENSE]
-    T01 --> T02[Tier 02: PHYSICS - GEOX]
-    T01 --> T03[Tier 03: WEALTH - ECONOMICS]
-    T02 --> T04[Tier 04: RISK & ENTROPY]
+    T00[000_INIT: IDENTITY] --> T01[111_SENSE: REALITY]
+    T01 --> T02[222_PHYSICS: GEOX]
+    T01 --> T03[333_MIND: REASON]
+    T02 --> T04[444_ROUT: KERNEL]
     T03 --> T04
-    T04 --> JG{JUDGMENT GATE}
-    JG -- SEALED --> T05[Tier 05: EXECUTION - FORGE]
-    JG -- HOLD/VOID --> T07[Tier 07: REFLECTION]
-    T05 --> T00(VAULT RECORD)
-    T05 --> T06[Tier 06: CIVILIZATION IMPACT]
-    T07 --> T00
+    T04 --> T05[555_MEM: MEMORY]
+    T05 --> T06[666_HEART: SAFETY]
+    T06 --> T07[777_OPS: THERMO]
+    T07 --> JG{JUDGMENT GATE}
+    JG -- SEALED --> T08[888_JUDGE: VERDICT]
+    T08 --> T09[999_SEAL: VAULT]
 ```
 
 ---

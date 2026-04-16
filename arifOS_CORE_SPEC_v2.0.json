@@ -18,7 +18,7 @@
     }
   },
   "pipeline": {
-    "stages": ["000","111","333","444","666","777","888","999"],
+    "stages": ["000_INIT", "111_SENSE", "333_MIND", "444_ROUT", "555_MEM", "666_HEART", "777_OPS", "888_JUDGE", "999_SEAL"],
     "dag_enforced": true,
     "shortcut_permitted": false
   },

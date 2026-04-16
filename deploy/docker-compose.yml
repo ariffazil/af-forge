@@ -1,3 +1,9 @@
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   prometheus:
     image: prom/prometheus:latest
@@ -18,6 +24,7 @@ services:
     networks:
       - af-forge-internal
       - arifosmcp_arifos_trinity
+    logging: *default-logging
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 
@@ -36,6 +43,7 @@ services:
       - "127.0.0.1:3000:3000"
     networks:
       - af-forge-internal
+    logging: *default-logging
     depends_on:
       - prometheus
 
@@ -56,6 +64,7 @@ services:
       - "127.0.0.1:9001:9001"
     networks:
       - af-forge-internal
+    logging: *default-logging
 
 volumes:
   prometheus-data:

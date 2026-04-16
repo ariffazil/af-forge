@@ -1,3 +1,9 @@
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   af-forge-bridge:
     build:
@@ -25,12 +31,14 @@ services:
       - AGENT_WORKBENCH_SCOREBOARD_PATH=/data/scoreboard.json
       - AGENT_WORKBENCH_RUN_METRICS_DIR=/data/metrics
       - AGENT_WORKBENCH_DEFAULT_MODE=${AGENT_WORKBENCH_DEFAULT_MODE:-external}
+      - OPERATOR_API_TOKEN=${OPERATOR_API_TOKEN:-AF_FORGE_999_SEAL}
       - POSTGRES_URL=${POSTGRES_URL:-}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     volumes:
       - af-forge-data:/data
     networks:
       - af-forge-internal
+    logging: *default-logging
     depends_on:
       postgres:
         condition: service_healthy
@@ -47,22 +55,22 @@ services:
     image: ariffazil/arifosmcp:latest
     container_name: af-forge-arifos-mcp
     restart: unless-stopped
-    ports:
-      - "8080:8080"
     expose:
       - "8080"
     environment:
       - PORT=8080
+      - OPERATOR_API_TOKEN=${OPERATOR_API_TOKEN:-AF_FORGE_999_SEAL}
       - DATABASE_URL=postgresql://${POSTGRES_USER:-af_forge}:${POSTGRES_PASSWORD:-af_forge_secret}@postgres:5432/${POSTGRES_DB:-af_forge}
       - REDIS_URL=redis://redis:6379
       - QDRANT_URL=http://qdrant:6333
       - OLLAMA_URL=http://ollama:11434
       - PYTHONPATH=/usr/src/project/arifosmcp:/usr/src/project
     volumes:
-      - /root/arifOS-pr325/arifosmcp:/usr/src/project/arifosmcp:ro
-      - /root/arifOS-pr325/core:/usr/src/project/core:ro
+      - ./arifOS/arifosmcp:/usr/src/project/arifosmcp:ro
+      - ./arifOS/core:/usr/src/project/core:ro
     networks:
       - af-forge-internal
+    logging: *default-logging
     depends_on:
       - postgres
       - redis
@@ -92,6 +100,7 @@ services:
       - ./geox:/app/geox:ro
     networks:
       - af-forge-internal
+    logging: *default-logging
     healthcheck:
       test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8765/health')\" 2>/dev/null || python3 -c \"import socket; s=socket.create_connection(('localhost',8765),2); s.close()\""]
       interval: 30s
@@ -115,6 +124,7 @@ services:
       - qdrant-data:/qdrant/storage
     networks:
       - af-forge-internal
+    logging: *default-logging
     healthcheck:
       test: ["CMD-SHELL", "bash -c 'echo >/dev/tcp/localhost/6333' 2>/dev/null"]
       interval: 15s
@@ -131,6 +141,7 @@ services:
       - ollama-data:/root/.ollama
     networks:
       - af-forge-internal
+    logging: *default-logging
     # No public port: internal network only
     healthcheck:
       test: ["CMD-SHELL", "ollama list > /dev/null 2>&1"]
@@ -152,6 +163,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - af-forge-internal
+    logging: *default-logging
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-af_forge} -d ${POSTGRES_DB:-af_forge}"]
       interval: 10s
@@ -166,6 +178,7 @@ services:
       - redis-data:/data
     networks:
       - af-forge-internal
+    logging: *default-logging
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -184,6 +197,7 @@ services:
       - caddy-config:/config
     networks:
       - af-forge-internal
+    logging: *default-logging
     depends_on:
       - af-forge-bridge
       - arifos-mcp
