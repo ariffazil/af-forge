@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-04-16T17:05:00Z",
+  "operator_id": "arif",
+  "metrics": {
+    "sleep": {
+      "last_night_hours": 7,
+      "sleep_debt_days": 0,
+      "quality_score": 8
+    },
+    "stress": {
+      "subjective_load": 3,
+      "restlessness": 2
+    },
+    "cognitive": {
+      "clarity": 9,
+      "decision_fatigue": 2
+    }
+  },
+  "well_score": 92,
+  "floors_violated": []
+}
