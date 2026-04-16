@@ -74,6 +74,44 @@ export class PostgresVaultClient implements VaultClient {
        VALUES ($1, $2, $3, $4, $5)`,
       [record.sealId, record.sessionId, record.verdict, record.timestamp, JSON.stringify(record)],
     );
+
+    // Step 5: Wire ARCHIVIST to write canon on every SEAL
+    if (record.verdict === "SEAL") {
+      await this.writeToCanon(record).catch((err) =>
+        console.error(`[Archivist] Failed to write canon: ${err}`),
+      );
+    }
+  }
+
+  private async writeToCanon(record: VaultSealRecord): Promise<void> {
+    // Basic heuristics to extract ADR-like info if not explicit
+    const title = record.task.split("\n")[0].slice(0, 100);
+    // Use sealId prefix if no ADR-ID is found in task
+    const adrIdMatch = record.task.match(/ADR-[0-9]+/);
+    const adrId = adrIdMatch ? adrIdMatch[0] : `AUTO-${record.sealId.slice(0, 8).toUpperCase()}`;
+
+    // Map profile to agent_id (best effort)
+    const agentId = record.profileName === "archivist" ? "ARCHIVIST-Agent" : 
+                    record.profileName === "engineer" ? "ENGINEER-Agent" :
+                    record.profileName === "aaa" ? "AAA-Agent" : "ARCHIVIST-Agent";
+
+    await this.pool.query(
+      `INSERT INTO arifos.canon_records 
+       (adr_id, title, decision, rationale, agent_id, session_id, epoch, sealed_by, payload)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       ON CONFLICT (adr_id) DO NOTHING`,
+      [
+        adrId,
+        title,
+        record.finalText.slice(0, 500),
+        record.task,
+        agentId,
+        record.sessionId,
+        record.timestamp,
+        "Muhammad Arif bin Fazil",
+        JSON.stringify(record),
+      ],
+    );
   }
 
   async query(options?: {

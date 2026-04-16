@@ -6,10 +6,10 @@ import type { ParallelPlannerContract } from "../planner/ParallelPlannerContract
 
 export class CoordinatorAgent {
   constructor(
-    private readonly profile: AgentProfile,
-    private readonly workerAgent: WorkerAgent,
-    private readonly llmProvider: LlmProvider,
-    private readonly plannerContract?: ParallelPlannerContract,
+    protected readonly profile: AgentProfile,
+    protected readonly workerAgent: WorkerAgent,
+    protected readonly llmProvider: LlmProvider,
+    protected readonly plannerContract?: ParallelPlannerContract,
   ) {}
 
   async coordinate(

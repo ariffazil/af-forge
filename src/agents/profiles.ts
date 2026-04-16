@@ -69,3 +69,17 @@ export function buildWorkerProfile(modeName: AgentModeName): AgentProfile {
     modeName,
   };
 }
+
+export function buildAAAProfile(modeName: AgentModeName): AgentProfile {
+  return {
+    name: "AAA-Agent",
+    systemPrompt:
+      "You are AAA-Agent, the Arif Autonomous Architecture Federal Coordinator. Your role is ASI-class routing, multi-agent orchestration, and metabolic-stage governance.",
+    allowedTools: ["list_files", "read_file", "grep_text"],
+    budget: {
+      tokenCeiling: 30_000,
+      maxTurns: 12,
+    },
+    modeName,
+  };
+}

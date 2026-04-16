@@ -27,6 +27,14 @@ import { getPostgresVaultClient, type FloorRule, MerkleV3Service } from "./vault
 import { LocalGovernanceClient } from "./governance/index.js";
 import { getAdaptiveThresholds } from "./governance/thresholds.js";
 import { createOperatorAuthMiddleware } from "./middleware/operatorAuth.js";
+import { AAAgent } from "./agents/AAAgent.js";
+import { WorkerAgent } from "./agents/WorkerAgent.js";
+import { buildAAAProfile } from "./agents/profiles.js";
+import { createLlmProvider } from "./llm/providerFactory.js";
+import { readRuntimeConfig } from "./config/RuntimeConfig.js";
+import { AgentEngine } from "./engine/AgentEngine.js";
+import { ToolRegistry } from "./tools/ToolRegistry.js";
+import { LongTermMemory } from "./memory/LongTermMemory.js";
 
 let cachedConstitution: FloorRule[] = [];
 
@@ -182,6 +190,47 @@ app.post("/sense", async (req: Request, res: Response) => {
         message: error instanceof Error ? error.message : String(error),
       },
     });
+  }
+});
+
+/**
+ * POST /route
+ * Federal Coordinator Routing — AAA-Agent (ASI)
+ * Routes tasks to GEOX, WEALTH, AUDITOR, etc.
+ */
+app.post("/route", async (req: Request, res: Response) => {
+  try {
+    return await runStage("333_MIND" as MetabolicStage, async () => {
+      const { prompt, sessionId, mode } = req.body;
+      if (!prompt) {
+        res.status(400).json({ ok: false, error: "prompt is required" });
+        return;
+      }
+
+      const config = readRuntimeConfig();
+      const llmProvider = createLlmProvider(config);
+      const aaaProfile = buildAAAProfile(mode === "internal" ? "internal_mode" : "external_safe_mode");
+      const workerAgent = new WorkerAgent((t) => new AgentEngine(t.profile, { 
+        llmProvider, 
+        toolRegistry: new ToolRegistry(),
+        longTermMemory: new LongTermMemory(config.memoryPath)
+      }));
+      const aaaAgent = new AAAgent(aaaProfile, workerAgent, llmProvider);
+
+      const decision = await aaaAgent.route(prompt);
+
+      res.json({
+        ok: true,
+        routing_decision: decision,
+        agent_id: decision === "888_HOLD" ? null : decision,
+        is_hold: decision === "888_HOLD",
+        session_id: sessionId ?? "anon",
+        coordinator: "AAA-Agent",
+      });
+    });
+  } catch (error) {
+    console.error("[AF-FORGE] /route error:", error);
+    res.status(500).json({ ok: false, error: { type: "internal_error", message: String(error) } });
   }
 });
 
