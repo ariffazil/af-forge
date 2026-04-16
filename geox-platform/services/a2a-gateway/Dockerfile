@@ -4,13 +4,14 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --production
 
 # Copy server
 COPY server.js .
 
-# Copy agent cards
-COPY agents ./agents
+# Copy agent cards (volume-mounted at runtime, but include for fallback)
+RUN mkdir -p /app/agents && \
+    cp -r agents/* /app/agents/ 2>/dev/null || true
 
 EXPOSE 3002
 

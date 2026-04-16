@@ -3,8 +3,6 @@
 # Wires Site + WebMCP + MCP + A2A together
 # ═══════════════════════════════════════════════════════════════════════════════
 
-version: '3.8'
-
 services:
   # ─── SURFACE 1: Site (Static) ───
   geox-site:
@@ -12,9 +10,8 @@ services:
     container_name: geox-site
     volumes:
       - ./apps/site:/usr/share/nginx/html:ro
-      - ./nginx/site.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
-      - "8080:80"
+      - "8081:80"
     networks:
       - geox-net
     healthcheck:
@@ -35,9 +32,9 @@ services:
       - LOG_LEVEL=info
     volumes:
       - ./apps/site/registry.json:/app/registry.json:ro
-      - ../GEOX:/app/geox-backend:ro  # Mount GEOX backend for imports
+      - ../GEOX:/app/geox-backend:ro
     ports:
-      - "8001:8000"
+      - "8010:8000"
     networks:
       - geox-net
     depends_on:
@@ -64,11 +61,12 @@ services:
       - GEOX_SCHEMA=geox
     ports:
       - "8000:8000"
+      - "8765:8765"
     networks:
       - arifos_core_network
       - geox-net
     healthcheck:
-      test: ["CMD", "curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "http://localhost:8000/"]
+      test: ["CMD-SHELL", "curl -s http://localhost:8000/ > /dev/null || curl -s http://localhost:8765/ > /dev/null"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -104,7 +102,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - "80:80"
+      - "81:80"
     networks:
       - geox-net
     depends_on:
