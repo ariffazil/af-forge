@@ -35,6 +35,9 @@ export { checkCoherence, checkResponseCoherence, type CoherenceResult, type Cohe
 // Seal Service
 export { SealService, type SealContext, type SealVerdict, type SealStatus, type EpistemicVerdict, type EpistemicThresholds } from "./SealService.js";
 
+// APEX Dials — Eigendecomposition from 13 Floors (K777_APEX §10.4)
+export { floorsToDials, calculateGeniusFromFloors, formatApexDisplay, type ApexDials, type ApexGeniusResult, type FloorScores13 } from "./apexDials.js";
+
 // Governance Client abstraction
 export {
   LocalGovernanceClient,

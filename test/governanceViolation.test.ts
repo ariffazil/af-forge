@@ -206,7 +206,7 @@ test("Replay with humanApprovedTicketId bypasses F13 force-hold and marks ticket
   });
 
   // Should succeed because humanOverride bypasses f13ForceHold
-  assert.equal(result.finalText, "Done");
+  assert.ok(result.finalText.startsWith("Done"), `Expected finalText to start with 'Done', got: ${result.finalText}`);
   assert.equal(result.metrics.blockedDangerousActions, 0);
 
   const replayed = await store.findById("replay_t1");

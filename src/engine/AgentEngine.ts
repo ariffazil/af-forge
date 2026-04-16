@@ -35,6 +35,8 @@ import {
   LocalGovernanceClient,
   type GovernanceClient,
   SealService,
+  calculateGeniusFromFloors,
+  type FloorScores13,
 } from "../governance/index.js";
 import { getAdaptiveThresholds } from "../governance/thresholds.js";
 import type { VaultClient, VaultSealRecord, VaultTelemetrySnapshot } from "../vault/index.js";
@@ -469,6 +471,33 @@ export class AgentEngine {
       finalResponse += `\n\n[STEWARDSHIP: ${stewardshipCheck.message} | detail=${stewardshipDetail}]`;
     }
 
+    // === 888_JUDGE APEX: Compute G via eigendecomposition from 13 floors ===
+    // K777_APEX §10.4: G = A × P × X × E² (derived from floor scores, not manual)
+    // This is the constitutional genius index — computed from governance signals.
+    let apexGenius: ReturnType<typeof calculateGeniusFromFloors> | undefined;
+    try {
+      const confidenceValue = this._routing && this._routing.primaryOrgan !== "CODE" ? 0.82 : 0.70;
+      const floorsProxy: FloorScores13 = {
+        f1_amanah: permissionContext.holdEnabled ? 1.0 : (blockedDangerousActions > 0 ? 0.3 : 0.8),
+        f2_truth: truthCheck.verdict === "PASS" ? 0.95 : (truthCheck.ungroundedClaims > 0 ? 0.5 : 0.75),
+        f3_tri_witness: this._geoxScenarios.length > 0 || this._wealthAllocations.length > 0 ? 0.88 : 0.70,
+        f4_clarity: 0.75,
+        f5_peace: stewardshipCheck.verdict === "PASS" ? 0.95 : 0.60,
+        f6_empathy: heartViolations.length === 0 ? 0.92 : 0.50,
+        f7_humility: 0.04,
+        f8_genius: this._geoxScenarios.length > 0 ? 0.82 : 0.70,
+        f9_antihantu: 0.85,
+        f10_ontology: 0.90,
+        f11_command: permissionContext.holdEnabled ? 1.0 : 0.80,
+        f12_injection: 0.85,
+        f13_sovereign: 1.0,
+      };
+      apexGenius = calculateGeniusFromFloors(floorsProxy, 0.5, 1.0);
+      finalResponse += `\n\n[888_JUDGE APEX: G=${apexGenius.G.toFixed(3)} | A=${apexGenius.dials.A.toFixed(2)} P=${apexGenius.dials.P.toFixed(2)} X=${apexGenius.dials.X.toFixed(2)} E=${apexGenius.dials.E.toFixed(2)} | ${apexGenius.verdict}]`;
+    } catch {
+      // APEX computation is best-effort — do not block verdict on failure
+    }
+
     await this.dependencies.longTermMemory.store({
       id: sessionId,
       summary: finalResponse,
@@ -508,6 +537,8 @@ export class AgentEngine {
       wallClockMs,
       completion,
       testsPassed,
+      genius_G: apexGenius?.G,
+      apex_Dials: apexGenius ? { A: apexGenius.dials.A, P: apexGenius.dials.P, X: apexGenius.dials.X, E: apexGenius.dials.E } : undefined,
       errorMessage,
     };
 

@@ -125,5 +125,7 @@ export type RunMetrics = {
   wallClockMs: number;
   completion: boolean;
   testsPassed: boolean;
+  genius_G?: number;
+  apex_Dials?: { A: number; P: number; X: number; E: number };
   errorMessage?: string;
 };
