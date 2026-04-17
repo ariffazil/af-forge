@@ -128,7 +128,11 @@ Update `opencode.json`:
   },
   "agent": {
     "forge-worker": {
+<<<<<<< HEAD
       "description": "A-FORGE worker - restricted subtask executor",
+=======
+      "description": "AF-FORGE worker - restricted subtask executor",
+>>>>>>> origin/promotion/ecosystem-final
       "mode": "subagent",
       "permission": {
         "bash": "ask",
@@ -189,7 +193,11 @@ ls -la /tmp/opencode-test.txt
 
 ## Conclusion
 
+<<<<<<< HEAD
 This is **NOT an A-FORGE governance issue** - it's a tool-layer schema/argument naming mismatch in OpenCode itself. The issue matches the pattern described in:
+=======
+This is **NOT an AF-FORGE governance issue** - it's a tool-layer schema/argument naming mismatch in OpenCode itself. The issue matches the pattern described in:
+>>>>>>> origin/promotion/ecosystem-final
 - https://github.com/anomalyco/opencode/issues/19801
 - https://github.com/anthropics/claude-code/issues/10289
 
@@ -198,5 +206,8 @@ This is **NOT an A-FORGE governance issue** - it's a tool-layer schema/argument 
 ---
 
 *DITEMPA BUKAN DIBERI — 999 SEAL ALIVE*
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> origin/promotion/ecosystem-final

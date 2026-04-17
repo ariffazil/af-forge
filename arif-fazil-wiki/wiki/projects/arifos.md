@@ -100,7 +100,7 @@ The complete lifecycle of an arifOS operation:
 - Manage memory (short-term and long-term)
 - Enforce budget constraints
 
-**Location:** `A-FORGE/src/engine/AgentEngine.ts`
+**Location:** `af-forge/src/engine/AgentEngine.ts`
 
 ### 2. ToolRegistry
 
@@ -243,7 +243,7 @@ The complete lifecycle of an arifOS operation:
 │   ├── src/
 │   ├── test/
 │   └── docs/
-├── A-FORGE/               # Agent workbench (uses arifOS)
+├── af-forge/               # Agent workbench (uses arifOS)
 │   ├── src/
 │   ├── test/
 │   └── examples/
@@ -280,7 +280,7 @@ Verify F2 (grounded) → Check F7 (confidence) → Seek 999_SEAL → Output
 ## Sources
 
 - `/root/arifOS/` — Runtime implementation
-- `/root/A-FORGE/` — Agent workbench
+- `/root/af-forge/` — Agent workbench
 - `/root/ARIFOS_SOVEREIGN_ARCHITECTURE.md` — Architecture spec
 - `/root/ARIFOS_SOVEREIGNTY_IMPLEMENTATION_GUIDE.md` — Implementation
 - Direct conversations with Arif
@@ -307,5 +307,3 @@ status: active
 ---
 
 **Seal:** VAULT999 | **ΔΩΨ | ARIF**
-
-

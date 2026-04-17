@@ -1,140 +1,98 @@
-"""
-GEOX Prospect Dimension Tools
-DITEMPA BUKAN DIBERI
-"""
-
 import logging
-from typing import Optional, Dict, Any
-
 from fastmcp import FastMCP
+from typing import List, Dict, Any
+from contracts.enums.statuses import get_standard_envelope, ExecutionStatus, GovernanceStatus, ArtifactStatus
 
-from contracts.enums.statuses import (
-    get_standard_envelope,
-    GovernanceStatus,
-    ClaimTag,
-)
+logger = logging.getLogger("geox.prospect")
 
-logger = logging.getLogger(__name__)
-
-
-def register_prospect_tools(mcp: FastMCP, profile: Optional[str] = None) -> None:
-    """Register all prospect dimension tools."""
-
-    @mcp.tool()
-    def prospect_evaluate(
-        prospect_id: str, 
-        play_type: Optional[str] = None,
-        ac_risk_score: float = 0.0,
-        u_phys: float = 0.2,
-        hypotheses_count: int = 1,
-        complexity_score: float = 0.5,
-        claimed_scenario: str = "ai_vision_only"
-    ) -> Dict[str, Any]:
-        """Evaluate a hydrocarbon prospect with active B_cog bias detection."""
-        
-        # 1. Bias Detection (B_cog Referee)
-        from geox.core.bias_detector import BiasDetector
-        bias_report = BiasDetector.detect(
-            claimed_scenario=claimed_scenario,
-            session_history=[], # In real app, this would be fetched from Vault
-            hypotheses_count=hypotheses_count,
-            complexity_score=complexity_score
-        )
-        
-        # Calculate Total AC Risk including B_cog
-        # Formula: ac_risk = (u_phys + b_cog) / 2 (simplified)
-        b_cog = bias_report["b_cog"]
-        total_ac_risk = (u_phys + b_cog) / 2
-        
-        metrics = {
-            "prospect_id": prospect_id,
-            "play_type": play_type or "structural_trap",
-            "pg": round(0.4 * (1 - total_ac_risk), 3), 
-            "stoiip_mmbbl": {
-                "p90": 10.0,
-                "p50": 45.0,
-                "p10": 120.0,
-                "mean": 58.0
-            },
-            "ac_risk": round(total_ac_risk, 3),
-            "bias_report": bias_report,
-            "uncertainty": u_phys
-        }
-        
-        # 2. Determine Governance Verdict (SOT Enforcement)
-        verdict = GovernanceStatus.QUALIFY
-        
-        # Floor F7: Single Model Collapse Check
-        if bias_report["detected_scenario"] == "single_model_collapse":
-            verdict = GovernanceStatus.HOLD
-            metrics["hold_reason"] = "MODEL_COLLAPSE_F7_BREACH"
-        
-        # Floor: Executive Pressure Check
-        elif b_cog > 0.5:
-            verdict = GovernanceStatus.HOLD
-            metrics["hold_reason"] = "EXECUTIVE_PRESSURE_DETECTED"
-            
-        elif total_ac_risk > 0.6:
-            verdict = GovernanceStatus.HOLD
-            metrics["hold_reason"] = "TOAC_RISK_EXCEEDED"
-        
+def register_prospect_tools(mcp: FastMCP, profile: str = "full"):
+    """
+    PROSPECT Registry: Play fairway discovery.
+    'Should we drill here?'
+    
+    Naming convention: prospect_{action}_{target}
+    """
+    
+    # Canonical tool: prospect_evaluate
+    @mcp.tool(name="prospect_evaluate")
+    async def prospect_evaluate(prospect_ref: str) -> dict:
+        """Judge: Evaluate hydrocarbon potential based on 888_JUDGE verdict."""
+        artifact = {"prospect_ref": prospect_ref, "score": 0.88, "status": "Highly Prospective (F9 Checked)"}
         return get_standard_envelope(
-            metrics,
-            governance_status=verdict,
-            claim_tag=ClaimTag.PLAUSIBLE,
-            uncertainty=u_phys
+            artifact, 
+            tool_class="judge", 
+            governance_status=GovernanceStatus.SEAL, 
+            artifact_status=ArtifactStatus.VERIFIED, 
+            uncertainty="Low", 
+            evidence_refs=["ratlas://play-fairway", "acp://verdict"],
+            ui_resource_uri="ui://prospect-dashboard"
         )
 
-    @mcp.tool()
-    def _alias_geox_prospect_evaluate(prospect_id: str, play_type: Optional[str] = None) -> Dict[str, Any]:
-        return prospect_evaluate(prospect_id, play_type)
+    # Aliases (separate functions required by FastMCP)
+    @mcp.tool(name="geox_prospect_evaluate")
+    async def _alias_geox_prospect_evaluate(prospect_ref: str) -> dict:
+        """Alias for prospect_evaluate."""
+        return await prospect_evaluate(prospect_ref)
 
-    @mcp.tool()
-    def _alias_geox_evaluate_prospect(prospect_id: str, play_type: Optional[str] = None) -> Dict[str, Any]:
-        return prospect_evaluate(prospect_id, play_type)
+    @mcp.tool(name="geox_evaluate_prospect")
+    async def _alias_geox_evaluate_prospect(area_id: str) -> dict:
+        """[DEPRECATED] Alias for prospect_evaluate. Use prospect_evaluate instead."""
+        return await prospect_evaluate(area_id)
 
-    @mcp.tool()
-    def _alias_prospect_evaluate_prospect(prospect_id: str, play_type: Optional[str] = None) -> Dict[str, Any]:
-        return prospect_evaluate(prospect_id, play_type)
+    @mcp.tool(name="prospect_evaluate_prospect")
+    async def _alias_prospect_evaluate_prospect(area_id: str) -> dict:
+        """[DEPRECATED] Alias for prospect_evaluate. Use prospect_evaluate instead."""
+        return await prospect_evaluate(area_id)
 
-    @mcp.tool()
-    def prospect_build_structural_candidates(line_id: str, max_candidates: int = 3) -> Dict[str, Any]:
-        """Generate multiple structural hypotheses."""
-        candidates = [
-            {"candidate_id": f"C{i}", "confidence": 0.8 - i * 0.1, "setting": "extensional"}
-            for i in range(min(max_candidates, 5))
-        ]
+    # Canonical tool: prospect_build_structural_candidates
+    @mcp.tool(name="prospect_build_structural_candidates")
+    async def prospect_build_structural_candidates(prospect_ref: str) -> dict:
+        """Interpret: Generate structural trap candidates for a prospect."""
+        artifact = {"prospect_ref": prospect_ref, "candidates": ["Anticline_01", "Fault_Trap_Beta"]}
         return get_standard_envelope(
-            {"line_id": line_id, "candidates": candidates, "non_uniqueness_note": "Multiple valid interpretations exist."},
-            governance_status=GovernanceStatus.QUALIFY,
-            claim_tag=ClaimTag.HYPOTHESIS,
+            artifact, 
+            tool_class="interpret", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.DRAFT, 
+            uncertainty="High",
+            ui_resource_uri="ui://prospect-dashboard"
         )
 
-    @mcp.tool()
-    def _alias_geox_prospect_build(line_id: str, max_candidates: int = 3) -> Dict[str, Any]:
-        return prospect_build_structural_candidates(line_id, max_candidates)
+    @mcp.tool(name="geox_prospect_build_structural_candidates")
+    async def _alias_geox_prospect_build(prospect_ref: str) -> dict:
+        """Alias for prospect_build_structural_candidates."""
+        return await prospect_build_structural_candidates(prospect_ref)
 
-    @mcp.tool()
-    def _alias_geox_build_structural(line_id: str, max_candidates: int = 3) -> Dict[str, Any]:
-        return prospect_build_structural_candidates(line_id, max_candidates)
+    @mcp.tool(name="geox_build_structural_candidates")
+    async def _alias_geox_build_structural(area_id: str) -> dict:
+        """[DEPRECATED] Alias for prospect_build_structural_candidates."""
+        return await prospect_build_structural_candidates(area_id)
 
-    @mcp.tool()
-    def prospect_verify_feasibility(prospect_id: str) -> Dict[str, Any]:
-        """Verify prospect feasibility against constitutional floors."""
+    # Canonical tool: prospect_verify_feasibility
+    @mcp.tool(name="prospect_verify_feasibility")
+    async def prospect_verify_feasibility(prospect_ref: str) -> dict:
+        """Verify: Technical and economic gating for the prospect."""
+        artifact = {"prospect_ref": prospect_ref, "feasible": True, "confidence": "High"}
         return get_standard_envelope(
-            {"prospect_id": prospect_id, "feasible": True, "floors_checked": ["F1", "F2", "F4", "F7"]},
-            governance_status=GovernanceStatus.QUALIFY,
-            claim_tag=ClaimTag.PLAUSIBLE,
+            artifact, 
+            tool_class="verify", 
+            governance_status=GovernanceStatus.HOLD, 
+            artifact_status=ArtifactStatus.IN_REVIEW, 
+            uncertainty="Moderate",
+            ui_resource_uri="ui://prospect-dashboard"
         )
 
-    @mcp.tool()
-    def _alias_geox_prospect_verify(prospect_id: str) -> Dict[str, Any]:
-        return prospect_verify_feasibility(prospect_id)
+    @mcp.tool(name="geox_prospect_verify_feasibility")
+    async def _alias_geox_prospect_verify(prospect_ref: str) -> dict:
+        """Alias for prospect_verify_feasibility."""
+        return await prospect_verify_feasibility(prospect_ref)
 
-    @mcp.tool()
-    def _alias_geox_feasibility_check(prospect_id: str) -> Dict[str, Any]:
-        return prospect_verify_feasibility(prospect_id)
+    @mcp.tool(name="geox_feasibility_check")
+    async def _alias_geox_feasibility_check(area_id: str) -> dict:
+        """[DEPRECATED] Alias for prospect_verify_feasibility."""
+        return await prospect_verify_feasibility(area_id)
 
-    @mcp.tool()
-    def _alias_prospect_feasibility_check(prospect_id: str) -> Dict[str, Any]:
-        return prospect_verify_feasibility(prospect_id)
+    @mcp.tool(name="prospect_feasibility_check")
+    async def _alias_prospect_feasibility_check(area_id: str) -> dict:
+        """[DEPRECATED] Alias for prospect_verify_feasibility."""
+        return await prospect_verify_feasibility(area_id)

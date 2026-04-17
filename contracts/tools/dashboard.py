@@ -1,35 +1,31 @@
-"""
-GEOX Dashboard Tools
-DITEMPA BUKAN DIBERI
-"""
-
 import logging
-from typing import Optional, Dict, Any
-
 from fastmcp import FastMCP
+from contracts.enums.statuses import get_standard_envelope, ExecutionStatus, GovernanceStatus, ArtifactStatus
 
-from contracts.enums.statuses import (
-    get_standard_envelope,
-    GovernanceStatus,
-    ClaimTag,
-)
+logger = logging.getLogger("geox.dashboard")
 
-logger = logging.getLogger(__name__)
-
-
-def register_dashboard_tools(mcp: FastMCP, profile: Optional[str] = None) -> None:
-    """Register all dashboard tools."""
-
-    @mcp.tool()
-    def dashboard_open(app_id: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Open a GEOX dashboard application."""
+def register_dashboard_tools(mcp: FastMCP, profile: str = "full"):
+    """
+    DASHBOARD Registry: Entry point for MCP Apps UI.
+    """
+    
+    @mcp.tool(name="geox_dashboard_open")
+    async def dashboard_open(target: str = "main") -> dict:
+        """Observe: Open the unified GEOX Kitchen Sink dashboard."""
+        artifact = {
+            "view": "kitchen_sink",
+            "active_dimensions": ["well", "prospect", "map"],
+            "session_id": "geox-live-001"
+        }
         return get_standard_envelope(
-            {"app_id": app_id, "opened": True, "context": context or {}},
-            governance_status=GovernanceStatus.SEAL,
-            claim_tag=ClaimTag.CLAIM,
+            artifact, 
+            tool_class="observe", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.USABLE,
+            ui_resource_uri="ui://geox-dashboard"
         )
 
-    @mcp.tool()
-    def legacy_open_dashboard(app_id: str) -> Dict[str, Any]:
-        """Legacy alias to open a dashboard."""
-        return dashboard_open(app_id)
+    # Legacy alias for backward compatibility
+    @mcp.tool(name="geox_open_dashboard")
+    async def legacy_open_dashboard():
+        return await dashboard_open()

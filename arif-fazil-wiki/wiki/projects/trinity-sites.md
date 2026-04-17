@@ -133,7 +133,7 @@ This ensures users can instantly identify which ring they're in by visual cues a
 ### FORGE — forge.arif-fazil.com
 - **Type**: Unified entry point (future)
 - **Status**: Placeholder
-- **Purpose**: A-FORGE agent workbench
+- **Purpose**: AF-FORGE agent workbench
 
 ---
 
@@ -207,5 +207,3 @@ The active site is highlighted with a bottom border.
 ---
 
 *Ditempa Bukan Diberi — Forged, Not Given*
-
-

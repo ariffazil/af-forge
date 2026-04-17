@@ -1,39 +1,32 @@
-"""
-GEOX status enums and standard envelope.
-DITEMPA BUKAN DIBERI
-"""
-
+from typing import List, Dict, Any, Optional
 from enum import Enum
-from typing import Any, Dict, Optional
 
+class Dimension(str, Enum):
+    PROSPECT = "prospect"
+    WELL = "well"
+    EARTH3D = "earth3d"
+    MAP = "map"
+    CROSS = "cross"
+    SECTION = "section"
+    TIME4D = "time4d"
+    PHYSICS = "physics"
+    DASHBOARD = "dashboard"
 
-class Dimension(Enum):
-    prospect = "prospect"
-    well = "well"
-    earth3d = "earth3d"
-    map = "map"
-    cross = "cross"
-    section = "section"
-    time4d = "time4d"
-    physics = "physics"
-    dashboard = "dashboard"
-
-
-class ExecutionStatus(Enum):
+class ExecutionStatus(str, Enum):
     SUCCESS = "SUCCESS"
     ERROR = "ERROR"
     HALT = "HALT"
 
-
-class GovernanceStatus(Enum):
+class GovernanceStatus(str, Enum):
     APPROVED = "APPROVED"
     QUALIFY = "QUALIFY"
     HOLD = "HOLD"
     VOID = "VOID"
     SEAL = "SEAL"
 
+Verdict = GovernanceStatus
 
-class ArtifactStatus(Enum):
+class ArtifactStatus(str, Enum):
     USABLE = "USABLE"
     STAGED = "STAGED"
     REJECTED = "REJECTED"
@@ -44,79 +37,83 @@ class ArtifactStatus(Enum):
     LOADED = "LOADED"
     IN_REVIEW = "IN_REVIEW"
 
+class FloorStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    VOID = "void"
+    HALT = "halt"
 
-class FloorStatus(Enum):
-    active = "active"
-    inactive = "inactive"
-    void = "void"
-    halt = "halt"
+class Runtime(str, Enum):
+    VPS = "vps"
+    FASTMCP = "fastmcp"
+    LOCAL = "local"
 
+class Transport(str, Enum):
+    HTTP = "http"
+    MCP = "mcp"
+    STDIO = "stdio"
+    SSE = "sse"
 
-class Runtime(Enum):
-    vps = "vps"
-    fastmcp = "fastmcp"
-    local = "local"
+class ToolCategory(str, Enum):
+    FOUNDATION = "foundation"
+    PHYSICS = "physics"
+    BRIDGE = "bridge"
+    DEMO = "demo"
+    SYSTEM = "system"
 
-
-class Transport(Enum):
-    http = "http"
-    mcp = "mcp"
-    stdio = "stdio"
-    sse = "sse"
-
-
-class ToolCategory(Enum):
-    foundation = "foundation"
-    physics = "physics"
-    bridge = "bridge"
-    demo = "demo"
-    system = "system"
-
-
-class ProspectVerdict(Enum):
+class ProspectVerdict(str, Enum):
     DRO = "DRO"
     DRIL = "DRIL"
     HOLD = "HOLD"
     DROP = "DROP"
 
-
-class ClaimTag(Enum):
+class ClaimTag(str, Enum):
     CLAIM = "CLAIM"
     PLAUSIBLE = "PLAUSIBLE"
     HYPOTHESIS = "HYPOTHESIS"
 
+# Type aliases
+VerdictCode = GovernanceStatus
+FloorCode = str
+DimensionCode = str
+
+# Constants
+CONSTITUTIONAL_FLOORS = ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13"]
+CANONICAL_TOOLS = []
+SEAL = "DITEMPA BUKAN DIBERI"
 
 def get_standard_envelope(
-    data: Dict[str, Any],
+    primary_artifact: Dict[str, Any], 
+    tool_class: str = "compute", 
     execution_status: ExecutionStatus = ExecutionStatus.SUCCESS,
-    governance_status: GovernanceStatus = GovernanceStatus.QUALIFY,
-    artifact_status: ArtifactStatus = ArtifactStatus.COMPUTED,
-    uncertainty: Optional[float] = None,
-    evidence_refs: Optional[list] = None,
-    diagnostics: Optional[list] = None,
-    ui_resource_uri: Optional[str] = None,
-    claim_tag: Optional[ClaimTag] = None,
+    governance_status: GovernanceStatus = GovernanceStatus.QUALIFY, 
+    artifact_status: ArtifactStatus = ArtifactStatus.DRAFT, 
+    uncertainty: str = "Moderate", 
+    evidence_refs: Optional[List[str]] = None,
+    diagnostics: Optional[Dict[str, Any]] = None,
+    ui_resource_uri: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Canonical MCP Apps Response Envelope.
     Follows MCP spec + arifOS Governance + MCP Apps UI.
     """
-    envelope = {
-        "data": data,
-        "_meta": {
-            "seal": "DITEMPA BUKAN DIBERI",
-            "execution_status": execution_status.value,
-            "governance_status": governance_status.value,
-            "artifact_status": artifact_status.value,
-            "primary_artifact": data.get("artifact_type", "UnknownArtifact"),
-            "tool_class": "compute",
-            "uncertainty": uncertainty,
-            "evidence_refs": evidence_refs or [],
-            "diagnostics": diagnostics or [],
-        },
+    response = {
+        "execution_status": execution_status.value if isinstance(execution_status, ExecutionStatus) else execution_status,
+        "tool_class": tool_class,
+        "governance_status": governance_status.value if isinstance(governance_status, GovernanceStatus) else governance_status,
+        "artifact_status": artifact_status.value if isinstance(artifact_status, ArtifactStatus) else artifact_status,
+        "primary_artifact": primary_artifact,
+        "uncertainty": uncertainty,
+        "evidence_refs": evidence_refs or [],
+        "diagnostics": diagnostics or {}
     }
+    
+    # MCP Apps UI support
     if ui_resource_uri:
-        envelope["ui"] = {"resourceUri": ui_resource_uri}
-    if claim_tag:
-        envelope["_meta"]["claim_tag"] = claim_tag.value
-    return envelope
+        response["_meta"] = {
+            "ui": {
+                "resourceUri": ui_resource_uri
+            }
+        }
+        
+    return response

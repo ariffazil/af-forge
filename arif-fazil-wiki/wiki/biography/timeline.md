@@ -101,7 +101,7 @@
 
 ---
 
-## 2024-2025: Ω-Wiki and A-FORGE
+## 2024-2025: Ω-Wiki and AF-FORGE
 
 ### Karpathy Influence
 
@@ -114,7 +114,7 @@
 - AI-maintained synthesis
 - Human-verified accuracy
 
-### A-FORGE Establishment
+### AF-FORGE Establishment
 
 **Purpose:** Systematize the building process
 
@@ -135,7 +135,7 @@
 **Components:**
 - arifOS runtime
 - GEOX knowledge system
-- A-FORGE workbench
+- AF-FORGE workbench
 - Multi-agent coordination (Claude, Gemini)
 
 ### Governance in Action
@@ -151,7 +151,7 @@
 **Status:**
 - arifOS: Architecturally mature, commercially unproven
 - GEOX: Active knowledge system
-- A-FORGE: Operational workbench
+- AF-FORGE: Operational workbench
 - This wiki: Comprehensive knowledge base established
 
 **Scorecard:**
@@ -173,7 +173,7 @@
 | Transition | 2020-2022 | Systems application | Recognition of AI governance gap |
 | Framework | 2022-2023 | Constitutional design | F1-F13, ΔΩΨ, 000-999 |
 | Building | 2023-2024 | Implementation | arifOS, GEOX runtimes |
-| Systematization | 2024-2025 | Process formalization | A-FORGE, Ω-Wiki |
+| Systematization | 2024-2025 | Process formalization | AF-FORGE, Ω-Wiki |
 | Operation | 2025-2026 | Governance in practice | Daily sovereign AI use |
 
 ---
@@ -263,5 +263,3 @@ status: active
 ---
 
 **Seal:** VAULT999 | **ΔΩΨ | ARIF**
-
-

@@ -65,6 +65,7 @@ export class SealService {
   }
 
   /**
+<<<<<<< HEAD
    * Validate an entire PlanDAG by authorizing every node.
    * Returns the first non-PASS verdict, or PASS if all nodes pass.
    */
@@ -98,6 +99,8 @@ export class SealService {
   }
 
   /**
+=======
+>>>>>>> origin/promotion/ecosystem-final
    * Hardened Authorization Loop
    * Phases 0-4 implementation
    */

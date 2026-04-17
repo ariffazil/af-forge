@@ -1,48 +1,55 @@
-"""
-GEOX Time4D Dimension Tools
-DITEMPA BUKAN DIBERI
-"""
-
 import logging
-from typing import Optional, Dict, Any
-
 from fastmcp import FastMCP
+from typing import List, Dict, Any
+from contracts.enums.statuses import get_standard_envelope, ExecutionStatus, GovernanceStatus, ArtifactStatus
 
-from contracts.enums.statuses import (
-    get_standard_envelope,
-    GovernanceStatus,
-    ClaimTag,
-)
+logger = logging.getLogger("geox.time4d")
 
-logger = logging.getLogger(__name__)
-
-
-def register_time4d_tools(mcp: FastMCP, profile: Optional[str] = None) -> None:
-    """Register all time4d dimension tools."""
-
-    @mcp.tool()
-    def time4d_simulate_burial(well_id: str, ages_ma: Optional[list] = None) -> Dict[str, Any]:
-        """Simulate burial history."""
+def register_time4d_tools(mcp: FastMCP, profile: str = "full"):
+    """
+    TIME 4D Registry: Basin evolution & play timing.
+    Simulating geological history through the temporal dimension.
+    
+    Naming convention: time4d_{action}_{target}
+    Aliases removed - use canonical names only.
+    """
+    
+    @mcp.tool(name="geox_time4d_simulate_burial")
+    @mcp.tool(name="time4d_simulate_burial")
+    async def time4d_simulate_burial(prospect_ref: str) -> dict:
+        """Compute: Simulate sediment burial and thermal maturation through time."""
+        artifact = {"prospect_ref": prospect_ref, "heat_flow": "standard", "maturity": "Oil_Window"}
         return get_standard_envelope(
-            {"well_id": well_id, "burial_curve": ages_ma or [0, 10, 20, 30], "unit": "m"},
-            governance_status=GovernanceStatus.QUALIFY,
-            claim_tag=ClaimTag.PLAUSIBLE,
+            artifact, 
+            tool_class="compute", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.COMPUTED,
+            ui_resource_uri="ui://time4d-dashboard"
         )
 
-    @mcp.tool()
-    def time4d_reconstruct_paleo(well_id: str, target_age_ma: float) -> Dict[str, Any]:
-        """Reconstruct paleo conditions."""
+    @mcp.tool(name="geox_time4d_reconstruct_paleo")
+    @mcp.tool(name="time4d_reconstruct_paleo")
+    async def time4d_reconstruct_paleo(time_ma: float) -> dict:
+        """Interpret: Reconstruct Paleo-geography at a specific point in time (Ma)."""
+        artifact = {"ma": time_ma, "paleo_env": "Deep_Marine", "confidence": 0.75}
         return get_standard_envelope(
-            {"well_id": well_id, "target_age_ma": target_age_ma, "paleo_depth_m": 1500.0},
-            governance_status=GovernanceStatus.HOLD,
-            claim_tag=ClaimTag.HYPOTHESIS,
+            artifact, 
+            tool_class="interpret", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.DRAFT,
+            ui_resource_uri="ui://time4d-dashboard"
         )
 
-    @mcp.tool()
-    def time4d_verify_timing(event_name: str, expected_age_ma: float) -> Dict[str, Any]:
-        """Verify timing of a geological event."""
+    @mcp.tool(name="geox_time4d_verify_timing")
+    @mcp.tool(name="time4d_verify_timing")
+    async def time4d_verify_timing(trap_formation_ma: float, charge_ma: float) -> dict:
+        """Verify: Check the temporal relationship between trap formation and charge."""
+        valid = trap_formation_ma > charge_ma
+        artifact = {"synchronized": valid, "delta": trap_formation_ma - charge_ma, "verdict": "valid_trap_charge_seq" if valid else "failed_timing_check"}
         return get_standard_envelope(
-            {"event": event_name, "expected_age_ma": expected_age_ma, "verified": True},
-            governance_status=GovernanceStatus.QUALIFY,
-            claim_tag=ClaimTag.PLAUSIBLE,
+            artifact, 
+            tool_class="verify", 
+            governance_status=GovernanceStatus.SEAL if valid else GovernanceStatus.HOLD, 
+            artifact_status=ArtifactStatus.VERIFIED if valid else ArtifactStatus.REJECTED,
+            ui_resource_uri="ui://time4d-dashboard"
         )

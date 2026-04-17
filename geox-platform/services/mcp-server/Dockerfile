@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY geox_mcp_server.py .
 
 # Copy registry (mounted at runtime, but copy for fallback)
-RUN cp registry.json . 2>/dev/null || echo "Registry will be mounted"
+COPY registry.json . 2>/dev/null || echo "Registry will be mounted"
 
 # Create geox-backend symlink (mounted at runtime)
 RUN mkdir -p /app/geox-backend

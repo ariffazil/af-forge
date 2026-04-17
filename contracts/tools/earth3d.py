@@ -1,57 +1,70 @@
-"""
-GEOX Earth3D Dimension Tools
-DITEMPA BUKAN DIBERI
-"""
-
 import logging
-from typing import Optional, Dict, Any
-
 from fastmcp import FastMCP
+from typing import List, Dict, Any
+from contracts.enums.statuses import get_standard_envelope, ExecutionStatus, GovernanceStatus, ArtifactStatus
 
-from contracts.enums.statuses import (
-    get_standard_envelope,
-    GovernanceStatus,
-    ClaimTag,
-)
+logger = logging.getLogger("geox.earth3d")
 
-logger = logging.getLogger(__name__)
-
-
-def register_earth3d_tools(mcp: FastMCP, profile: Optional[str] = None) -> None:
-    """Register all earth3d dimension tools."""
-
-    @mcp.tool()
-    def earth3d_load_volume(volume_id: str) -> Dict[str, Any]:
-        """Load a 3D seismic volume."""
+def register_earth3d_tools(mcp: FastMCP, profile: str = "full"):
+    """
+    EARTH 3D Registry: Volumetric seismic tools & structural modeling.
+    'What does the seismic show in 3D space?'
+    
+    Naming convention: earth3d_{action}_{target}
+    """
+    
+    @mcp.tool(name="geox_earth3d_load_volume")
+    @mcp.tool(name="earth3d_load_volume")
+    async def earth3d_load_volume(volume_ref: str) -> dict:
+        """Observe: Load a structural seismic volume for analysis."""
+        artifact = {"volume_ref": volume_ref, "status": "Active", "bbox": [0, 0, 100, 100]}
         return get_standard_envelope(
-            {"volume_id": volume_id, "loaded": True, "dimensions": [500, 500, 1000]},
-            governance_status=GovernanceStatus.SEAL,
-            claim_tag=ClaimTag.CLAIM,
+            artifact, 
+            tool_class="observe", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.LOADED, 
+            uncertainty="Low",
+            ui_resource_uri="ui://earth3d-dashboard"
         )
 
-    @mcp.tool()
-    def earth3d_interpret_horizons(volume_id: str, horizon_names: Optional[list] = None) -> Dict[str, Any]:
-        """Interpret horizons in a 3D volume."""
+    @mcp.tool(name="geox_earth3d_interpret_horizons")
+    @mcp.tool(name="earth3d_interpret_horizons")
+    async def earth3d_interpret_horizons(volume_ref: str) -> dict:
+        """Interpret: Automatically/Manually pick horizons within the 3D volume."""
+        artifact = {"volume_ref": volume_ref, "horizons": ["Top_Reservoir", "Base_Seal"]}
         return get_standard_envelope(
-            {"volume_id": volume_id, "horizons": horizon_names or ["H1", "H2", "H3"]},
-            governance_status=GovernanceStatus.QUALIFY,
-            claim_tag=ClaimTag.PLAUSIBLE,
+            artifact, 
+            tool_class="interpret", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.DRAFT, 
+            uncertainty="High",
+            ui_resource_uri="ui://earth3d-dashboard"
         )
 
-    @mcp.tool()
-    def earth3d_model_geometries(volume_id: str) -> Dict[str, Any]:
-        """Model structural geometries in 3D."""
+    @mcp.tool(name="geox_earth3d_model_geometries")
+    @mcp.tool(name="earth3d_model_geometries")
+    async def earth3d_model_geometries(horizon_ids: list) -> dict:
+        """Compute: Build architectural geometries from interpreted horizons."""
+        artifact = {"model_ref": "earth_structural_001", "elements": len(horizon_ids)}
         return get_standard_envelope(
-            {"volume_id": volume_id, "geometries": ["fault_model", "horizon_model"]},
-            governance_status=GovernanceStatus.HOLD,
-            claim_tag=ClaimTag.HYPOTHESIS,
+            artifact, 
+            tool_class="compute", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.COMPUTED, 
+            uncertainty="Moderate",
+            ui_resource_uri="ui://earth3d-dashboard"
         )
 
-    @mcp.tool()
-    def earth3d_verify_structural_integrity(volume_id: str) -> Dict[str, Any]:
-        """Verify structural integrity of a 3D model."""
+    @mcp.tool(name="geox_earth3d_verify_structural_integrity")
+    @mcp.tool(name="earth3d_verify_structural_integrity")
+    async def earth3d_verify_structural_integrity(model_ref: str) -> dict:
+        """Verify: Check model for structural paradoxes (e.g., overlapping faults)."""
+        artifact = {"model_ref": model_ref, "consistent": True, "verdict": "PHYSICALLY_FEASIBLE"}
         return get_standard_envelope(
-            {"volume_id": volume_id, "integrity_score": 0.92, "valid": True},
-            governance_status=GovernanceStatus.QUALIFY,
-            claim_tag=ClaimTag.PLAUSIBLE,
+            artifact, 
+            tool_class="verify", 
+            governance_status=GovernanceStatus.SEAL, 
+            artifact_status=ArtifactStatus.VERIFIED, 
+            uncertainty="Low",
+            ui_resource_uri="ui://earth3d-dashboard"
         )

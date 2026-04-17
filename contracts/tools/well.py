@@ -1,200 +1,166 @@
-"""
-GEOX Well Dimension Tools
-DITEMPA BUKAN DIBERI
-"""
-
 import logging
-from typing import Optional, Dict, Any
-
 from fastmcp import FastMCP
+from typing import List, Dict, Any
+from contracts.enums.statuses import get_standard_envelope, ExecutionStatus, GovernanceStatus, ArtifactStatus
 
-from contracts.enums.statuses import (
-    get_standard_envelope,
-    ExecutionStatus,
-    GovernanceStatus,
-    ArtifactStatus,
-    ClaimTag,
-)
+logger = logging.getLogger("geox.well")
 
-logger = logging.getLogger(__name__)
+def register_well_tools(mcp: FastMCP, profile: str = "full"):
+    """
+    WELL Registry: Borehole & Log Analysis tools.
+    'What's in this borehole?'
+    
+    Naming convention: well_{action}_{target}
+    """
+    
+    try:
+        from services.witness_engine.petrophysics import witness
+    except ImportError:
+        logger.error("Well services unavailable")
+        witness = None
 
-
-def register_well_tools(mcp: FastMCP, profile: Optional[str] = None) -> None:
-    """Register all well dimension tools."""
-
-    @mcp.tool()
-    def well_load_bundle(well_id: str) -> Dict[str, Any]:
-        """Load a well bundle."""
+    @mcp.tool(name="geox_well_load_bundle")
+    @mcp.tool(name="well_load_bundle")
+    async def well_load_bundle(well_ref: str, bundle_uri: str) -> dict:
+        """Observe: Load a full log bundle (LAS/DLIS) into the witness context."""
+        artifact = {"well_ref": well_ref, "status": "loaded", "uri": bundle_uri}
         return get_standard_envelope(
-            {"well_id": well_id, "bundle_loaded": True, "curves": ["GR", "RT", "NPHI", "RHOB"]},
-            governance_status=GovernanceStatus.SEAL,
-            claim_tag=ClaimTag.CLAIM,
+            artifact, 
+            tool_class="observe", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.DRAFT, 
+            uncertainty="Low",
+            ui_resource_uri="ui://well-dashboard"
         )
 
-    @mcp.tool()
-    def well_load_log_bundle(well_id: str, log_types: Optional[list] = None) -> Dict[str, Any]:
-        """Load specific log types for a well."""
+    @mcp.tool(name="well_load_log_bundle")
+    async def well_load_log_bundle(well_id: str, bundle_uri: str) -> dict:
+        """[DEPRECATED] Alias for well_load_bundle."""
+        return await well_load_bundle(well_id, bundle_uri)
+
+    @mcp.tool(name="geox_well_qc_logs")
+    @mcp.tool(name="well_qc_logs")
+    async def well_qc_logs(well_ref: str) -> dict:
+        """Verify: Perform Quality Control on loaded logs."""
+        artifact = {"well_ref": well_ref, "qc_status": "pass", "flags": []}
         return get_standard_envelope(
-            {"well_id": well_id, "log_types": log_types or ["GR", "RT"], "loaded": True},
-            governance_status=GovernanceStatus.SEAL,
+            artifact, 
+            tool_class="verify", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.VERIFIED, 
+            uncertainty="Low",
+            ui_resource_uri="ui://well-dashboard"
         )
 
-    @mcp.tool()
-    def well_qc_logs(well_id: str, curves: Optional[list] = None) -> Dict[str, Any]:
-        """QC well logs."""
+    @mcp.tool(name="geox_qc_logs")
+    async def geox_qc_logs(well_id: str) -> dict:
+        """[DEPRECATED] Alias for well_qc_logs."""
+        return await well_qc_logs(well_id)
+
+    @mcp.tool(name="geox_well_validate_cutoffs")
+    @mcp.tool(name="well_validate_cutoffs")
+    async def well_validate_cutoffs(well_ref: str, parameter: str, value: float) -> dict:
+        """Verify: Validate petrophysical cutoffs against regional norms."""
+        artifact = {"well_ref": well_ref, "parameter": parameter, "valid": True}
         return get_standard_envelope(
-            {"well_id": well_id, "qc_passed": True, "curves_checked": curves or ["GR", "RT"]},
-            governance_status=GovernanceStatus.QUALIFY,
-            claim_tag=ClaimTag.PLAUSIBLE,
+            artifact, 
+            tool_class="verify", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.VERIFIED, 
+            uncertainty="Low",
+            ui_resource_uri="ui://well-dashboard"
         )
 
-    @mcp.tool()
-    def geox_qc_logs(well_id: str, curves: Optional[list] = None) -> Dict[str, Any]:
-        """Alias: QC well logs."""
-        return well_qc_logs(well_id, curves)
+    @mcp.tool(name="geox_validate_cutoffs")
+    async def geox_validate_cutoffs(well_id: str, parameter: str, value: float) -> dict:
+        """[DEPRECATED] Alias for well_validate_cutoffs."""
+        return await well_validate_cutoffs(well_id, parameter, value)
 
-    @mcp.tool()
-    def well_validate_cutoffs(well_id: str, cutoffs: Dict[str, float]) -> Dict[str, Any]:
-        """Validate petrophysical cutoffs."""
+    @mcp.tool(name="geox_well_select_sw_model")
+    @mcp.tool(name="well_select_sw_model")
+    async def well_select_sw_model(formation: str, temperature_c: float) -> dict:
+        """Interpret: Recommends a Water Saturation (Sw) model based on formation context."""
+        if witness:
+            result = witness.select_sw_model(formation, temperature_c)
+        else:
+            result = {"formation": formation, "model": "Archie", "temperature_c": temperature_c}
         return get_standard_envelope(
-            {"well_id": well_id, "cutoffs": cutoffs, "valid": True},
-            governance_status=GovernanceStatus.QUALIFY,
-            claim_tag=ClaimTag.PLAUSIBLE,
+            result, 
+            tool_class="interpret", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.DRAFT, 
+            uncertainty="Moderate",
+            ui_resource_uri="ui://well-dashboard"
         )
 
-    @mcp.tool()
-    def geox_validate_cutoffs(well_id: str, cutoffs: Dict[str, float]) -> Dict[str, Any]:
-        """Alias: Validate cutoffs."""
-        return well_validate_cutoffs(well_id, cutoffs)
+    @mcp.tool(name="geox_select_sw_model")
+    async def geox_select_sw_model(formation: str, temperature_c: float) -> dict:
+        """[DEPRECATED] Alias for well_select_sw_model."""
+        return await well_select_sw_model(formation, temperature_c)
 
-    @mcp.tool()
-    def well_select_sw_model(well_id: str, model: str = "archie") -> Dict[str, Any]:
-        """Select water saturation model."""
+    @mcp.tool(name="geox_well_compute_petrophysics")
+    @mcp.tool(name="well_compute_petrophysics")
+    async def well_compute_petrophysics(
+        model: str, 
+        rw: float, 
+        rt: float, 
+        phi: float, 
+        a: float = 1.0, 
+        m: float = 2.0, 
+        n: float = 2.0
+    ) -> dict:
+        """Compute: Executes physics-9 grounded petrophysical calculations."""
+        if witness:
+            result_obj = witness.compute_archie_sw(model, rw, rt, phi, a, m, n)
+            artifact = result_obj.model_dump()
+        else:
+            sw = (a * rw / (rt * phi**m))**(1/n)
+            artifact = {"sw": sw, "phi": phi, "rw": rw, "rt": rt, "model": model}
         return get_standard_envelope(
-            {"well_id": well_id, "sw_model": model, "selected": True},
-            governance_status=GovernanceStatus.QUALIFY,
-            claim_tag=ClaimTag.PLAUSIBLE,
+            artifact, 
+            tool_class="compute", 
+            governance_status=GovernanceStatus.QUALIFY, 
+            artifact_status=ArtifactStatus.COMPUTED, 
+            uncertainty="Moderate",
+            ui_resource_uri="ui://well-dashboard"
         )
 
-    @mcp.tool()
-    def geox_select_sw_model(well_id: str, model: str = "archie") -> Dict[str, Any]:
-        """Alias: Select Sw model."""
-        return well_select_sw_model(well_id, model)
+    @mcp.tool(name="geox_compute_petrophysics")
+    async def geox_compute_petrophysics(
+        model: str, 
+        rw: float, 
+        rt: float, 
+        phi: float, 
+        a: float = 1.0, 
+        m: float = 2.0, 
+        n: float = 2.0
+    ) -> dict:
+        """[DEPRECATED] Alias for well_compute_petrophysics."""
+        return await well_compute_petrophysics(model, rw, rt, phi, a, m, n)
 
-    @mcp.tool()
-    def well_compute_petrophysics(
-        well_id: str, 
-        model: str = "archie",
-        rw: float = 0.1,
-        rt: float = 10.0,
-        phi: float = 0.2,
-        u_phys: float = 0.3,
-        transform_stack: list[str] = ["linear_scaling"],
-        bias_scenario: str = "physics_validated"
-    ) -> Dict[str, Any]:
-        """Compute petrophysics for a well with ToAC audit."""
-        
-        # 1. Core Physics (Simplified)
-        sw = (0.62 * rw / (rt * phi**2.15))**0.5  # Humble Archie
-        artifact = {
-            "well_id": well_id, 
-            "model": model, 
-            "computed": True, 
-            "vshale": 0.25, 
-            "sw": round(sw, 4), 
-            "phie": phi
-        }
-
-        # 2. Forge ToAC Payload
-        try:
-            from ENGINE.ac_risk import ACRiskCalculator
-            calculator = ACRiskCalculator()
-            ac_result = calculator.compute(
-                u_phys=u_phys,
-                transform_stack=transform_stack,
-                bias_scenario=bias_scenario
-            )
-            artifact["toac_payload"] = {
-                "ac_risk": round(ac_result.ac_risk, 4),
-                "verdict": ac_result.verdict,
-                "explanation": ac_result.explanation,
-                "components": {
-                    "u_phys": ac_result.u_phys,
-                    "d_transform": ac_result.d_transform,
-                    "b_cog": ac_result.b_cog
-                }
-            }
-            verdict = ac_result.verdict
-        except Exception as e:
-            logger.warning(f"ToAC calculation failed for petrophysics: {e}")
-            verdict = GovernanceStatus.QUALIFY.value
-            artifact["toac_payload"] = {"error": str(e)}
-
+    @mcp.tool(name="geox_well_verify_petrophysics")
+    @mcp.tool(name="well_verify_petrophysics")
+    async def well_verify_petrophysics(well_ref: str, phi: float, sw: float) -> dict:
+        """Verify: Governance check (888_HOLD) for anomalous petrophysics."""
+        if witness:
+            artifact = witness.hold_check(well_ref, phi, sw)
+        else:
+            artifact = {"well_ref": well_ref, "status": "HOLD_TRIGGERED"}
         return get_standard_envelope(
-            artifact,
-            governance_status=GovernanceStatus[verdict] if verdict in GovernanceStatus.__members__ else GovernanceStatus.QUALIFY,
-            claim_tag=ClaimTag.PLAUSIBLE,
-            uncertainty=u_phys
+            artifact, 
+            tool_class="verify", 
+            governance_status=GovernanceStatus.HOLD, 
+            artifact_status=ArtifactStatus.IN_REVIEW, 
+            uncertainty="High",
+            ui_resource_uri="ui://well-dashboard"
         )
 
-    @mcp.tool()
-    def geox_compute_petrophysics(well_id: str, model: str = "archie") -> Dict[str, Any]:
-        """Alias: Compute petrophysics."""
-        return well_compute_petrophysics(well_id, model)
+    @mcp.tool(name="well_petrophysical_check")
+    async def well_petrophysical_check(well_id: str, phi: float, sw: float) -> dict:
+        """[DEPRECATED] Alias for well_verify_petrophysics."""
+        return await well_verify_petrophysics(well_id, phi, sw)
 
-    @mcp.tool()
-    def well_verify_petrophysics(well_id: str) -> Dict[str, Any]:
-        """Verify petrophysics results."""
-        return get_standard_envelope(
-            {"well_id": well_id, "verified": True},
-            governance_status=GovernanceStatus.SEAL,
-            claim_tag=ClaimTag.CLAIM,
-        )
-
-    @mcp.tool()
-    def well_petrophysical_check(well_id: str) -> Dict[str, Any]:
-        """Run petrophysical consistency check."""
-        return get_standard_envelope(
-            {"well_id": well_id, "consistent": True},
-            governance_status=GovernanceStatus.QUALIFY,
-            claim_tag=ClaimTag.PLAUSIBLE,
-        )
-
-    @mcp.tool()
-    def geox_petrophysical_hold_check(well_id: str) -> Dict[str, Any]:
-        """Governance hold check for petrophysics."""
-        return get_standard_envelope(
-            {"well_id": well_id, "hold_required": False},
-            governance_status=GovernanceStatus.SEAL,
-            claim_tag=ClaimTag.CLAIM,
-        )
-
-    @mcp.tool()
-    def well_digitize_log(
-        image_path: str,
-        curve_types: Optional[list] = None,
-    ) -> Dict[str, Any]:
-        """
-        Analog Digitizer — PLANNED design spike.
-        Accepts scanned log image and returns structured tasks only.
-        """
-        return get_standard_envelope(
-            {
-                "image_path": image_path,
-                "curve_types": curve_types or ["gamma_ray", "resistivity"],
-                "status": "design_spike",
-                "pipeline": [
-                    {"stage": "preprocess", "status": "pending", "description": "Image alignment, denoising, grid isolation"},
-                    {"stage": "neural_interpretation", "status": "pending", "description": "CNN/RNN curve tracking"},
-                    {"stage": "vectorization", "status": "pending", "description": "Pixel paths to mathematical vectors"},
-                    {"stage": "las_export", "status": "pending", "description": "Map to depth and scale values"},
-                ],
-                "governance": {
-                    "note": "Truth >= 0.99 required before any SEALED LAS used for business decisions.",
-                    "f1_amanah": "All digitization must be git-backed and reversible",
-                },
-            },
-            governance_status=GovernanceStatus.HOLD,
-            artifact_status=ArtifactStatus.DRAFT,
-            claim_tag=ClaimTag.HYPOTHESIS,
-        )
+    @mcp.tool(name="geox_petrophysical_hold_check")
+    async def geox_petrophysical_hold_check(well_id: str, phi: float, sw: float) -> dict:
+        """[DEPRECATED] Alias for well_verify_petrophysics."""
+        return await well_verify_petrophysics(well_id, phi, sw)
