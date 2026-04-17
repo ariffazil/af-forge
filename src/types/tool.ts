@@ -36,6 +36,8 @@ export type ToolExecutionContext = {
     maxFileBytes: number;
     allowedCommandPrefixes: string[];
     blockedCommandPatterns: string[];
+    allowedTools?: string[];
+    blockedTools?: string[];
   };
 };
 

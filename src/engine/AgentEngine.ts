@@ -759,7 +759,9 @@ export class AgentEngine {
 
       let toolResult;
       try {
-        toolResult = await this.dependencies.toolRegistry.runTool(
+        // PER-TOOL TIMEOUT HARDENING: Ensure no tool hangs the engine
+        const toolTimeoutMs = 30000;
+        const toolPromise = this.dependencies.toolRegistry.runTool(
           call.toolName,
           call.args,
           {
@@ -770,6 +772,12 @@ export class AgentEngine {
           },
           permissionContext,
         );
+
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error(`Tool '${call.toolName}' timed out after ${toolTimeoutMs}ms`)), toolTimeoutMs)
+        );
+
+        toolResult = await Promise.race([toolPromise, timeoutPromise]);
 
         // Track for grounding check
         toolResults.push({ ok: toolResult.ok, output: toolResult.output });

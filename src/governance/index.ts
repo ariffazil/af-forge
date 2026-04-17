@@ -32,6 +32,9 @@ export { checkInjection, redactSecrets, type InjectionResult, type InjectionVerd
 // F11: Coherence (NEW)
 export { checkCoherence, checkResponseCoherence, type CoherenceResult, type CoherenceVerdict } from "./f11Coherence.js";
 
+// W0: WELL Readiness (NEW)
+export { checkWellReadiness, type WellReadinessResult, type WellVerdict } from "./wellReadiness.js";
+
 // Seal Service
 export { SealService, type SealContext, type SealVerdict, type SealStatus, type EpistemicVerdict, type EpistemicThresholds } from "./SealService.js";
 

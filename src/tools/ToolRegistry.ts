@@ -34,8 +34,27 @@ export class ToolRegistry {
       throw new Error(`Unknown tool: ${toolName}`);
     }
 
+    // 1. Strict Permission Check
     if (!tool.isPermitted(permissionContext)) {
       throw new Error(`Tool is not permitted in this profile or mode: ${toolName}`);
+    }
+
+    // 2. Policy Policy Enforcement (if provided)
+    if (executionContext.policy) {
+      const { allowedTools, blockedTools } = executionContext.policy;
+      
+      if (blockedTools && blockedTools.includes(toolName)) {
+        throw new Error(`Tool '${toolName}' is explicitly blocked by runtime ToolPolicyConfig.`);
+      }
+
+      if (allowedTools && allowedTools.length > 0 && !allowedTools.includes(toolName)) {
+         throw new Error(`Tool '${toolName}' is not in the allowlist of runtime ToolPolicyConfig.`);
+      }
+    }
+
+    // 3. Mode Isolation (Internal Mode protection)
+    if (executionContext.modeName !== "internal_mode" && tool.riskLevel === "dangerous") {
+       throw new Error(`Critical: Dangerous tool '${toolName}' attempted outside internal_mode.`);
     }
 
     // === F13 Sovereign + F1 Amanah: 888_HOLD gate for dangerous tools ===

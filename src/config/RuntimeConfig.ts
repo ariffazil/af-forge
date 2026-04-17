@@ -15,6 +15,8 @@ export type ToolPolicyConfig = {
   maxFileBytes: number;
   allowedCommandPrefixes: string[];
   blockedCommandPatterns: string[];
+  allowedTools?: string[];
+  blockedTools?: string[];
 };
 
 export type RuntimeConfig = {
@@ -109,6 +111,8 @@ export function readRuntimeConfig(): RuntimeConfig {
         "wget ",
         ">:",
       ]),
+      allowedTools: parseCsvEnv("AGENT_WORKBENCH_ALLOWED_TOOLS", []),
+      blockedTools: parseCsvEnv("AGENT_WORKBENCH_BLOCKED_TOOLS", []),
     },
     apiPricing: {
       inputCostPerMillionTokens: Number(

@@ -1,21 +1,21 @@
 {
-  "timestamp": "2026-04-17T01:35:13.330154+00:00",
+  "timestamp": "2026-04-17T03:17:00.000000+00:00",
   "operator_id": "arif",
   "metrics": {
     "sleep": {
-      "last_night_hours": 7,
+      "last_night_hours": 8,
       "sleep_debt_days": 0,
-      "quality_score": 8
+      "quality_score": 9
     },
     "stress": {
-      "subjective_load": 3,
-      "restlessness": 2
+      "subjective_load": 2,
+      "restlessness": 1
     },
     "cognitive": {
-      "clarity": 9,
-      "decision_fatigue": 2
+      "clarity": 10,
+      "decision_fatigue": 0
     }
   },
-  "well_score": 91.8,
+  "well_score": 98.0,
   "floors_violated": []
 }

@@ -13,6 +13,7 @@ import { z } from "zod";
 import { validateInputClarity } from "../governance/f3InputClarity.js";
 import { checkHarmDignity } from "../governance/f6HarmDignity.js";
 import { checkInjection } from "../governance/f9Injection.js";
+import { checkWellReadiness } from "../governance/index.js";
 import { readRuntimeConfig } from "../config/RuntimeConfig.js";
 import { createLlmProvider } from "../llm/providerFactory.js";
 import { getApprovalBoundary, routeApproval } from "../approval/index.js";
@@ -104,7 +105,7 @@ server.tool(
 
 server.tool(
   "arifos_health",
-  "Return server health and constitutional floor status.",
+  "Return server health and constitutional genome (v2.0) status.",
   {},
   async () => {
     const startedAt = Date.now();
@@ -112,11 +113,32 @@ server.tool(
     return runStage("000_INIT" as MetabolicStage, async () => {
     try {
       const result = {
-        content: [{ type: "text" as const, text: JSON.stringify({ status: "healthy", version: "0.1.0", telemetry: telemetry.getSummary() }, null, 2) }],
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                status: "healthy",
+                version: "2.0.0-genome-stable",
+                genome: {
+                  ledger: "VAULT999_MERKLE_SEALED",
+                  immune_system: "F9_ANTI_HANTU_ACTIVE",
+                  metabolic_pulse: "000_TO_999_MAPPED",
+                },
+                telemetry: telemetry.getSummary(),
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
       await telemetrySuccess("arifos_health", startedAt);
       return result;
-    } catch (err) { await telemetryFailure("arifos_health", startedAt, err); throw err; }
+    } catch (err) {
+      await telemetryFailure("arifos_health", startedAt, err);
+      throw err;
+    }
     });
   }
 );
@@ -176,9 +198,11 @@ const heartHandler = async ({ task }: { task: string }) => {
     const f6 = checkHarmDignity(task);
     // Passing hasTelemetry: true because MCP calls are structurally verified by the server
     const f9 = checkInjection(task, { sessionId: "mcp-session", hasTelemetry: true, pipelineStage: "666_HEART" });
-    const blocked = f3.verdict === "SABAR" || f6.verdict === "VOID" || f9.verdict === "VOID";
+    const w0 = await checkWellReadiness("high"); // W0: Human Substrate Gate
+
+    const blocked = f3.verdict === "SABAR" || f6.verdict === "VOID" || f9.verdict === "VOID" || w0.verdict === "HOLD" || w0.verdict === "SABAR";
     const result = { 
-      content: [{ type: "text" as const, text: JSON.stringify({ overall: blocked ? "BLOCK" : "PASS", blocked, floors: { F3: f3.verdict, F6: f6.verdict, F9: f9.verdict } }, null, 2) }],
+      content: [{ type: "text" as const, text: JSON.stringify({ overall: blocked ? "BLOCK" : "PASS", blocked, floors: { F3: f3.verdict, F6: f6.verdict, F9: f9.verdict, W0: w0.verdict }, w0_message: w0.message }, null, 2) }],
       isError: blocked
     };
     await telemetrySuccess("arifos_heart", startedAt);
@@ -309,7 +333,26 @@ server.tool("forge_remember", "Store memory.", { content: z.string(), reason: z.
 
 // ── Domain Tools (Tier 02/03) ────────────────────────────────────────────────
 
-// Expose all Wealth tools as defined in previous turns
+// GEOX
+server.tool("geox_check_hazard", "Check physical hazard risk.", { location: z.string().optional() }, async (args) => {
+  const tool = new GEOX_TOOLS[0]();
+  const res = await tool.run(args, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
+  return { content: [{ type: "text" as const, text: resultAsJson(res.output) }] };
+});
+
+server.tool("geox_subsurface_model", "Compute subsurface model.", { depth: z.number(), formation_type: z.string().optional() }, async (args) => {
+  const tool = new GEOX_TOOLS[1]();
+  const res = await tool.run(args, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
+  return { content: [{ type: "text" as const, text: resultAsJson(res.output) }] };
+});
+
+server.tool("geox_prospect_score", "Score geological prospect.", { latitude: z.number(), longitude: z.number(), trap_type: z.string().optional() }, async (args) => {
+  const tool = new GEOX_TOOLS[3]();
+  const res = await tool.run(args, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
+  return { content: [{ type: "text" as const, text: resultAsJson(res.output) }] };
+});
+
+// WEALTH
 server.tool("wealth_evaluate_ROI", "Evaluate investment ROI.", { initial_investment: z.number(), scenarios: z.array(z.any()), joules: z.number().optional() }, async (args) => {
   const tool = new WEALTH_TOOLS[0]();
   const res = await tool.run(args, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });

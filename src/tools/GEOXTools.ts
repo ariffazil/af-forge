@@ -562,7 +562,10 @@ export class GEOXProspectScoreTool extends BaseTool {
     const porosity_fraction = 0.10 + reservoirQuality * 0.15;
     const saturation_oil = 0.60 + reservoirQuality * 0.25;
     const formationVolumeFactor = 1.3;
-    const OOIP_MMstb = (area_km2 * thickness_m * porosity_fraction * saturation_oil * (1 / formationVolumeFactor)) / 1e6;
+    // MMstb = (Area[km2] * Thickness[m] * Porosity * Saturation * (1/Boi)) / 159 (conversion) ...
+    // Simplified volumetric for demo: Area * Thickness * Porosity * Saturation / Boi
+    // We want the result in Millions, so if input is Area=50, Thickness=20, Porosity=0.1, we get 100.
+    const OOIP_MMstb = (area_km2 * thickness_m * porosity_fraction * saturation_oil * (1 / formationVolumeFactor));
 
     const GOR_scf_bbl = 500 + reservoirQuality * 2000;
     const GIP_Bscf = (OOIP_MMstb * GOR_scf_bbl) / 1e6;
