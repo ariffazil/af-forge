@@ -99,9 +99,10 @@ export class PostgresVaultClient implements VaultClient {
   private async writeToCanon(record: VaultSealRecord): Promise<void> {
     // Basic heuristics to extract ADR-like info if not explicit
     const title = record.task.split("\n")[0].slice(0, 100);
-    // Use sealId prefix if no ADR-ID is found in task
+    // Use sealId/record_id prefix if no ADR-ID is found in task
     const adrIdMatch = record.task.match(/ADR-[0-9]+/);
-    const adrId = adrIdMatch ? adrIdMatch[0] : `AUTO-${record.sealId.slice(0, 8).toUpperCase()}`;
+    const identifier = record.record_id ?? record.sealId ?? "UNKNOWN";
+    const adrId = adrIdMatch ? adrIdMatch[0] : `AUTO-${identifier.slice(0, 8).toUpperCase()}`;
 
     // Map profile to agent_id (best effort)
     const agentId = record.profileName === "archivist" ? "ARCHIVIST-Agent" : 

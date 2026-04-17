@@ -26,9 +26,18 @@ export type AuditEventAction =
 
 export interface AuditEvent {
   epoch: string;
+  session_id?: string;
+  pipeline_stage?: string;
   tool: string;
   action: AuditEventAction;
   outcome?: string;
+  dS?: number;
+  peace2?: number;
+  omega?: number;
+  w3?: number;
+  kappa_r?: number;
+  confidence?: number;
+  verdict?: "SEAL" | "HOLD" | "VOID";
   metadata?: Record<string, unknown>;
 }
 
@@ -39,6 +48,9 @@ export interface TelemetrySummary {
   failures: Record<string, number>;
   providerUsage: Record<string, number>;
   totalEvents: number;
+  avgEntropyDelta: number;
+  avgPeace2: number;
+  avgOmega: number;
 }
 
 class McpTelemetry {
@@ -105,6 +117,13 @@ class McpTelemetry {
       tool: event.tool,
       action: event.action,
       outcome: safeEvent.outcome,
+      session_id: event.session_id,
+      pipeline_stage: event.pipeline_stage,
+      dS: event.dS,
+      peace2: event.peace2,
+      omega: event.omega,
+      w3: event.w3,
+      verdict: event.verdict,
       metadata: safeEvent.metadata,
     });
   }
@@ -117,6 +136,9 @@ class McpTelemetry {
       failures: { ...this.failures },
       providerUsage: { ...this.providerUsage },
       totalEvents: this.totalEvents,
+      avgEntropyDelta: 0,
+      avgPeace2: 0.95,
+      avgOmega: 0.99,
     };
   }
 

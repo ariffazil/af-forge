@@ -57,7 +57,11 @@ export class LocalGovernanceClient implements GovernanceClient {
     }
 
     // F9: Injection
-    const injection = checkInjection(request.task);
+    const injection = checkInjection(request.task, {
+      sessionId: request.sessionId,
+      hasTelemetry: !!request.context?.hasTelemetry,
+      pipelineStage: request.context?.pipelineStage as string | undefined,
+    });
     if (injection.verdict === "VOID") {
       floorsTriggered.push("F9");
       return { verdict: "VOID", floorsTriggered, message: injection.message };

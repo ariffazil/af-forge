@@ -1,19 +1,21 @@
 /**
- * AF-FORGE MCP Server (stdio wrapper)
+ * AF-FORGE MCP Server — STDIO entry point
  *
- * Legacy entry point that now imports from core.ts.
- * Runs the standard stdio transport.
+ * Imports all tools + resources from core.ts and runs stdio transport.
+ * This is the canonical entry point for local MCP clients
+ * (Claude Desktop, Cursor, OpenCode, Windsurf).
  *
- * @module mcp/server
+ * @module mcp/stdio
  */
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
 import { server } from "./core.js";
 import { getApprovalBoundary } from "../approval/index.js";
 import { getMemoryContract } from "../memory-contract/index.js";
 import { telemetry } from "./telemetry.js";
 
-async function main() {
+async function main(): Promise<void> {
   const approvalBoundary = getApprovalBoundary();
   const memoryContract = getMemoryContract();
 

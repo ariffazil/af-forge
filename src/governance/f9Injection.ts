@@ -19,7 +19,7 @@ export interface InjectionResult {
 
 // Prompt injection / manipulation patterns
 const INJECTION_PATTERNS: Array<{ pattern: RegExp; severity: "high" | "critical" }> = [
-  { pattern: /ignore\s+(?:previous|earlier|above)\s+(?:instructions?|commands?)/i, severity: "critical" },
+  { pattern: /ignore\s+(?:all\s+)?(?:previous|earlier|above)\s+(?:instructions?|commands?)/i, severity: "critical" },
   { pattern: /bypass\s+(?:policy|security|restrictions?)/i, severity: "critical" },
   { pattern: /override\s+(?:system|safety|constraints?)/i, severity: "critical" },
   { pattern: /do\s+not\s+(?:log|record|remember)/i, severity: "high" },
@@ -31,26 +31,67 @@ const INJECTION_PATTERNS: Array<{ pattern: RegExp; severity: "high" | "critical"
   { pattern: /disregard\s+(?:safety|ethical|morality)/i, severity: "critical" },
 ];
 
+// F9 Anti-Hantu: arifOS Shadow Detection Patterns
+const SHADOW_PATTERNS: Array<{ pattern: RegExp; vocabulary: string }> = [
+  { pattern: /\bmaruah\b/i, vocabulary: "Maruah" },
+  { pattern: /\bseal\s+verdict\b/i, vocabulary: "SEAL" },
+  { pattern: /[\u03A9\u03C9]/, vocabulary: "Omega (Ω)" }, // Ω
+  { pattern: /\bvault999\b/i, vocabulary: "Vault999" },
+  { pattern: /\bmetabolic\s+pulse\b/i, vocabulary: "Metabolic Pulse" },
+  { pattern: /\btri-witness\b/i, vocabulary: "Tri-Witness" },
+  { pattern: /\b\u039B2\b/, vocabulary: "Lambda2 (Λ2)" }, // Λ2
+];
+
+export interface ShadowContext {
+  sessionId?: string;
+  pipelineStage?: string;
+  hasTelemetry?: boolean;
+}
+
 /**
- * Check for prompt injection / manipulation attempts.
+ * Check for prompt injection and Shadow-arifOS patterns.
  * VOID = void the operation entirely.
  */
-export function checkInjection(input: string): InjectionResult {
+export function checkInjection(input: string, context?: ShadowContext): InjectionResult {
   const normalized = input.toLowerCase();
   const triggered: string[] = [];
 
+  // 1. Classic Prompt Injection Checks
   for (const { pattern, severity } of INJECTION_PATTERNS) {
-    if (pattern.test(normalized)) {
+    if (pattern.test(input)) {
       triggered.push(`${severity}: ${pattern.source.slice(0, 40)}...`);
     }
   }
 
+  // 2. F9 Anti-Hantu: Pattern 1 — Vocabulary Without Structure
+  const foundVocab = SHADOW_PATTERNS.filter(p => p.pattern.test(input));
+  if (foundVocab.length > 0 && !context?.hasTelemetry) {
+    triggered.push(`shadow: Vocabulary detected [${foundVocab.map(v => v.vocabulary).join(", ")}] without telemetry`);
+  }
+
+  // 3. F9 Anti-Hantu: Pattern 4 — Identity Forgery (No Session ID)
+  if (foundVocab.length > 0 && !context?.sessionId) {
+    triggered.push("shadow: arifOS vocabulary used without valid session_id");
+  }
+
+  // 4. F9 Anti-Hantu: Pattern 2 — Pipeline Shortcut
+  // If we are at 777_FORGE but skipped 666_HEART (indicated by context)
+  // (In practice, this is enforced by the DAG, but we check here for prompt-based mimicry)
+  if (normalized.includes("stage 777") && !context?.pipelineStage?.includes("666")) {
+    if (!context?.pipelineStage?.includes("777")) { // if context doesn't even know we are in 777
+       triggered.push("shadow: Unauthorized Stage 777 activation attempt");
+    }
+  }
+
   if (triggered.length > 0) {
+    const isShadow = triggered.some(t => t.startsWith("shadow:"));
     return {
       verdict: "VOID",
       triggeredPatterns: triggered,
-      reason: "INJECTION_DETECTED",
-      message: `VOID: Potential instruction injection or manipulation detected (${triggered.length} patterns).`,
+      reason: isShadow ? "SHADOW_ARIFOS_DETECTED" : "INJECTION_DETECTED",
+      message: isShadow 
+        ? `VOID: Shadow-arifOS detected. Narrative laundering or identity forgery attempt.`
+        : `VOID: Potential instruction injection or manipulation detected.`,
     };
   }
 

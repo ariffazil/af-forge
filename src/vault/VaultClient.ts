@@ -22,7 +22,9 @@ export type VaultTelemetrySnapshot = {
 };
 
 export interface VaultSealRecord {
-  sealId: string;
+  record_id?: string; // Spec v2.0: SHA-256 of content
+  prev_hash?: string; // Spec v2.0: SHA-256 of previous record
+  sealId?: string;    // Legacy compatibility
   sessionId: string;
   verdict: VaultVerdict;
   hashofinput: string;
@@ -81,6 +83,7 @@ export class NoOpVaultClient implements VaultClient {
 export class FileVaultClient implements VaultClient {
   private readonly filePath: string;
   private initialized = false;
+  private lastHash: string = "0".repeat(64); // Chain seed (Genesis)
 
   constructor(filePath?: string) {
     this.filePath =
@@ -90,6 +93,18 @@ export class FileVaultClient implements VaultClient {
 
   async seal(record: VaultSealRecord): Promise<void> {
     await this.initialize();
+    
+    // 1. Link to previous record
+    record.prev_hash = this.lastHash;
+    
+    // 2. Compute record content hash (excluding record_id itself)
+    const { record_id, ...content } = record;
+    const contentString = JSON.stringify(content);
+    record.record_id = createHash("sha256").update(contentString).digest("hex");
+    
+    // 3. Update lastHash for next call
+    this.lastHash = record.record_id;
+
     const line = JSON.stringify(record) + "\n";
     await appendFile(this.filePath, line, "utf-8");
   }
@@ -130,7 +145,7 @@ export class FileVaultClient implements VaultClient {
     return results;
   }
 
-  async findById(sealId: string): Promise<VaultSealRecord | undefined> {
+  async findById(recordId: string): Promise<VaultSealRecord | undefined> {
     await this.initialize();
     let text: string;
     try {
@@ -143,7 +158,7 @@ export class FileVaultClient implements VaultClient {
       if (!line.trim()) continue;
       try {
         const record = JSON.parse(line) as VaultSealRecord;
-        if (record.sealId === sealId) {
+        if (record.record_id === recordId || record.sealId === recordId) {
           found = record;
         }
       } catch {
@@ -156,6 +171,21 @@ export class FileVaultClient implements VaultClient {
   private async initialize(): Promise<void> {
     if (this.initialized) return;
     await mkdir(dirname(this.filePath), { recursive: true });
+    
+    // Try to find lastHash from existing file
+    try {
+      const text = await readFile(this.filePath, "utf-8");
+      const lines = text.trim().split("\n");
+      if (lines.length > 0 && lines[lines.length - 1].trim()) {
+        const lastRecord = JSON.parse(lines[lines.length - 1]) as VaultSealRecord;
+        if (lastRecord.record_id) {
+          this.lastHash = lastRecord.record_id;
+        }
+      }
+    } catch (e) {
+      // File might not exist yet, which is fine
+    }
+    
     this.initialized = true;
   }
 }
