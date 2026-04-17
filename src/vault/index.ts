@@ -25,6 +25,7 @@ export {
   computeInputHash,
   generateSealId,
 };
+export { SupabaseVaultClient, getSupabaseClient, type VaultRecord } from "./SupabaseVaultClient.js";
 export { MerkleV3Service, type TelemetryRow, type MerkleVerificationResult } from "./MerkleV3Service.js";
 
 let _postgresVaultClient: PostgresVaultClient | null = null;

@@ -21,7 +21,7 @@ import { getMemoryContract } from "../memory-contract/index.js";
 import { telemetry } from "./telemetry.js";
 import { runStage, recordFloorViolation } from "../metrics/prometheus.js";
 import type { MetabolicStage } from "../types/aki.js";
-import { FileVaultClient } from "../vault/index.js";
+import { FileVaultClient, SupabaseVaultClient, type VaultVerdict } from "../vault/index.js";
 import { WebhookHumanEscalationClient, NoOpHumanEscalationClient } from "../escalation/index.js";
 import { WEALTH_TOOLS } from "../tools/WealthTools.js";
 
@@ -329,6 +329,138 @@ const vaultHandler = async ({ content, reason, tier, tags }: { content: string, 
 server.tool("arifos_vault", "Ledger closure (Stage 999 VAULT).", { content: z.string(), reason: z.string(), tier: z.string().optional(), tags: z.array(z.string()).optional() }, vaultHandler);
 server.tool("forge_remember", "Store memory.", { content: z.string(), reason: z.string(), tier: z.string().optional(), tags: z.array(z.string()).optional() }, vaultHandler);
 
+// ── VAULT999 REST Tools ───────────────────────────────────────────────────────
+
+const vaultReadHandler = async ({ name }: { name: string }) => {
+  const startedAt = Date.now();
+  await telemetryInvoke("forge_vault_read");
+  return runStage("999_VAULT" as MetabolicStage, async () => {
+  try {
+    const sbClient = new SupabaseVaultClient();
+    const record = await sbClient.read(name);
+    return { content: [{ type: "text" as const, text: JSON.stringify({ found: !!record, record }, null, 2) }] };
+  } catch (err) {
+    await telemetryFailure("forge_vault_read", startedAt, err);
+    return { content: [{ type: "text" as const, text: JSON.stringify({ error: String(err) }, null, 2) }], isError: true };
+  }
+  });
+};
+
+const vaultListHandler = async ({ category, limit }: { category?: string, limit?: number }) => {
+  const startedAt = Date.now();
+  await telemetryInvoke("forge_vault_list");
+  return runStage("999_VAULT" as MetabolicStage, async () => {
+  try {
+    const sbClient = new SupabaseVaultClient();
+    const records = await sbClient.list(category, limit ?? 100);
+    return { content: [{ type: "text" as const, text: JSON.stringify({ count: records.length, records }, null, 2) }] };
+  } catch (err) {
+    await telemetryFailure("forge_vault_list", startedAt, err);
+    return { content: [{ type: "text" as const, text: JSON.stringify({ error: String(err) }, null, 2) }], isError: true };
+  }
+  });
+};
+
+const vaultWriteHandler = async ({ name, category, value, metadata }: { name: string, category: string, value: string, metadata?: Record<string, unknown> }) => {
+  const startedAt = Date.now();
+  await telemetryInvoke("forge_vault_write");
+  return runStage("999_VAULT" as MetabolicStage, async () => {
+  try {
+    const sbClient = new SupabaseVaultClient();
+    const record = await sbClient.write({ name, category, value, metadata });
+    return { content: [{ type: "text" as const, text: JSON.stringify({ status: "written", record }, null, 2) }] };
+  } catch (err) {
+    await telemetryFailure("forge_vault_write", startedAt, err);
+    return { content: [{ type: "text" as const, text: JSON.stringify({ error: String(err) }, null, 2) }], isError: true };
+  }
+  });
+};
+
+const vaultDeleteHandler = async ({ name }: { name: string }) => {
+  const startedAt = Date.now();
+  await telemetryInvoke("forge_vault_delete");
+  return runStage("999_VAULT" as MetabolicStage, async () => {
+  try {
+    const sbClient = new SupabaseVaultClient();
+    await sbClient.delete(name);
+    return { content: [{ type: "text" as const, text: JSON.stringify({ status: "deleted", name }, null, 2) }] };
+  } catch (err) {
+    await telemetryFailure("forge_vault_delete", startedAt, err);
+    return { content: [{ type: "text" as const, text: JSON.stringify({ error: String(err) }, null, 2) }], isError: true };
+  }
+  });
+};
+
+const vaultSealHandler = async ({ sealId, sessionId, verdict, task, finalText, turnCount, profileName, floorsTriggered, telemetrysnapshot }: {
+  sealId: string, sessionId: string, verdict: VaultVerdict, task: string, finalText: string, turnCount: number, profileName: string, floorsTriggered?: string[], telemetrysnapshot?: any
+}) => {
+  const startedAt = Date.now();
+  await telemetryInvoke("forge_vault_seal");
+  return runStage("999_VAULT" as MetabolicStage, async () => {
+  try {
+    const sbClient = new SupabaseVaultClient();
+    await sbClient.seal({
+      sealId,
+      sessionId,
+      verdict,
+      hashofinput: "",
+      telemetrysnapshot: telemetrysnapshot ?? { dS: 0, peace2: 0, psi_le: 0, W3: 0, G: 0 },
+      floors_triggered: floorsTriggered ?? [],
+      irreversibilityacknowledged: true,
+      timestamp: new Date().toISOString(),
+      task,
+      finalText,
+      turnCount,
+      profileName,
+    });
+    return { content: [{ type: "text" as const, text: JSON.stringify({ status: "SEAL", sealId, verdict }, null, 2) }] };
+  } catch (err) {
+    await telemetryFailure("forge_vault_seal", startedAt, err);
+    return { content: [{ type: "text" as const, text: JSON.stringify({ error: String(err) }, null, 2) }], isError: true };
+  }
+  });
+};
+
+server.registerTool("forge_vault_read", {
+  description: "Read a vault record by name from vault999.",
+  inputSchema: z.object({ name: z.string().describe("Record name") }),
+}, vaultReadHandler);
+
+server.registerTool("forge_vault_list", {
+  description: "List vault records by category from vault999.",
+  inputSchema: z.object({ category: z.string().optional().describe("Category filter"), limit: z.number().optional().describe("Max records (default 100)") }),
+}, vaultListHandler);
+
+server.registerTool("forge_vault_write", {
+  description: "Write a vault record to vault999.",
+  inputSchema: z.object({
+    name: z.string().describe("Record name"),
+    category: z.string().describe("Record category"),
+    value: z.string().describe("Record value (string)"),
+    metadata: z.record(z.string(), z.unknown()).optional().describe("Optional metadata"),
+  }),
+}, vaultWriteHandler);
+
+server.registerTool("forge_vault_delete", {
+  description: "Delete a vault record by name from vault999.",
+  inputSchema: z.object({ name: z.string().describe("Record name") }),
+}, vaultDeleteHandler);
+
+server.registerTool("forge_vault_seal", {
+  description: "Seal a terminal verdict to vault999.",
+  inputSchema: z.object({
+    sealId: z.string().describe("Seal ID"),
+    sessionId: z.string().describe("Session ID"),
+    verdict: z.enum(["SEAL", "HOLD", "SABAR", "VOID"]).describe("Verdict type"),
+    task: z.string().describe("Task description"),
+    finalText: z.string().describe("Final agent output"),
+    turnCount: z.number().describe("Number of turns"),
+    profileName: z.string().describe("Agent profile name"),
+    floorsTriggered: z.array(z.string()).optional().describe("Floors triggered"),
+    telemetrysnapshot: z.record(z.string(), z.number()).optional().describe("Telemetry snapshot"),
+  }),
+}, vaultSealHandler);
+
 // ── Domain Tools (Tier 03) ───────────────────────────────────────────────────
 
 server.tool("wealth_evaluate_ROI", "Evaluate investment ROI.", { initial_investment: z.number(), scenarios: z.array(z.any()), joules: z.number().optional() }, async (args) => {
@@ -367,6 +499,36 @@ server.resource("forge://memory/working", "forge://memory/working", { mimeType: 
       uri: "forge://memory/working",
       mimeType: "application/json",
       text: JSON.stringify({ count: result.total, memories: result.memories }, null, 2)
+    }]
+  };
+});
+
+// ── VAULT999 Resources ─────────────────────────────────────────────────────────
+
+server.resource("forge://vault/records", "forge://vault/records", { mimeType: "application/json" }, async () => {
+  const sbClient = new SupabaseVaultClient();
+  const records = await sbClient.list(undefined, 50);
+  return {
+    contents: [{
+      uri: "forge://vault/records",
+      mimeType: "application/json",
+      text: JSON.stringify({ count: records.length, records }, null, 2)
+    }]
+  };
+});
+
+server.resource("forge://vault/categories", "forge://vault/categories", { mimeType: "application/json" }, async () => {
+  const sbClient = new SupabaseVaultClient();
+  const cats = ["agents", "mcp", "floor_rules", "identity", "ledger", "infrastructure", "geox", "wealth"];
+  const results = await Promise.all(cats.map(async (cat) => {
+    const records = await sbClient.list(cat, 100);
+    return { category: cat, count: records.length };
+  }));
+  return {
+    contents: [{
+      uri: "forge://vault/categories",
+      mimeType: "application/json",
+      text: JSON.stringify({ categories: results }, null, 2)
     }]
   };
 });

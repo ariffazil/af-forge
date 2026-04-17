@@ -87,3 +87,4 @@ ARCHIVE_*/
 *.zip
 *.tgz
 
+.supabase/
