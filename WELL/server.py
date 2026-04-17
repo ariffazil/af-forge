@@ -339,65 +339,36 @@ def well_readiness(ctx: Context | None = None) -> dict[str, Any]:
 
 
 @mcp.tool()
-def well_anchor(
+async def well_anchor(
     force: bool = False,
     ctx: Context | None = None,
 ) -> dict[str, Any]:
     """
-    Anchor current WELL state to VAULT999 immutable ledger.
-    Only writes if score changed >10 pts, floors violated, or capacity is low (or force=True).
-    Maintains high-signal-only ledger integrity.
+    Anchor current WELL state to arifOS VAULT999 (PostgreSQL + Merkle).
+    Ensures human substrate readiness is immutably recorded.
     """
-    state = _load_state()
-    score = state.get("well_score", 50)
-    violations = state.get("floors_violated", [])
-
-    # Read last anchored score
-    last_score: float | None = None
-    if VAULT_LEDGER_PATH.exists():
-        try:
-            lines = VAULT_LEDGER_PATH.read_text().splitlines()
-            for line in reversed(lines):
-                if line.strip():
-                    last_score = json.loads(line).get("well_score")
-                    break
-        except Exception:
-            pass
-
-    is_degraded = bool(violations)
-    is_low = score < 70
-    is_delta = last_score is None or abs(score - last_score) >= 10
-
-    if not (is_degraded or is_low or is_delta or force):
-        return {
-            "ok": True,
-            "anchored": False,
-            "reason": "Signal-to-noise suppressed. Ledger remains clean.",
-            "well_score": score,
-        }
-
-    payload: dict[str, Any] = {
-        "vault_type": "well_event",
-        "epoch": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        "operator_id": state.get("operator_id", "arif"),
-        "well_score": score,
-        "status": "DEGRADED" if is_degraded else "LOW" if is_low else "STABLE",
-        "violations": violations,
-        "trigger": "VIOLATION" if is_degraded else "CAPACITY" if is_low else "DELTA" if is_delta else "MANUAL",
-        "w0_assertion": "OPERATOR_VETO_INTACT / HIERARCHY_INVARIANT",
-    }
-    payload["hash"] = hashlib.sha256(
-        json.dumps(payload, sort_keys=True).encode()
-    ).hexdigest()
-
+    import sys
+    from pathlib import Path
+    
+    # Ensure arifOS is in path for bridge
+    ARIFOS_PATH = "/root/arifOS"
+    if ARIFOS_PATH not in sys.path:
+        sys.path.append(ARIFOS_PATH)
+        
     try:
-        VAULT_LEDGER_PATH.parent.mkdir(parents=True, exist_ok=True)
-        with open(VAULT_LEDGER_PATH, "a") as f:
-            f.write(json.dumps(payload) + "\n")
-        _append_event({"event": "VAULT_ANCHOR", "hash": payload["hash"], "trigger": payload["trigger"]})
-        return {"ok": True, "anchored": True, "payload": payload}
+        from arifosmcp.runtime.well_bridge import anchor_well_to_vault
+        res = await anchor_well_to_vault(force=force)
+        
+        if res["ok"]:
+            _append_event({
+                "event": "VAULT_ANCHOR_SQL",
+                "vault_id": res["vault_id"],
+                "hash": res["hash"]
+            })
+            
+        return res
     except Exception as e:
-        return {"ok": False, "anchored": False, "error": str(e)}
+        return {"ok": False, "error": str(e)}
 
 
 @mcp.tool()
