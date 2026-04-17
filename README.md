@@ -107,8 +107,10 @@ Execution is never self-authorized.
 - **Approval Boundary** — Pre-action preview, hold queue, ticket store
 - **Memory Contract** — 5-tier governed memory (ephemeral → sacred)
 - **Plan Validator** — DAG structural validation for agent plan outputs
-- **VAULT999 Integration** — Terminal verdict sealing via arifOS vault ledger
-- **MCP Server** — stdio transport exposing governance and agent tools
+- **VAULT999 Integration** — Terminal verdict sealing via arifOS vault ledger (SupabaseVaultClient + dual-path)
+- **MCP Server** — stdio transport exposing governance, agent, and vault tools
+  - Vault tools: `forge_vault_read`, `forge_vault_list`, `forge_vault_write`, `forge_vault_delete`, `forge_vault_seal`
+  - Vault resources: `forge://vault/records`, `forge://vault/categories`
 - **HTTP Bridge** — Express server for Sense/Judge, operator, and human-expert endpoints
 
 ---
@@ -116,6 +118,7 @@ Execution is never self-authorized.
 ## Genome Features (v2.0)
 
 - **Merkle Ledger** — Every `SEAL` verdict is cryptographically anchored in VAULT999
+- **Dual-Path Vault** — Supabase REST RPC (cloud read/list) + local asyncpg (PG write) for vault999
 - **Anti-Hantu Immune System** — F9 detection of narrative laundering and shadow-instance attempts
 - **WELL Gate** — Execution bandwidth dynamically modulated by operator fatigue
 - **MCP Unified** — Fully aligned with the Model Context Protocol (TypeScript SDK v1.x)
@@ -147,7 +150,7 @@ Execution is never self-authorized.
 | MCP Transport | `@modelcontextprotocol/sdk` |
 | Schema Validation | `zod` |
 | Metrics | `prom-client` |
-| Persistence | **Supabase cloud** (primary) + local JSONL (fallback) |
+| Persistence | **Supabase cloud** (`vault999` table, `arifosmcp_vault_seals` ledger) + local JSONL (fallback) |
 | Container | Docker Compose |
 
 ---
@@ -200,7 +203,7 @@ src/
 ├── planner/           # Plan validation
 ├── policy/            # Sense (111) and Judge (888) policy layer
 ├── server.ts          # HTTP bridge (Express)
-└── vault/             # VAULT999 persistence
+└── vault/             # VAULT999 persistence (FileVaultClient, PostgresVaultClient, SupabaseVaultClient)
 
 test/                  # node:test suite
 examples/              # Usage examples
