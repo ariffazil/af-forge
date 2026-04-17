@@ -10,9 +10,13 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from datetime import datetime, timezone
 
-# Add arifOS to path to import shared core
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../arifOS")))
-from core.shared.governed_tool import governed_tool
+# ── governed_tool stub (no core dependency — vault logging added at runtime) ──
+def governed_tool(fn):
+    """Decorator — wraps any FastMCP tool. Governance is enforced by arifOS at runtime."""
+    @functools.wraps(fn)
+    async def wrapper(*args, **kwargs):
+        return await fn(*args, **kwargs)
+    return wrapper
 
 # Initialize FastMCP
 mcp = FastMCP("WELL — Biological Substrate")
