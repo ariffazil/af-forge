@@ -5,7 +5,6 @@ import { ToolRegistry } from "./tools/ToolRegistry.js";
 import { ReadFileTool, WriteFileTool, ListFilesTool } from "./tools/FileTools.js";
 import { GrepTextTool } from "./tools/SearchTools.js";
 import { RunCommandTool, RunTestsTool } from "./tools/ShellTools.js";
-import { GEOX_TOOLS } from "./tools/GEOXTools.js";
 import { WEALTH_TOOLS } from "./tools/WealthTools.js";
 import { GEOXLogInterpreterTool } from "./domains/geophysics/logInterpreter.js";
 import { LongTermMemory } from "./memory/LongTermMemory.js";
@@ -29,7 +28,6 @@ function buildToolRegistry(): ToolRegistry {
   registry.register(new GrepTextTool());
   registry.register(new RunTestsTool());
   registry.register(new RunCommandTool());
-  for (const ToolClass of GEOX_TOOLS) registry.register(new ToolClass());
   registry.register(new GEOXLogInterpreterTool());
   for (const ToolClass of WEALTH_TOOLS) registry.register(new ToolClass());
   return registry;
@@ -113,4 +111,3 @@ main().catch((error: unknown) => {
   process.stderr.write(`agent-workbench failed: ${message}\n`);
   process.exitCode = 1;
 });
-

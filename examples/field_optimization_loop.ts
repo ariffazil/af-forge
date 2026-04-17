@@ -1,6 +1,6 @@
 import { ArifOSKernel } from "../src/engine/ArifOSKernel.js";
-import { GEOXEngine } from "../src/engine/GEOXEngine.js";
 import { WealthEngine } from "../src/engine/WealthEngine.js";
+import { buildDefaultGEOXScenarios } from "../src/engine/defaultGEOXScenarios.js";
 
 /**
  * Example: Field Optimization Loop (000-999)
@@ -10,7 +10,6 @@ import { WealthEngine } from "../src/engine/WealthEngine.js";
 async function runLoop() {
   const intent = "Optimize development for Field X under climate and maruah constraints.";
   const kernel = new ArifOSKernel(intent, "session-v0.1-field-x");
-  const GEOX = new GEOXEngine();
   const wealth = new WealthEngine();
 
   console.log(`[000 INIT] Intent: ${intent}`);
@@ -23,7 +22,7 @@ async function runLoop() {
 
   // 333 EXPLORE
   kernel.transition("333");
-  const scenarios = await GEOX.generateScenarios("Field X");
+  const scenarios = buildDefaultGEOXScenarios("primary");
   const allocations = await wealth.allocate(scenarios);
   kernel.injectContext("GEOX_scenarios", scenarios);
   kernel.injectContext("wealth_allocations", allocations);
@@ -60,4 +59,3 @@ async function runLoop() {
 }
 
 runLoop().catch(console.error);
-

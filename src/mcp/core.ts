@@ -23,7 +23,6 @@ import { runStage, recordFloorViolation } from "../metrics/prometheus.js";
 import type { MetabolicStage } from "../types/aki.js";
 import { FileVaultClient } from "../vault/index.js";
 import { WebhookHumanEscalationClient, NoOpHumanEscalationClient } from "../escalation/index.js";
-import { GEOX_TOOLS } from "../tools/GEOXTools.js";
 import { WEALTH_TOOLS } from "../tools/WealthTools.js";
 
 export const server = new McpServer({
@@ -253,7 +252,6 @@ const forgeHandler = async ({ task, mode }: { task: string, mode?: "internal_mod
       registry.register(new ReadFileTool());
       registry.register(new ListFilesTool());
       registry.register(new GrepTextTool());
-      for (const T of GEOX_TOOLS) registry.register(new T());
       for (const T of WEALTH_TOOLS) registry.register(new T());
       const engine = new AgentEngine(buildExploreProfile(mode ?? "external_safe_mode"), {
         llmProvider: createLlmProvider(runtimeConfig),
@@ -331,28 +329,8 @@ const vaultHandler = async ({ content, reason, tier, tags }: { content: string, 
 server.tool("arifos_vault", "Ledger closure (Stage 999 VAULT).", { content: z.string(), reason: z.string(), tier: z.string().optional(), tags: z.array(z.string()).optional() }, vaultHandler);
 server.tool("forge_remember", "Store memory.", { content: z.string(), reason: z.string(), tier: z.string().optional(), tags: z.array(z.string()).optional() }, vaultHandler);
 
-// ── Domain Tools (Tier 02/03) ────────────────────────────────────────────────
+// ── Domain Tools (Tier 03) ───────────────────────────────────────────────────
 
-// GEOX
-server.tool("GEOX_check_hazard", "Check physical hazard risk.", { location: z.string().optional() }, async (args) => {
-  const tool = new GEOX_TOOLS[0]();
-  const res = await tool.run(args, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
-  return { content: [{ type: "text" as const, text: resultAsJson(res.output) }] };
-});
-
-server.tool("GEOX_subsurface_model", "Compute subsurface model.", { depth: z.number(), formation_type: z.string().optional() }, async (args) => {
-  const tool = new GEOX_TOOLS[1]();
-  const res = await tool.run(args, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
-  return { content: [{ type: "text" as const, text: resultAsJson(res.output) }] };
-});
-
-server.tool("GEOX_prospect_score", "Score geological prospect.", { latitude: z.number(), longitude: z.number(), trap_type: z.string().optional() }, async (args) => {
-  const tool = new GEOX_TOOLS[3]();
-  const res = await tool.run(args, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
-  return { content: [{ type: "text" as const, text: resultAsJson(res.output) }] };
-});
-
-// WEALTH
 server.tool("wealth_evaluate_ROI", "Evaluate investment ROI.", { initial_investment: z.number(), scenarios: z.array(z.any()), joules: z.number().optional() }, async (args) => {
   const tool = new WEALTH_TOOLS[0]();
   const res = await tool.run(args, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
@@ -392,6 +370,5 @@ server.resource("forge://memory/working", "forge://memory/working", { mimeType: 
     }]
   };
 });
-
 
 

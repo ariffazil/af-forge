@@ -1,57 +1,49 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { GEOXEngine } from "../src/engine/GEOXEngine.js";
+import { buildDefaultGEOXScenarios } from "../src/engine/defaultGEOXScenarios.js";
+import { WealthEngine } from "../src/engine/WealthEngine.js";
 
-const GEOX = new GEOXEngine();
+const GEOXScenarios = buildDefaultGEOXScenarios("primary");
 
-test("GEOXEngine — generateScenarios returns array of GEOXScenarioContract", async () => {
-  const scenarios = await GEOX.generateScenarios("primary");
-  assert.ok(Array.isArray(scenarios));
-  assert.ok(scenarios.length > 0);
-  for (const s of scenarios) {
+test("default GEOX scenarios return GEOXScenarioContract-compatible records", () => {
+  assert.ok(Array.isArray(GEOXScenarios));
+  assert.ok(GEOXScenarios.length > 0);
+  for (const s of GEOXScenarios) {
     assert.ok(typeof s.id === "string");
     assert.ok(typeof s.name === "string");
     assert.ok(typeof s.physicalConstraints === "object");
     assert.ok(typeof s.probability === "number");
     assert.ok(["ESTIMATE", "HYPOTHESIS"].includes(s.tag));
   }
-});
-
-test("GEOXEngine — primary scenario has higher probability", async () => {
-  const primary = await GEOX.generateScenarios("primary");
-  const secondary = await GEOX.generateScenarios("secondary");
+  const secondary = buildDefaultGEOXScenarios("secondary");
+  const primary = GEOXScenarios;
   assert.ok(primary[0].probability >= secondary[0].probability);
 });
 
-test("GEOXEngine — scenario has physicalConstraints with maxExtractionRate", async () => {
-  const scenarios = await GEOX.generateScenarios("primary");
-  const s = scenarios[0];
+test("default GEOX scenario has physicalConstraints", () => {
+  const s = GEOXScenarios[0];
   assert.ok(typeof s.physicalConstraints.maxExtractionRate === "number");
   assert.ok(typeof s.physicalConstraints.seismicRiskIndex === "number");
   assert.ok(typeof s.physicalConstraints.environmentalImpact === "number");
 });
 
-test("GEOXEngine — HYPOTHESIS tag has fewer grounding evidence", async () => {
-  const scenarios = await GEOX.generateScenarios("primary");
-  const hypothesis = scenarios.find((s) => s.tag === "HYPOTHESIS");
-  const estimate = scenarios.find((s) => s.tag === "ESTIMATE");
+test("default GEOX hypothesis has less or equal grounding evidence", () => {
+  const hypothesis = GEOXScenarios.find((s) => s.tag === "HYPOTHESIS");
+  const estimate = GEOXScenarios.find((s) => s.tag === "ESTIMATE");
   assert.ok(hypothesis);
   assert.ok(estimate);
   assert.ok(hypothesis.groundingEvidence.length <= estimate.groundingEvidence.length);
 });
 
-test("GEOXEngine — all scenarios have groundingEvidence array", async () => {
-  const scenarios = await GEOX.generateScenarios("primary");
-  for (const s of scenarios) {
+test("default GEOX scenarios always include groundingEvidence arrays", () => {
+  for (const s of GEOXScenarios) {
     assert.ok(Array.isArray(s.groundingEvidence));
   }
 });
 
 test("WealthEngine — allocate returns WealthAllocationContract array", async () => {
-  const { WealthEngine } = await import("../src/engine/WealthEngine.js");
   const wealth = new WealthEngine();
-  const scenarios = await GEOX.generateScenarios("primary");
-  const allocations = await wealth.allocate(scenarios);
+  const allocations = await wealth.allocate(GEOXScenarios);
   assert.ok(Array.isArray(allocations));
   for (const a of allocations) {
     assert.ok(typeof a.id === "string");
@@ -64,7 +56,6 @@ test("WealthEngine — allocate returns WealthAllocationContract array", async (
 });
 
 test("WealthEngine — high seismic risk increases capitalRequired", async () => {
-  const { WealthEngine } = await import("../src/engine/WealthEngine.js");
   const wealth = new WealthEngine();
   const lowRisk = { id: "low", name: "Low Risk", physicalConstraints: { maxExtractionRate: 500, seismicRiskIndex: 0.1, environmentalImpact: 0.1 }, probability: 0.9, tag: "ESTIMATE" as const, groundingEvidence: ["Low risk"] };
   const highRisk = { id: "high", name: "High Risk", physicalConstraints: { maxExtractionRate: 800, seismicRiskIndex: 0.45, environmentalImpact: 0.7 }, probability: 0.3, tag: "HYPOTHESIS" as const, groundingEvidence: [] };
@@ -74,7 +65,6 @@ test("WealthEngine — high seismic risk increases capitalRequired", async () =>
 });
 
 test("WealthEngine — high environmental impact reduces maruahScore", async () => {
-  const { WealthEngine } = await import("../src/engine/WealthEngine.js");
   const wealth = new WealthEngine();
   const lowEnv = { id: "low", name: "Low", physicalConstraints: { maxExtractionRate: 500, seismicRiskIndex: 0.1, environmentalImpact: 0.1 }, probability: 0.9, tag: "ESTIMATE" as const, groundingEvidence: [] };
   const highEnv = { id: "high", name: "High", physicalConstraints: { maxExtractionRate: 800, seismicRiskIndex: 0.4, environmentalImpact: 0.7 }, probability: 0.3, tag: "HYPOTHESIS" as const, groundingEvidence: [] };
@@ -84,7 +74,6 @@ test("WealthEngine — high environmental impact reduces maruahScore", async () 
 });
 
 test("WealthEngine — HYPOTHESIS scenarios get higher knowledgeDelta", async () => {
-  const { WealthEngine } = await import("../src/engine/WealthEngine.js");
   const wealth = new WealthEngine();
   const estimate = { id: "est", name: "Est", physicalConstraints: { maxExtractionRate: 500, seismicRiskIndex: 0.2, environmentalImpact: 0.3 }, probability: 0.7, tag: "ESTIMATE" as const, groundingEvidence: ["Data"] };
   const hypothesis = { id: "hyp", name: "Hyp", physicalConstraints: { maxExtractionRate: 700, seismicRiskIndex: 0.4, environmentalImpact: 0.5 }, probability: 0.4, tag: "HYPOTHESIS" as const, groundingEvidence: [] };
@@ -94,10 +83,8 @@ test("WealthEngine — HYPOTHESIS scenarios get higher knowledgeDelta", async ()
 });
 
 test("WealthEngine — ROI object has financial, knowledge, peace components", async () => {
-  const { WealthEngine } = await import("../src/engine/WealthEngine.js");
   const wealth = new WealthEngine();
-  const scenarios = await GEOX.generateScenarios("primary");
-  const allocations = await wealth.allocate(scenarios);
+  const allocations = await wealth.allocate(GEOXScenarios);
   for (const a of allocations) {
     assert.ok(typeof a.expectedROI.financial === "number");
     assert.ok(typeof a.expectedROI.knowledge === "number");
@@ -106,7 +93,6 @@ test("WealthEngine — ROI object has financial, knowledge, peace components", a
 });
 
 test("WealthEngine — reversibility = 1 - (environmentalImpact / 2)", async () => {
-  const { WealthEngine } = await import("../src/engine/WealthEngine.js");
   const wealth = new WealthEngine();
   const s = { id: "t", name: "T", physicalConstraints: { maxExtractionRate: 500, seismicRiskIndex: 0.2, environmentalImpact: 0.6 }, probability: 0.5, tag: "ESTIMATE" as const, groundingEvidence: [] };
   const alloc = await wealth.allocate([s]);

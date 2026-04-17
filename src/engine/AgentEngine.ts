@@ -50,8 +50,8 @@ import type { MemoryContract } from "../memory-contract/index.js";
 import { getMemoryContract } from "../memory-contract/index.js";
 import { ThermodynamicCostEstimator } from "../ops/ThermodynamicCostEstimator.js";
 import { routeIntent, type RoutingDecision } from "./IntentRouter.js";
-import { GEOXEngine } from "./GEOXEngine.js";
 import { WealthEngine } from "./WealthEngine.js";
+import { buildDefaultGEOXScenarios } from "./defaultGEOXScenarios.js";
 import { evaluateWithConfidence, calculateConfidenceEstimate } from "../policy/confidence.js";
 import { ArifOSKernel } from "./ArifOSKernel.js";
 
@@ -225,18 +225,18 @@ export class AgentEngine {
     const routing: RoutingDecision = routeIntent(options.task);
 
     // === 333_MIND: GEOX + WEALTH Organ Activation ===
-    const GEOXEngine = new GEOXEngine();
     const wealthEngine = new WealthEngine();
 
     if (routing.primaryOrgan === "GEOX" || routing.secondaryOrgans.includes("GEOX")) {
-      const scenarios = await GEOXEngine.generateScenarios(routing.primaryOrgan === "GEOX" ? "primary" : "secondary");
-      this._GEOXScenarios = scenarios;
+      this._GEOXScenarios = buildDefaultGEOXScenarios(
+        routing.primaryOrgan === "GEOX" ? "primary" : "secondary",
+      );
     }
 
     if (routing.primaryOrgan === "WEALTH" || routing.secondaryOrgans.includes("WEALTH")) {
       const GEOXScenarios = this._GEOXScenarios.length > 0
         ? this._GEOXScenarios
-        : [{ id: "default-scen", name: "Default", physicalConstraints: { maxExtractionRate: 500, seismicRiskIndex: 0.2, environmentalImpact: 0.3 }, probability: 0.7, tag: "ESTIMATE" as const, groundingEvidence: ["General knowledge"] }];
+        : buildDefaultGEOXScenarios("secondary");
       const allocations = await wealthEngine.allocate(GEOXScenarios as import("../types/arifos.js").GEOXScenarioContract[]);
       this._wealthAllocations = allocations.map((a: { id: string; maruahScore: number }) => ({ id: a.id, maruahScore: a.maruahScore }));
       const budgetStatus = wealthEngine.getBudgetStatus();
@@ -1166,4 +1166,3 @@ function countMemoryReferences(messages: AgentMessage[]): number {
     (message) => message.role === "assistant" && /\bmemory\b/i.test(message.content),
   ).length;
 }
-

@@ -58,8 +58,8 @@ import { recordHumanEscalation, recordFloorViolation, runStage } from "../metric
 
 import { routeIntent, type RoutingDecision, type IntentDomain } from "./IntentRouter.js";
 import { ArifOSKernel } from "./ArifOSKernel.js";
-import { GEOXEngine } from "./GEOXEngine.js";
 import { WealthEngine } from "./WealthEngine.js";
+import { buildDefaultGEOXScenarios } from "./defaultGEOXScenarios.js";
 import type { GEOXScenarioContract, WealthAllocationContract } from "../types/arifos.js";
 
 export type PipelineDependencies = {
@@ -220,26 +220,20 @@ export class PipelineCoordinator {
     GEOXScenarios: GEOXScenarioContract[];
     wealthAllocations: WealthAllocationContract[];
   }> {
-    const GEOX = new GEOXEngine();
     const wealth = new WealthEngine();
 
     let GEOXScenarios: GEOXScenarioContract[] = [];
     if (routing.primaryOrgan === "GEOX" || routing.secondaryOrgans.includes("GEOX")) {
-      GEOXScenarios = await GEOX.generateScenarios(routing.primaryOrgan === "GEOX" ? "primary" : "secondary");
+      GEOXScenarios = buildDefaultGEOXScenarios(
+        routing.primaryOrgan === "GEOX" ? "primary" : "secondary",
+      );
     }
 
     let wealthAllocations: WealthAllocationContract[] = [];
     if (routing.primaryOrgan === "WEALTH" || routing.secondaryOrgans.includes("WEALTH")) {
       wealthAllocations = await wealth.allocate(
         GEOXScenarios.length > 0 ? GEOXScenarios : [
-          {
-            id: "default-scen",
-            name: "Default Scenario",
-            physicalConstraints: { maxExtractionRate: 500, seismicRiskIndex: 0.2, environmentalImpact: 0.3 },
-            probability: 0.7,
-            tag: "ESTIMATE",
-            groundingEvidence: ["General knowledge"],
-          },
+          ...buildDefaultGEOXScenarios("secondary"),
         ],
       );
     }
