@@ -14,79 +14,54 @@
 // ============================================================================
 
 export interface A2AAgentCard {
-  /** Schema version */
-  version: string;
-  
-  /** Unique agent identifier */
-  agentId: string;
-  
-  /** Human-readable name */
   name: string;
-  
-  /** Description of what the agent does */
   description: string;
-  
-  /** Agent provider/author */
-  provider: {
-    name: string;
-    url?: string;
-  };
-  
-  /** URL for sending tasks to this agent */
-  endpoint: string;
-  
-  /** Authentication requirements */
-  authentication: {
-    schemes: string[];
-    credentials?: string;
-  };
-  
-  /** Skills this agent provides */
-  skills: A2ASkill[];
-  
-  /** Capabilities supported by this agent */
-  capabilities: {
-    streaming: boolean;
-    pushNotifications: boolean;
-    stateTransitionHistory: boolean;
-  };
-  
-  /** Default input/output modes */
+  supportedInterfaces: A2AAgentInterface[];
+  provider?: A2AAgentProvider;
+  version: string;
+  documentationUrl?: string;
+  capabilities: A2ACapabilities;
+  securitySchemes?: Record<string, unknown>;
+  securityRequirements?: Array<Record<string, string[]>>;
   defaultInputModes: string[];
   defaultOutputModes: string[];
-  
-  /** Maximum number of tasks this agent can handle concurrently */
-  maxConcurrentTasks?: number;
-  
-  /** Links to related resources */
-  links?: {
-    type: string;
-    url: string;
-    title?: string;
-  }[];
+  skills: A2ASkill[];
+  iconUrl?: string;
+}
+
+export interface A2AAgentInterface {
+  url: string;
+  protocolBinding: "JSONRPC" | "GRPC" | "HTTP+JSON" | string;
+  protocolVersion: string;
+  tenant?: string;
+}
+
+export interface A2AAgentProvider {
+  organization: string;
+  url: string;
+}
+
+export interface A2ACapabilities {
+  streaming?: boolean;
+  pushNotifications?: boolean;
+  extendedAgentCard?: boolean;
+  extensions?: Array<{
+    uri: string;
+    description?: string;
+    required?: boolean;
+    params?: Record<string, unknown>;
+  }>;
 }
 
 export interface A2ASkill {
-  /** Unique skill identifier */
   id: string;
-  
-  /** Human-readable name */
   name: string;
-  
-  /** Description of what the skill does */
   description: string;
-  
-  /** Tags for categorization */
-  tags?: string[];
-  
-  /** Example queries that trigger this skill */
+  tags: string[];
   examples?: string[];
-  
-  /** Input modes supported */
   inputModes?: string[];
-  
-  /** Output modes supported */
   outputModes?: string[];
+  securityRequirements?: Array<Record<string, string[]>>;
 }
 
 // ============================================================================
@@ -95,27 +70,31 @@ export interface A2ASkill {
 
 export function createArifOSAgentCard(baseUrl: string): A2AAgentCard {
   return {
-    version: "1.0.0",
-    agentId: "arifos.personal.v2",
     name: "arifOS Personal",
     description: 
       "A personal AI operating system for sovereign human cognition. " +
       "Provides memory management, decision support, bounded execution, " +
       "and continuity across sessions. Designed for one human operator.",
-    
+    supportedInterfaces: [
+      {
+        url: `${baseUrl}/a2a`,
+        protocolBinding: "JSONRPC",
+        protocolVersion: "1.0",
+      },
+    ],
     provider: {
-      name: "ARIF",
+      organization: "ARIF",
       url: "https://arif-fazil.com",
     },
-    
-    endpoint: `${baseUrl}/a2a`,
-    
-    authentication: {
-      schemes: ["none"], // Personal OS - local/controlled access
-      credentials: "Personal OS operates in sovereign single-user mode. " +
-        "For personal deployment, authentication is handled at infrastructure level.",
+    version: "1.0.0",
+    documentationUrl: `${baseUrl}/contract`,
+    capabilities: {
+      streaming: false,
+      pushNotifications: false,
+      extendedAgentCard: false,
     },
-    
+    defaultInputModes: ["text/plain", "application/json"],
+    defaultOutputModes: ["text/plain", "application/json"],
     skills: [
       {
         id: "memory.remember",
@@ -204,35 +183,6 @@ export function createArifOSAgentCard(baseUrl: string): A2AAgentCard {
           "Wrap up my day",
           "What did I accomplish today?",
         ],
-      },
-    ],
-    
-    capabilities: {
-      streaming: true,
-      pushNotifications: false, // Could add webhook support later
-      stateTransitionHistory: true,
-    },
-    
-    defaultInputModes: ["text/plain", "application/json"],
-    defaultOutputModes: ["text/plain", "application/json"],
-    
-    maxConcurrentTasks: 5,
-    
-    links: [
-      {
-        type: "homepage",
-        url: baseUrl,
-        title: "arifOS Personal Dashboard",
-      },
-      {
-        type: "documentation",
-        url: `${baseUrl}/docs`,
-        title: "Documentation",
-      },
-      {
-        type: "schema",
-        url: `${baseUrl}/.well-known/arifos.schema.json`,
-        title: "arifOS Tool Schema",
       },
     ],
   };

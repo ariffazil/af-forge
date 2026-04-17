@@ -11,6 +11,7 @@
 
 import express from "express";
 import type { Request, Response } from "express";
+import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { runSense } from "./policy/sense.js";
 import {
@@ -35,6 +36,7 @@ import { readRuntimeConfig } from "./config/RuntimeConfig.js";
 import { AgentEngine } from "./engine/AgentEngine.js";
 import { ToolRegistry } from "./tools/ToolRegistry.js";
 import { LongTermMemory } from "./memory/LongTermMemory.js";
+import { createA2ARouter } from "./a2a/index.js";
 
 let cachedConstitution: FloorRule[] = [];
 
@@ -62,29 +64,34 @@ export function getConstitution(): FloorRule[] {
   return cachedConstitution;
 }
 
-const app = express();
-app.use(express.json());
-
-// Request logging
-app.use((req, _res, next) => {
-  console.error(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-});
-
-// Operator / Human-expert auth middleware
-const OPERATOR_API_TOKEN = process.env.OPERATOR_API_TOKEN;
-const isProduction = process.env.NODE_ENV === "production" || process.env.AF_FORGE_ENV === "production";
-if (!OPERATOR_API_TOKEN) {
-  if (isProduction) {
-    console.error("[FATAL] OPERATOR_API_TOKEN is required in production mode; /operator and /human-expert endpoints cannot be exposed without authentication");
-    process.exit(1);
+function ensureOperatorTokenPolicy(): string | undefined {
+  const operatorApiToken = process.env.OPERATOR_API_TOKEN;
+  const isProduction = process.env.NODE_ENV === "production" || process.env.AF_FORGE_ENV === "production";
+  if (!operatorApiToken) {
+    if (isProduction) {
+      console.error("[FATAL] OPERATOR_API_TOKEN is required in production mode; /operator and /human-expert endpoints cannot be exposed without authentication");
+      process.exit(1);
+    }
+    console.error("[WARN] OPERATOR_API_TOKEN is not set; /operator and /human-expert endpoints are unauthenticated");
   }
-  console.error("[WARN] OPERATOR_API_TOKEN is not set; /operator and /human-expert endpoints are unauthenticated");
+  return operatorApiToken;
 }
 
-const requireOperatorAuth = createOperatorAuthMiddleware(OPERATOR_API_TOKEN);
-app.use("/operator", requireOperatorAuth);
-app.use("/human-expert", requireOperatorAuth);
+export function createApp(): express.Express {
+  const app = express();
+  app.use(express.json());
+
+  // Request logging
+  app.use((req, _res, next) => {
+    console.error(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+    next();
+  });
+
+  app.use(createA2ARouter());
+
+  const requireOperatorAuth = createOperatorAuthMiddleware(ensureOperatorTokenPolicy());
+  app.use("/operator", requireOperatorAuth);
+  app.use("/human-expert", requireOperatorAuth);
 
 /**
  * POST /sense
@@ -304,6 +311,7 @@ app.get("/contract", (_req: Request, res: Response) => {
       sense: true,
       judge: true,
       governance_evaluate: true,
+      a2a: true,
       operator_console: true,
       human_expert: true,
       seal_service: true,
@@ -314,6 +322,8 @@ app.get("/contract", (_req: Request, res: Response) => {
     endpoints: {
       geox_log_interpreter: "POST /geox/log_interpreter",
       geox_contract: "GET /geox/contract",
+      a2a: "POST /a2a",
+      a2a_agent_card: "GET /.well-known/agent-card.json",
       python_mcp: "geox-mcp:8765",
       bridge: "af-forge-bridge:7071",
     },
@@ -789,18 +799,31 @@ app.use((err: Error, _req: Request, res: Response, _next: express.NextFunction) 
   });
 });
 
+  return app;
+}
+
+export const app = createApp();
+
 const port = process.env.AF_FORGE_PORT ? parseInt(process.env.AF_FORGE_PORT, 10) : 7071;
 
-app.listen(port, "0.0.0.0", async () => {
+export async function startServer(): Promise<void> {
   await loadConstitution();
-  console.error(`═══════════════════════════════════════════════════════════`);
-  console.error(`  AF-FORGE Sense Bridge Server`);
-  console.error(`  Listening on 0.0.0.0:${port}`);
-  console.error(`  Endpoints:`);
-  console.error(`    POST /sense  - Sense + Judge evaluation`);
-  console.error(`    GET  /health - Health check`);
-  console.error(`    GET  /ready  - Readiness probe`);
-  console.error(`    GET  /operator/approvals - List approval tickets`);
-  console.error(`    GET  /operator/vault      - Search vault seals`);
-  console.error(`═══════════════════════════════════════════════════════════`);
-});
+  app.listen(port, "0.0.0.0", async () => {
+    console.error(`═══════════════════════════════════════════════════════════`);
+    console.error(`  AF-FORGE Sense Bridge Server`);
+    console.error(`  Listening on 0.0.0.0:${port}`);
+    console.error(`  Endpoints:`);
+    console.error(`    POST /sense  - Sense + Judge evaluation`);
+    console.error(`    POST /a2a    - A2A JSON-RPC gateway`);
+    console.error(`    GET  /health - Health check`);
+    console.error(`    GET  /ready  - Readiness probe`);
+    console.error(`    GET  /.well-known/agent-card.json - A2A Agent Card`);
+    console.error(`    GET  /operator/approvals - List approval tickets`);
+    console.error(`    GET  /operator/vault      - Search vault seals`);
+    console.error(`═══════════════════════════════════════════════════════════`);
+  });
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  void startServer();
+}

@@ -103,6 +103,8 @@ export type { RouteApprovalOptions } from "./approval/ApprovalRouter.js";
 
 // Config
 export { readRuntimeConfig } from "./config/RuntimeConfig.js";
+export { createA2ARouter } from "./a2a/index.js";
+export type { A2ATask, A2AMessage, JsonRpcRequest } from "./a2a/index.js";
 
 // Flags
 export type { FeatureFlags } from "./flags/featureFlags.js";
