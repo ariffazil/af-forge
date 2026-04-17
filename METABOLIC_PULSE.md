@@ -1,1 +1,1 @@
-[PEACE] VPS Body state stable: 36% used.
+[PEACE] VPS Body state stable: 48% used.

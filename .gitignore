@@ -73,6 +73,7 @@ ARCHIVE_*/
 .copilot/
 .gemini/
 .kimi/
+.mcp-auth/
 .openclaw/
 .opencode/
 .playwright-mcp/
