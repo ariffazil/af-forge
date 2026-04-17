@@ -5,7 +5,7 @@ x-default-logging: &default-logging
     max-file: "2"
 
 # ── A-FORGE Root Stack ───────────────────────────────────────────────────────
-# Services: A-FORGE-bridge (agent executor), arifos-mcp (kernel), ollama (LLM)
+# Services: af-forge-bridge (agent executor), arifos-mcp (kernel), ollama (LLM)
 # Network:  arifos_core_network (external, canonical — shared with agent-plane)
 # Data:     postgres / redis / qdrant from arifos_core_network (no duplicates)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -27,12 +27,15 @@ services:
       - PORT=8080
       - OPERATOR_API_TOKEN=${OPERATOR_API_TOKEN:-AF_FORGE_999_SEAL}
       - DATABASE_URL=postgresql://${POSTGRES_USER:-arifos_admin}:${POSTGRES_PASSWORD_ENCODED:-ArifPostgresVault2026%21}@postgres:5432/${POSTGRES_DB:-arifos_vault}
+      - SUPABASE_URL=https://utbmmjmbolmuahwixjqc.supabase.co
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0Ym1tam1ib2xtdWFod2l4anFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjQxNDMzMSwiZXhwIjoyMDkxOTkwMzMxfQ.4M3cakfaNoQK_4RMIlGTAfFCRsL4hD2U6gzD1KF-x4o}
       - REDIS_URL=redis://redis:6379
       - QDRANT_URL=http://qdrant:6333
       - OLLAMA_URL=http://ollama:11434
       - PYTHONPATH=/usr/src/app
       - WELL_STATE_PATH=/app/well/state.json
       - ARIFOS_SESSION_STORE_PATH=/tmp/arifos_runtime_sessions.json
+      - ORGAN_ID=arifos
     volumes:
       # Live code mount — local edits reflected immediately without docker cp
       - /root/arifOS/arifosmcp:/usr/src/app/arifosmcp:ro
@@ -56,11 +59,11 @@ services:
       start_period: 15s
 
   # ── Agent Executor (A-FORGE bridge) ────────────────────────────
-  A-FORGE-bridge:
+  af-forge-bridge:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: A-FORGE-bridge
+    container_name: af-forge-bridge
     restart: unless-stopped
     expose:
       - "7071"

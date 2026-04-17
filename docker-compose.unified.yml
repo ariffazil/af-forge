@@ -14,6 +14,7 @@ services:
       - GEOX_PROFILE=vps
       - GEOX_VERSION=v2026.04.11-DIMENSION-NATIVE
       - PYTHONUNBUFFERED=1
+      - ORGAN_ID=geox
     volumes:
       - ./data:/app/data:ro
       - vault_999:/app/999_vault
