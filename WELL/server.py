@@ -1,9 +1,18 @@
 from fastmcp import FastMCP
 import json
 import os
+import sys
+import functools
+import hashlib
+import time
+import inspect
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from datetime import datetime, timezone
+
+# Add arifOS to path to import shared core
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../arifOS")))
+from core.shared.governed_tool import governed_tool
 
 # Initialize FastMCP
 mcp = FastMCP("WELL — Biological Substrate")
@@ -12,10 +21,40 @@ mcp = FastMCP("WELL — Biological Substrate")
 WELL_STATE_PATH = Path(os.environ.get("WELL_STATE_PATH", "/var/lib/arifosmcp/WELL/state.json"))
 
 try:
-    from arifosmcp.runtime.vault_postgres import SupabaseStateStore
+    from arifosmcp.runtime.vault_postgres import SupabaseStateStore, log_tool_call
     state_store = SupabaseStateStore()
 except Exception:
     state_store = None
+    log_tool_call = None
+
+def vault_tool(fn):
+    """Decorator: auto-logs every MCP tool call to VAULT999."""
+    @functools.wraps(fn)
+    async def wrapper(*args, **kwargs):
+        start = time.monotonic()
+        input_hash = hashlib.sha256(str(kwargs).encode()).hexdigest()[:16]
+        result_code = "OK"
+        try:
+            if inspect.iscoroutinefunction(fn):
+                result = await fn(*args, **kwargs)
+            else:
+                result = fn(*args, **kwargs)
+            return result
+        except Exception as e:
+            result_code = "ERROR"
+            raise
+        finally:
+            duration_ms = int((time.monotonic() - start) * 1000)
+            if log_tool_call:
+                await log_tool_call(
+                    tool_name   = fn.__name__,
+                    agent_id    = kwargs.get("agent_id", "arifOS"),
+                    session_id  = kwargs.get("session_id", "UNANCHORED"),
+                    input_hash  = input_hash,
+                    result_code = result_code,
+                    duration_ms = duration_ms,
+                )
+    return wrapper
 
 def _get_raw_state() -> Dict[str, Any]:
     """Helper to read WELL state with fallback and cloud sync."""
@@ -62,7 +101,8 @@ def _save_state(state: Dict[str, Any]) -> bool:
 # === PERCEPTION TOOLS (P-Axis) ===
 
 @mcp.tool()
-def mcp_P_well_state_read() -> Dict[str, Any]:
+@governed_tool
+async def mcp_P_well_state_read() -> Dict[str, Any]:
     """
     Read the current biological telemetry snapshot from the WELL substrate.
     Returns: A dictionary containing scores, metrics, and readiness verdict.
@@ -70,7 +110,8 @@ def mcp_P_well_state_read() -> Dict[str, Any]:
     return _get_raw_state()
 
 @mcp.tool()
-def mcp_P_well_readiness_check() -> Dict[str, Any]:
+@governed_tool
+async def mcp_P_well_readiness_check() -> Dict[str, Any]:
     """
     Perform a biological readiness check for constitutional governance.
     Returns: A verdict (OPTIMAL, FUNCTIONAL, DEGRADED, LOW_CAPACITY) and supporting metrics.
@@ -101,7 +142,8 @@ def mcp_P_well_readiness_check() -> Dict[str, Any]:
     }
 
 @mcp.tool()
-def mcp_P_well_floor_scan() -> Dict[str, Any]:
+@governed_tool
+async def mcp_P_well_floor_scan() -> Dict[str, Any]:
     """
     Scan the 13 W-Floors (Well-being dimensions) for any constitutional violations.
     Returns: A list of violated floors and current system health.
@@ -116,7 +158,8 @@ def mcp_P_well_floor_scan() -> Dict[str, Any]:
 # === EXECUTION TOOLS (E-Axis) ===
 
 @mcp.tool()
-def mcp_E_well_log_update(
+@governed_tool
+async def mcp_E_well_log_update(
     well_score: Optional[float] = None,
     metrics: Optional[Dict[str, Any]] = None,
     floors_violated: Optional[List[str]] = None
@@ -138,7 +181,8 @@ def mcp_E_well_log_update(
     return {"success": success, "updated_state": state if success else None}
 
 @mcp.tool()
-def mcp_E_well_pressure_signal(load_delta: float, reason: str) -> Dict[str, Any]:
+@governed_tool
+async def mcp_E_well_pressure_signal(load_delta: float, reason: str) -> Dict[str, Any]:
     """
     Signal cognitive pressure/load to WELL. Triggers W6 Metabolic Pause if load is too high.
     """
@@ -166,6 +210,7 @@ def mcp_E_well_pressure_signal(load_delta: float, reason: str) -> Dict[str, Any]
     return {"success": success, "verdict": "HOLD" if load_delta > 2.0 else "PROCEED", "reason": reason}
 
 @mcp.tool()
+@governed_tool
 async def mcp_E_well_anchor_to_vault(summary: str = "WELL Substrate Anchor") -> Dict[str, Any]:
     """
     Seal the current WELL state to the arifOS VAULT999 (requires arifosmcp package).
