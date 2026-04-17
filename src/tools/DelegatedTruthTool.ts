@@ -22,8 +22,6 @@ export abstract class DelegatedTruthTool extends BaseTool {
   protected async delegate(method: string, params: Record<string, unknown>): Promise<ToolResult> {
     const url = `${this.laneBaseUrl.replace(/\/$/, "")}/mcp`;
     
-    // In production, we would use a proper MCP Client with SSE support.
-    // For the "Shell only" mandate, we proxy the call via HTTP POST.
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -46,7 +44,7 @@ export abstract class DelegatedTruthTool extends BaseTool {
         };
       }
 
-      const body = await response.json();
+      const body = (await response.json()) as any;
       if (body.error) {
          return {
            ok: false,
