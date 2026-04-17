@@ -481,6 +481,150 @@ server.tool("wealth_thermodynamic_scan", "Scan for Landauer cost.", { actions: z
   return { content: [{ type: "text" as const, text: resultAsJson(res.output) }] };
 });
 
+// ── WELL Tools (Tier 03 — Human Substrate) ───────────────────────────────────
+
+const wellStateReadHandler = async () => {
+  const startedAt = Date.now();
+  await telemetryInvoke("forge_well_state_read");
+  return runStage("111_SENSE" as MetabolicStage, async () => {
+    try {
+      const { readFile } = await import("node:fs/promises");
+      const { resolve } = await import("node:path");
+      const statePath = resolve(process.cwd(), "WELL", "state.json");
+      let state: any;
+      try {
+        const data = await readFile(statePath, "utf-8");
+        state = JSON.parse(data);
+      } catch {
+        state = { ok: false, well_score: 50, verdict: "UNKNOWN", bandwidth: "NORMAL", floors_violated: [], message: "WELL telemetry offline" };
+      }
+      await telemetrySuccess("forge_well_state_read", startedAt);
+      return { content: [{ type: "text" as const, text: JSON.stringify(state, null, 2) }] };
+    } catch (err) {
+      await telemetryFailure("forge_well_state_read", startedAt, err);
+      return { content: [{ type: "text" as const, text: JSON.stringify({ error: String(err) }, null, 2) }], isError: true };
+    }
+  });
+};
+
+const wellReadinessCheckHandler = async () => {
+  const startedAt = Date.now();
+  await telemetryInvoke("forge_well_readiness_check");
+  return runStage("111_SENSE" as MetabolicStage, async () => {
+    try {
+      const { readFile } = await import("node:fs/promises");
+      const { resolve } = await import("node:path");
+      const statePath = resolve(process.cwd(), "WELL", "state.json");
+      let state: any;
+      try {
+        const data = await readFile(statePath, "utf-8");
+        state = JSON.parse(data);
+      } catch {
+        state = { ok: false, well_score: 50, verdict: "UNKNOWN", floors_violated: [] };
+      }
+      const score = state.well_score ?? 50;
+      const violations = state.floors_violated ?? [];
+      let verdict: string, bandwidth: string;
+      if (violations.length > 0) {
+        verdict = "DEGRADED";
+        bandwidth = "RESTRICTED";
+      } else if (score >= 80) {
+        verdict = "OPTIMAL";
+        bandwidth = "FULL";
+      } else if (score >= 60) {
+        verdict = "FUNCTIONAL";
+        bandwidth = "NORMAL";
+      } else {
+        verdict = "LOW_CAPACITY";
+        bandwidth = "REDUCED";
+      }
+      await telemetrySuccess("forge_well_readiness_check", startedAt);
+      return { content: [{ type: "text" as const, text: JSON.stringify({ verdict, well_score: score, bandwidth, violations, timestamp: state.timestamp }, null, 2) }] };
+    } catch (err) {
+      await telemetryFailure("forge_well_readiness_check", startedAt, err);
+      return { content: [{ type: "text" as const, text: JSON.stringify({ error: String(err) }, null, 2) }], isError: true };
+    }
+  });
+};
+
+const wellFloorScanHandler = async () => {
+  const startedAt = Date.now();
+  await telemetryInvoke("forge_well_floor_scan");
+  return runStage("111_SENSE" as MetabolicStage, async () => {
+    try {
+      const { readFile } = await import("node:fs/promises");
+      const { resolve } = await import("node:path");
+      const statePath = resolve(process.cwd(), "WELL", "state.json");
+      let state: any;
+      try {
+        const data = await readFile(statePath, "utf-8");
+        state = JSON.parse(data);
+      } catch {
+        state = { floors_violated: [], metrics: {}, well_score: 0 };
+      }
+      await telemetrySuccess("forge_well_floor_scan", startedAt);
+      return { content: [{ type: "text" as const, text: JSON.stringify({ floors_violated: state.floors_violated ?? [], metrics: state.metrics ?? {}, health_score: state.well_score ?? 0 }, null, 2) }] };
+    } catch (err) {
+      await telemetryFailure("forge_well_floor_scan", startedAt, err);
+      return { content: [{ type: "text" as const, text: JSON.stringify({ error: String(err) }, null, 2) }], isError: true };
+    }
+  });
+};
+
+const wellAnchorHandler = async ({ sessionId, agentId }: { sessionId?: string, agentId?: string }) => {
+  const startedAt = Date.now();
+  await telemetryInvoke("forge_well_anchor");
+  return runStage("999_VAULT" as MetabolicStage, async () => {
+    try {
+      const { readFile } = await import("node:fs/promises");
+      const { resolve } = await import("node:path");
+      const statePath = resolve(process.cwd(), "WELL", "state.json");
+      let state: any;
+      try {
+        const data = await readFile(statePath, "utf-8");
+        state = JSON.parse(data);
+      } catch {
+        return { content: [{ type: "text" as const, text: JSON.stringify({ error: "WELL state not found" }, null, 2) }], isError: true };
+      }
+      const sbClient = new SupabaseVaultClient();
+      await sbClient.write({
+        name: `well_anchor_${sessionId ?? "unanchored"}`,
+        category: "well",
+        value: JSON.stringify(state),
+        metadata: { agentId: agentId ?? "A-FORGE", sessionId: sessionId ?? "UNANCHORED", anchored_at: new Date().toISOString() },
+      });
+      await telemetrySuccess("forge_well_anchor", startedAt);
+      return { content: [{ type: "text" as const, text: JSON.stringify({ status: "anchored", well_score: state.well_score, bandwidth: state.bandwidth ?? "NORMAL" }, null, 2) }] };
+    } catch (err) {
+      await telemetryFailure("forge_well_anchor", startedAt, err);
+      return { content: [{ type: "text" as const, text: JSON.stringify({ error: String(err) }, null, 2) }], isError: true };
+    }
+  });
+};
+
+server.registerTool("forge_well_state_read", {
+  description: "Read current WELL biological telemetry snapshot (well_score, bandwidth, violations).",
+  inputSchema: z.object({}),
+}, wellStateReadHandler);
+
+server.registerTool("forge_well_readiness_check", {
+  description: "Check WELL readiness verdict for constitutional governance (OPTIMAL/FUNCTIONAL/DEGRADED/LOW_CAPACITY).",
+  inputSchema: z.object({}),
+}, wellReadinessCheckHandler);
+
+server.registerTool("forge_well_floor_scan", {
+  description: "Scan all 13 W-Floors (well-being dimensions) for constitutional violations.",
+  inputSchema: z.object({}),
+}, wellFloorScanHandler);
+
+server.registerTool("forge_well_anchor", {
+  description: "Anchor current WELL state to vault999 ledger.",
+  inputSchema: z.object({
+    sessionId: z.string().optional().describe("Session ID"),
+    agentId: z.string().optional().describe("Agent ID"),
+  }),
+}, wellAnchorHandler);
+
 // ── Resources ────────────────────────────────────────────────────────────────
 
 server.resource("forge://governance/floors", "forge://governance/floors", { mimeType: "application/json" }, async () => ({
@@ -519,7 +663,7 @@ server.resource("forge://vault/records", "forge://vault/records", { mimeType: "a
 
 server.resource("forge://vault/categories", "forge://vault/categories", { mimeType: "application/json" }, async () => {
   const sbClient = new SupabaseVaultClient();
-  const cats = ["agents", "mcp", "floor_rules", "identity", "ledger", "infrastructure", "geox", "wealth"];
+  const cats = ["agents", "mcp", "floor_rules", "identity", "ledger", "infrastructure", "geox", "wealth", "well"];
   const results = await Promise.all(cats.map(async (cat) => {
     const records = await sbClient.list(cat, 100);
     return { category: cat, count: records.length };
@@ -529,6 +673,26 @@ server.resource("forge://vault/categories", "forge://vault/categories", { mimeTy
       uri: "forge://vault/categories",
       mimeType: "application/json",
       text: JSON.stringify({ categories: results }, null, 2)
+    }]
+  };
+});
+
+server.resource("forge://well/state", "forge://well/state", { mimeType: "application/json" }, async () => {
+  const { readFile } = await import("node:fs/promises");
+  const { resolve } = await import("node:path");
+  const statePath = resolve(process.cwd(), "WELL", "state.json");
+  let state: any;
+  try {
+    const data = await readFile(statePath, "utf-8");
+    state = JSON.parse(data);
+  } catch {
+    state = { ok: false, well_score: 50, verdict: "UNKNOWN", bandwidth: "NORMAL", floors_violated: [], message: "WELL telemetry offline" };
+  }
+  return {
+    contents: [{
+      uri: "forge://well/state",
+      mimeType: "application/json",
+      text: JSON.stringify(state, null, 2)
     }]
   };
 });
