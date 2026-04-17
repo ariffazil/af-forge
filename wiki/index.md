@@ -17,7 +17,7 @@ This wiki is the canonical knowledge base for GEOX. It contains the philosophica
 | [**GEOX Manifesto**](00_INDEX/MANIFESTO.md) | Philosophical foundation |
 | [**Unified Roadmap**](00_INDEX/UNIFIED_ROADMAP.md) | Strategic trajectory & milestones |
 | [**Quickstart Guide**](00_INDEX/Quickstart.md) | Rapid onboarding for humans and agents |
-| [**Three Wikis Gateway**](00_INDEX/Three_Wikis_Gateway.md) | How GEOX, arifOS, and AF-FORGE fit together |
+| [**Three Wikis Gateway**](00_INDEX/Three_Wikis_Gateway.md) | How GEOX, arifOS, and A-FORGE fit together |
 | [**LLM/LEM Manifesto**](00_INDEX/LLM_LEM_Manifesto.md) | Constitutional grounding for language models |
 
 ---
@@ -258,3 +258,4 @@ The **Malay Basin Petroleum Exploration Pilot** is the live demo implementation:
 *Sealed by: 888_JUDGE | 2026.04.12*  
 *Constitutional Authority: Muhammad Arif bin Fazil*  
 *DITEMPA BUKAN DIBERI*
+

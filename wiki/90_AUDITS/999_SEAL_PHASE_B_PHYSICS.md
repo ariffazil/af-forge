@@ -114,7 +114,7 @@ await geox_compute_petrophysics(
 ## Seal Authority
 
 **Sovereign Architect:** Arif  
-**Forge Operator:** Kimi Code (VPS/AF-FORGE)  
+**Forge Operator:** Kimi Code (VPS/A-FORGE)  
 **Governance Engine:** arifOS v2.1  
 **Physics Verification:** Crain's Petrophysical Handbook, Asquith & Krygowski  
 **Seal Hash:** 8bd53a1f1b9f...
@@ -126,3 +126,4 @@ await geox_compute_petrophysics(
 ΔΩΨ | GEOX Earth Witness | 999 SEAL ✅
 
 *"The bridge from logs to decisions now has a foundation in physical law."*
+

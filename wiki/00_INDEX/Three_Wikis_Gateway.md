@@ -11,7 +11,7 @@ It is a **three-wiki federation**:
 |------|------|---------------|
 | **arifOS** | Constitutional runtime | What is allowed, how is it governed? |
 | **GEOX** | Earth witness | What is physically true in Earth reasoning? |
-| **AF-FORGE** | VPS infrastructure forge | What is running, how is it wired, and how is it operated? |
+| **A-FORGE** | VPS infrastructure forge | What is running, how is it wired, and how is it operated? |
 
 ---
 
@@ -30,7 +30,7 @@ It should be entered when the work involves:
 But GEOX does not stand alone.
 
 - **arifOS** provides the constitutional floors, verdicts, human sovereignty, and naming canon.
-- **AF-FORGE** provides the machine, deployment, services, and operational substrate.
+- **A-FORGE** provides the machine, deployment, services, and operational substrate.
 
 ---
 
@@ -38,7 +38,7 @@ But GEOX does not stand alone.
 
 For cross-system work, the clean stack is:
 
-1. **AF-FORGE** — machine and deployment reality
+1. **A-FORGE** — machine and deployment reality
 2. **arifOS** — governance and permission boundaries
 3. **GEOX** — Earth-domain truth and claim discipline
 
@@ -60,15 +60,15 @@ Recommended entry points:
 - `Floors`
 - `Trinity_Architecture`
 
-### To AF-FORGE
-Use AF-FORGE when you need:
+### To A-FORGE
+Use A-FORGE when you need:
 - VPS status
 - containers/services
 - topology, ports, domains
 - deploy/recovery/runbooks
 
 Recommended entry points:
-- `/root/af-forge/wiki/index.md`
+- `/root/A-FORGE/wiki/index.md`
 - `20_BLUEPRINTS/Stack_Components`
 - `60_TEMPERATURES/Live_Status`
 - `00_OPERATORS/Reconnect_Recovery_Runbook`
@@ -80,7 +80,7 @@ Recommended entry points:
 When a question is Earth-domain:
 - GEOX grounds
 - arifOS judges what may be claimed
-- AF-FORGE only matters if the machine/runtime state affects execution or evidence access
+- A-FORGE only matters if the machine/runtime state affects execution or evidence access
 
 ---
 
@@ -88,3 +88,4 @@ When a question is Earth-domain:
 - [Cross Wiki Links](../80_INTEGRATION/Cross_Wiki_Links.md)
 - [Agent Initialization Protocol](Agent_Initialization_Protocol.md)
 - [GEOX Manifesto](MANIFESTO.md)
+

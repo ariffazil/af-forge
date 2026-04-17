@@ -98,7 +98,7 @@ geox_petrophysical_hold_check 🚧 Phase B
 ## Seal Authority
 
 **Sovereign Architect:** Arif  
-**Forge Operator:** Kimi Code (VPS/AF-FORGE)  
+**Forge Operator:** Kimi Code (VPS/A-FORGE)  
 **Governance Engine:** arifOS v2.1  
 **Seal Hash:** c6ca589d9f8e...
 
@@ -109,3 +109,4 @@ geox_petrophysical_hold_check 🚧 Phase B
 ΔΩΨ | GEOX Earth Witness | 999 SEAL ✅
 
 *"The petrophysics bridge between geology and physics is now forged in constitutional code."*
+

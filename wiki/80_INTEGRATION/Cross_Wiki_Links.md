@@ -1,6 +1,6 @@
 # Cross-Wiki Links — Three-Wiki Federation
 
-> **Purpose:** Navigation across GEOX, arifOS, and AF-FORGE as one working system.  
+> **Purpose:** Navigation across GEOX, arifOS, and A-FORGE as one working system.  
 > **Status:** ACTIVE  
 > **Authority:** 888_JUDGE
 
@@ -9,7 +9,7 @@
 ## The Federation
 
 ```text
-AF-FORGE -> machine, services, deployment, recovery
+A-FORGE -> machine, services, deployment, recovery
 arifOS   -> governance, floors, verdicts, runtime law
 GEOX     -> Earth truth, physics, basins, petrophysics
 ```
@@ -23,7 +23,7 @@ They are three organs of one larger intelligence system.
 
 | Wiki | Role | Use it when... |
 |------|------|----------------|
-| **AF-FORGE** | infrastructure forge | the issue is VPS state, services, ports, recovery, deployment, components |
+| **A-FORGE** | infrastructure forge | the issue is VPS state, services, ports, recovery, deployment, components |
 | **arifOS** | constitutional runtime | the issue is authority, floors, verdicts, permissions, or execution boundaries |
 | **GEOX** | Earth witness | the issue is geological truth, physics, uncertainty, wells, seismic, basins |
 
@@ -45,20 +45,20 @@ Recommended arifOS entry points:
 - `Trinity_Architecture`
 - `Federation_Three_Wikis`
 
-### GEOX -> AF-FORGE
-Jump to AF-FORGE for:
+### GEOX -> A-FORGE
+Jump to A-FORGE for:
 - live VPS context
 - service/component topology
 - infrastructure failures or recovery
 - deployment reality that may affect GEOX execution
 
-Recommended AF-FORGE entry points:
-- `/root/af-forge/wiki/index.md`
+Recommended A-FORGE entry points:
+- `/root/A-FORGE/wiki/index.md`
 - `20_BLUEPRINTS/Stack_Components`
 - `60_TEMPERATURES/Live_Status`
 - `50_CRACKS/Intelligence_Gaps`
 
-### arifOS / AF-FORGE -> GEOX
+### arifOS / A-FORGE -> GEOX
 Jump back into GEOX when the work needs:
 - Earth Canon 9
 - Theory of Anomalous Contrast
@@ -76,7 +76,7 @@ Recommended GEOX entry points:
 ## Federation Rule
 
 For multi-system tasks, prefer this order:
-1. **AF-FORGE** for machine reality
+1. **A-FORGE** for machine reality
 2. **arifOS** for governance and permission boundaries
 3. **GEOX** for Earth-domain truth
 
@@ -91,3 +91,4 @@ This avoids three common failures:
 - [Three Wikis Gateway](../00_INDEX/Three_Wikis_Gateway.md)
 - [Agent Initialization Protocol](../00_INDEX/Agent_Initialization_Protocol.md)
 - [Deployment Checklist](DEPLOYMENT_CHECKLIST.md)
+

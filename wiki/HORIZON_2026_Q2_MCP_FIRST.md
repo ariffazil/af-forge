@@ -3,7 +3,7 @@
 > **Strategic Priority:** Optimize GEOX as the subsurface MCP server and governance brain  
 > **Timeline:** 2-week sprints  
 > **Seal:** DITEMPA BUKAN DIBERI  
-> **Applies to:** GEOX, arifOS, AF-FORGE
+> **Applies to:** GEOX, arifOS, A-FORGE
 
 ---
 
@@ -206,4 +206,5 @@ MCP-integrated subsurface governance engine over standalone UX.
 ---
 
 *DITEMPA BUKAN DIBERI — Forged, Not Given*  
-*Applies across: GEOX, arifOS, AF-FORGE*
+*Applies across: GEOX, arifOS, A-FORGE*
+

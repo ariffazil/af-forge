@@ -53,7 +53,7 @@
 ## [2026-04-10] federation | three-wiki navigation strengthened
 - Added [[00_INDEX/Three_Wikis_Gateway]] as a top-level GEOX federation entry point.
 - Rewrote [[80_INTEGRATION/Cross_Wiki_Links]] so it reflects the actual three-wiki stack:
-  - AF-FORGE = infrastructure forge
+  - A-FORGE = infrastructure forge
   - arifOS = constitutional runtime
   - GEOX = Earth witness
 - Updated `index.md` to surface federation navigation from the GEOX entry layer.
@@ -161,3 +161,4 @@
 - Updated [[80_INTEGRATION/GEOX_REPO_STATE_AND_COMPONENT_MAP]] so the live platform wiring and the long-term canonical backend target are both explicit.
 - Updated `index.md` integration navigation to surface the new platform wiring page.
 - Status: PLATFORM_WIRING_MAPPED
+
