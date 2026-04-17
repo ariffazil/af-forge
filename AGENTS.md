@@ -42,9 +42,9 @@ The project includes:
 **Sibling directories are separate subprojects** and are not governed by this `AGENTS.md`:
 - `arifOS/` — Python constitutional kernel (F1–F13) and VAULT999
 - `GEOX/` — Wrapper/launcher layer for geospatial services
-- `geox/` — Shared geospatial contracts and domain logic (Python, with its own `pyproject.toml`)
-- `geox-gui/` — React cockpit UI
-- `geox-site/` — Static web presence
+- `GEOX/` — Shared geospatial contracts and domain logic (Python, with its own `pyproject.toml`)
+- `GEOX-gui/` — React cockpit UI
+- `GEOX-site/` — Static web presence
 - `control_plane/` — Routing and coordination services
 - `execution_plane/` — Calculation and engine services
 
@@ -290,7 +290,7 @@ dist/                  # Compiled JavaScript output (gitignored)
 package.json           # NPM manifest
 /tsconfig.json         # TypeScript configuration (ES2022, NodeNext)
 Makefile               # Convenient build/test/docker targets
-docker-compose.yml     # Full stack deployment (bridge, arifos-mcp, geox-mcp, ollama, postgres, redis, qdrant, caddy, prometheus, grafana)
+docker-compose.yml     # Full stack deployment (bridge, arifos-mcp, GEOX-mcp, ollama, postgres, redis, qdrant, caddy, prometheus, grafana)
 .env.example           # Example environment configuration
 ```
 
@@ -698,6 +698,7 @@ A-FORGE now physically integrates the **Central Nervous System** of the arifOS f
 7. **WEALTH-Agent** (AGI): Capital, transactions, and NAV specialist.
 8. **ARCHIVIST-Agent** (AGI): Canon and Memory Keeper. Automatically writes every `SEAL` to the `arifos.canon_records` immutable ledger.
 9. **NOTIFIER-Agent** (TOOL): Human-loop delivery. Bridges `888_HOLD` to external webhooks (e.g., Telegram sidecar on port 9001).
+
 
 
 

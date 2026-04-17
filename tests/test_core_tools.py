@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from arifos.geox.geox_schemas import CoordinatePoint
-from arifos.geox.geox_tools import (
+from arifos.GEOX.GEOX_schemas import CoordinatePoint
+from arifos.GEOX.GEOX_tools import (
     EOFoundationModelTool,
     EarthModelTool,
     GeoRAGTool,
@@ -153,3 +153,4 @@ def test_tool_registry_default_registry_contains_expected_aliases():
     assert "WellLogTool" in names
     assert "PetroPhysicsTool" in names
     assert registry.health_check_all()["EarthModelTool"] is True
+

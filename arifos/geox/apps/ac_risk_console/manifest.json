@@ -1,25 +1,25 @@
 {
-  "$schema": "https://geox.arif-fazil.com/schemas/app-manifest/v1.json",
-  "app_id": "geox.ac_risk.console",
+  "$schema": "https://GEOX.arif-fazil.com/schemas/app-manifest/v1.json",
+  "app_id": "GEOX.ac_risk.console",
   "version": "1.0.0-AAA",
   "domain": "governance",
   "display_name": "AC_Risk Console",
   "description": "Interactive Theory of Anomalous Contrast risk calculator with real-time verdict display",
-  "icon": "https://geox.arif-fazil.com/apps/ac_risk_console/icon.svg",
+  "icon": "https://GEOX.arif-fazil.com/apps/ac_risk_console/icon.svg",
   "required_tools": [
-    "mcp.geox.compute_ac_risk"
+    "mcp.GEOX.compute_ac_risk"
   ],
   "optional_tools": [
-    "mcp.geox.list_tools",
-    "mcp.geox.load_seismic_line"
+    "mcp.GEOX.list_tools",
+    "mcp.GEOX.load_seismic_line"
   ],
   "ui_entry": {
-    "resource_uri": "https://geox.arif-fazil.com/apps/ac_risk_console/index.html",
+    "resource_uri": "https://GEOX.arif-fazil.com/apps/ac_risk_console/index.html",
     "mode": "inline-or-external",
     "capability_required": [
       "embedded_webview"
     ],
-    "csp_policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.geox.arif-fazil.com; style-src 'self' 'unsafe-inline';",
+    "csp_policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.GEOX.arif-fazil.com; style-src 'self' 'unsafe-inline';",
     "sandbox": "allow-scripts allow-same-origin",
     "inline_config": {
       "max_width": 1200,
@@ -65,7 +65,7 @@
       "card",
       "text"
     ],
-    "external_url": "https://geox.arif-fazil.com/apps/ac_risk_console/?session={session_id}",
+    "external_url": "https://GEOX.arif-fazil.com/apps/ac_risk_console/?session={session_id}",
     "card_template": "/apps/ac_risk_console/card.html"
   },
   "arifos": {
@@ -88,8 +88,8 @@
   "meta": {
     "author": "GEOX Platform Team",
     "license": "MIT",
-    "repository": "https://github.com/ariffazil/arifos-geox",
-    "homepage": "https://geox.arif-fazil.com/apps/ac_risk_console/",
+    "repository": "https://github.com/ariffazil/arifos-GEOX",
+    "homepage": "https://GEOX.arif-fazil.com/apps/ac_risk_console/",
     "keywords": [
       "ac_risk",
       "toac",
@@ -101,3 +101,4 @@
     "updated_at": "2026-04-10T00:00:00Z"
   }
 }
+

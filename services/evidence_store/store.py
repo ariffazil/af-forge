@@ -4,10 +4,10 @@ from datetime import datetime
 from typing import List, Optional, Dict
 from uuid import uuid4
 
-# Import from the relative path assuming this is run in a way that geox is in path
+# Import from the relative path assuming this is run in a way that GEOX is in path
 # In a real app, you'd have a proper package structure.
 try:
-    from geox.shared.contracts.schemas import EvidenceRef, EvidenceObject, GeoContext, EvidenceKind
+    from GEOX.shared.contracts.schemas import EvidenceRef, EvidenceObject, GeoContext, EvidenceKind
 except ImportError:
     # Fallback or Mock for standalone testing
     from pydantic import BaseModel
@@ -73,3 +73,4 @@ class EvidenceStore:
 
 # Global Access Instance
 store = EvidenceStore()
+

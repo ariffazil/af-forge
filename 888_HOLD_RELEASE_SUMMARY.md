@@ -29,7 +29,7 @@ This document contains:
 **Status:** 🔴 888 HOLD — Planned, not executed  
 **Reason:** External action with user-facing consequences
 
-### 2. Plan for geox.arif-fazil.com
+### 2. Plan for GEOX.arif-fazil.com
 **Status:** ✅ COMPLETE — Full specification ready
 
 ### 3. /mcp and /apps mapping
@@ -46,7 +46,7 @@ This document contains:
 ## Site Structure: Verified
 
 ```
-geox.arif-fazil.com
+GEOX.arif-fazil.com
 │
 ├── /                    [REQUIRED] ✅ Content ready
 │   ├── Hero
@@ -91,11 +91,11 @@ geox.arif-fazil.com
 **What it does:** Exposes functions agents can call
 
 **Current Tools:**
-- ✅ `geox_load_seismic_line` — LIVE
-- ✅ `geox_build_structural_candidates` — LIVE
-- ✅ `geox_compute_ac_risk` — LIVE
-- 🟡 `geox_georeference_map` — SCAFFOLD
-- 🔴 `geox_digitize_analog` — PLANNED
+- ✅ `GEOX_load_seismic_line` — LIVE
+- ✅ `GEOX_build_structural_candidates` — LIVE
+- ✅ `GEOX_compute_ac_risk` — LIVE
+- 🟡 `GEOX_georeference_map` — SCAFFOLD
+- 🔴 `GEOX_digitize_analog` — PLANNED
 
 ### Apps = Human Interface
 **For:** Geoscientists, operators  
@@ -159,10 +159,10 @@ Visual separation:
 ### /mcp
 | Tool | Code Exists | Status |
 |------|-------------|--------|
-| geox_load_seismic_line | ✅ Yes | LIVE |
-| geox_compute_ac_risk | ✅ Yes | LIVE |
-| geox_georeference_map | ✅ Yes | SCAFFOLD |
-| geox_digitize_analog | 🔴 No | PLANNED |
+| GEOX_load_seismic_line | ✅ Yes | LIVE |
+| GEOX_compute_ac_risk | ✅ Yes | LIVE |
+| GEOX_georeference_map | ✅ Yes | SCAFFOLD |
+| GEOX_digitize_analog | 🔴 No | PLANNED |
 
 ### /apps
 | App | Code Exists | UI Exists | Status |
@@ -253,7 +253,7 @@ GEOX/
 
 ### Code
 ```
-arifos/geox/
+arifos/GEOX/
 ├── ENGINE/ac_risk.py                   (✅ Tested)
 └── vision/                             (✅ Scaffold)
     ├── governed_vlm.py
@@ -303,3 +303,4 @@ arifos/geox/
 
 *DITEMPA BUKAN DIBERI*  
 *Plan is forged. Hold is acknowledged. Release at will.*
+

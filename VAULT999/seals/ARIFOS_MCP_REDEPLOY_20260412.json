@@ -85,7 +85,7 @@
       "location": "/etc/systemd/system/arifos-backup.timer"
     },
     "backupVolumes": [
-      "geox_vault_999",
+      "GEOX_vault_999",
       "arifosmcp_vault", 
       "arifos_arifosmcp_vault",
       "postgres",
@@ -121,3 +121,4 @@
     "ClamAV scan running at 97.5% CPU (background process)"
   ]
 }
+

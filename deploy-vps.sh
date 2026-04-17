@@ -3,7 +3,7 @@
 # DITEMPA BUKAN DIBERI
 #
 # Usage: ./deploy-vps.sh
-# Deploys GEOX MCP server to production VPS at geox.arif-fazil.com
+# Deploys GEOX MCP server to production VPS at GEOX.arif-fazil.com
 
 set -e
 
@@ -15,18 +15,18 @@ echo ""
 # Configuration
 VPS_HOST="srv1325122.hstgr.cloud"
 VPS_USER="root"
-DEPLOY_DIR="/opt/arifos/geox"
-DOMAIN="geox.arif-fazil.com"
+DEPLOY_DIR="/opt/arifos/GEOX"
+DOMAIN="GEOX.arif-fazil.com"
 
 echo "Step 1: Building Docker images locally (Deep Forge)..."
-docker build --no-cache -t geox-server:latest .
-docker build --no-cache -t geox-gui:latest ./geox-gui
+docker build --no-cache -t GEOX-server:latest .
+docker build --no-cache -t GEOX-gui:latest ./GEOX-gui
 
 echo ""
 echo "Step 2: Pushing to VPS..."
 # Save and transfer images
-docker save geox-server:latest | ssh ${VPS_USER}@${VPS_HOST} "docker load"
-docker save geox-gui:latest | ssh ${VPS_USER}@${VPS_HOST} "docker load"
+docker save GEOX-server:latest | ssh ${VPS_USER}@${VPS_HOST} "docker load"
+docker save GEOX-gui:latest | ssh ${VPS_USER}@${VPS_HOST} "docker load"
 
 echo ""
 echo "Step 3: Deploying on VPS..."
@@ -78,3 +78,4 @@ echo "  curl https://${DOMAIN}/health"
 echo "  fastmcp list https://${DOMAIN}/mcp"
 echo ""
 echo "DITEMPA BUKAN DIBERI — 999 SEAL ALIVE"
+

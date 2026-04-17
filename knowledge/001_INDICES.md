@@ -11,7 +11,7 @@ This document formalizes the operational indices used by the arifOS Governance K
 
 *   **Logic:** Safety can be purchased when the action is reversible and budget exists.
 *   **Threshold:** $>0.8$ allows for "Sovereign Fast" mode (spend tokens for lower latency).
-*   **Usage:** Used in `geox_hardened.py` to determine if a synchronous `888_JUDGE` verification can be safely bypassed or optimized.
+*   **Usage:** Used in `GEOX_hardened.py` to determine if a synchronous `888_JUDGE` verification can be safely bypassed or optimized.
 
 ## 2. Wait Index ($I_w$)
 **Formula:** $I_w = \Omega_s \times (1.0 - \text{MetabolicFluxNormalized})$
@@ -46,3 +46,4 @@ This document formalizes the operational indices used by the arifOS Governance K
 
 ---
 **GEOS Production Ready — FORGED NOT GIVEN**
+

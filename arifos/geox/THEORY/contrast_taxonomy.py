@@ -333,3 +333,4 @@ class ContrastTaxonomy:
             "domain": self.domain,
             "anomalous_risk_score": self.anomalous_risk_score,
         }
+

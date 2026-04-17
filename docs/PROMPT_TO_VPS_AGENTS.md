@@ -4,7 +4,7 @@
 Transition the GEOX platform from "Visualization Shell" to "Heavy Subsurface Interpretation Engine".
 
 ## PHASE 1: INTEGRATION (1D/2D)
-1. **Macrostrat API**: Implement `geox_fetch_stratigraphy` tool to hydrate the 3D Basin Explorer with real stratigraphic columns.
+1. **Macrostrat API**: Implement `GEOX_fetch_stratigraphy` tool to hydrate the 3D Basin Explorer with real stratigraphic columns.
 2. **LAS/SEGY Normalization**: Deploy `lasio` and `segyio` pipelines to process raw industrial files into GEOX Canonical JSON.
 3. **Analog Visual Mode**: Implement the vision intelligence logic for scale-aware digitization (pixel-to-depth calibration).
 
@@ -19,3 +19,4 @@ Transition the GEOX platform from "Visualization Shell" to "Heavy Subsurface Int
 
 ## SEAL
 DITEMPA BUKAN DIBERI. Perform with 999_SEAL integrity.
+

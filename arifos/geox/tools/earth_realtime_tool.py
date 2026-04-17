@@ -1,5 +1,5 @@
 """
-arifos/geox/tools/earth_realtime_tool.py — Real Earth Signals Tool
+arifos/GEOX/tools/earth_realtime_tool.py — Real Earth Signals Tool
 DITEMPA BUKAN DIBERI
 
 Live, zero-auth Earth observation signals:
@@ -26,10 +26,10 @@ from typing import Any
 
 import httpx
 
-from arifos.geox.base_tool import BaseTool, GeoToolResult
-from arifos.geox.geox_schemas import CoordinatePoint, GeoQuantity, ProvenanceRecord
+from arifos.GEOX.base_tool import BaseTool, GeoToolResult
+from arifos.GEOX.GEOX_schemas import CoordinatePoint, GeoQuantity, ProvenanceRecord
 
-logger = logging.getLogger("geox.tools.earth_realtime")
+logger = logging.getLogger("GEOX.tools.earth_realtime")
 
 _USGS_BASE = "https://earthquake.usgs.gov/fdsnws/event/1/query"
 _OPENMETEO_BASE = "https://api.open-meteo.com/v1/forecast"
@@ -396,3 +396,4 @@ class EarthRealtimeTool(BaseTool):
             return True
         except Exception:
             return False
+

@@ -5,8 +5,8 @@ DITEMPA BUKAN DIBERI
 
 from .types import (
     # Base
-    GeoXResult,
-    GeoXStatus,
+    GEOXResult,
+    GEOXStatus,
     # Petrophysics
     SwModel,
     SwCalculationResult,
@@ -30,8 +30,8 @@ from .types import (
 )
 
 __all__ = [
-    "GeoXResult",
-    "GeoXStatus",
+    "GEOXResult",
+    "GEOXStatus",
     "SwModel",
     "SwCalculationResult",
     "SwModelAdmissibilityResult",
@@ -47,3 +47,4 @@ __all__ = [
     "HealthResult",
     "AppIntent",
 ]
+

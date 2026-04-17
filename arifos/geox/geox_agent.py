@@ -31,7 +31,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.GEOX_schemas import (
     GeoInsight,
     GeoPrediction,
     GeoQuantity,
@@ -39,24 +39,24 @@ from arifos.geox.geox_schemas import (
     GeoResponse,
     ProvenanceRecord,
 )
-from arifos.geox.geox_tools import (
+from arifos.GEOX.GEOX_tools import (
     BaseTool,
     GeoToolResult,
     ToolRegistry,
 )
-from arifos.geox.geox_validator import AggregateVerdict, GeoXValidator
+from arifos.GEOX.GEOX_validator import AggregateVerdict, GEOXValidator
 
-logger = logging.getLogger("geox.agent")
+logger = logging.getLogger("GEOX.agent")
 
 
 # ---------------------------------------------------------------------------
-# GeoXConfig
+# GEOXConfig
 # ---------------------------------------------------------------------------
 
 @dataclass
-class GeoXConfig:
+class GEOXConfig:
     """
-    Configuration for the GeoXAgent pipeline.
+    Configuration for the GEOXAgent pipeline.
 
     Attributes:
         lem_confidence_threshold:  Minimum LEM output confidence to accept.
@@ -83,14 +83,14 @@ class GeoXConfig:
         "high": "regulator_required",
         "critical": "888_HOLD",
     })
-    pipeline_id: str = "geox-v0.1"
+    pipeline_id: str = "GEOX-v0.1"
 
 
 # ---------------------------------------------------------------------------
-# GeoXAgent
+# GEOXAgent
 # ---------------------------------------------------------------------------
 
-class GeoXAgent:
+class GEOXAgent:
     """
     GEOX pipeline orchestrator.
 
@@ -101,9 +101,9 @@ class GeoXAgent:
     arifOS kernel integration.
 
     Args:
-        config:       GeoXConfig governing pipeline behaviour.
+        config:       GEOXConfig governing pipeline behaviour.
         tool_registry: ToolRegistry providing tool access.
-        validator:    GeoXValidator for insight verification.
+        validator:    GEOXValidator for insight verification.
         llm_planner:  Optional arifOS agi_mind planner callable.
                       Signature: async (query: str, context: dict) -> str
         audit_sink:   Optional arifOS vault_ledger callable.
@@ -113,9 +113,9 @@ class GeoXAgent:
 
     def __init__(
         self,
-        config: GeoXConfig,
+        config: GEOXConfig,
         tool_registry: ToolRegistry,
-        validator: GeoXValidator,
+        validator: GEOXValidator,
         llm_planner: Callable[[str, dict], Awaitable[str]] | None = None,
         audit_sink: Callable[[dict], Awaitable[None]] | None = None,
         memory_store: Any | None = None,
@@ -712,7 +712,7 @@ class GeoXAgent:
         request: GeoRequest,
     ) -> AggregateVerdict:
         """
-        Validate all insights via the GeoXValidator (777 REASON + 888 AUDIT).
+        Validate all insights via the GEOXValidator (777 REASON + 888 AUDIT).
 
         Args:
             insights: GeoInsight objects from synthesise().
@@ -934,3 +934,4 @@ class GeoXAgent:
                 await self.audit_sink(event)
             except Exception as exc:
                 logger.warning("audit_sink failed: %s", exc)
+

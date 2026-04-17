@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from arifos.geox.physics.petrophysics import archie_sw, simandoux_sw, indonesia_sw, monte_carlo_sw
+from arifos.GEOX.physics.petrophysics import archie_sw, simandoux_sw, indonesia_sw, monte_carlo_sw
 
 def test_archie_sw():
     # Rw=0.1, Rt=10, phi=0.2, a=1, m=2, n=2
@@ -46,3 +46,4 @@ def test_governance_trigger():
     result = monte_carlo_sw("archie", params)
     assert result["verdict"] == "888_HOLD"
     assert any("Porosity" in t for t in result["hold_triggers"])
+

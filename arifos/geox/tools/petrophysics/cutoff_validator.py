@@ -2,10 +2,10 @@
 Cutoff Validator — Stub for Phase B
 DITEMPA BUKAN DIBERI
 
-Full implementation in Phase B: geox_validate_cutoffs tool.
+Full implementation in Phase B: GEOX_validate_cutoffs tool.
 """
 
-from arifos.geox.schemas.petrophysics.cutoffs import CutoffPolicy
+from arifos.GEOX.schemas.petrophysics.cutoffs import CutoffPolicy
 
 # In-memory store
 _policy_store: dict[str, CutoffPolicy] = {}
@@ -31,3 +31,4 @@ class CutoffValidator:
     async def apply(self):
         """Placeholder for cutoff validation."""
         raise NotImplementedError("Phase B: Cutoff validation")
+

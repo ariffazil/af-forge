@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://geox.arif-fazil.com/schemas/app-manifest/v1.json",
+  "$id": "https://GEOX.arif-fazil.com/schemas/app-manifest/v1.json",
   "title": "GEOX App Manifest",
   "description": "Canonical manifest schema for GEOX MCP Apps. Host-agnostic definition of app capabilities, requirements, and integration contracts.",
   "type": "object",
@@ -13,8 +13,8 @@
     },
     "app_id": {
       "type": "string",
-      "pattern": "^geox\\.[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$",
-      "description": "Unique app identifier in geox.{domain}.{name} format"
+      "pattern": "^GEOX\\.[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$",
+      "description": "Unique app identifier in GEOX.{domain}.{name} format"
     },
     "version": {
       "type": "string",
@@ -55,7 +55,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^mcp\\.geox\\.[a-z0-9_\\.\\*]+$"
+        "pattern": "^mcp\\.GEOX\\.[a-z0-9_\\.\\*]+$"
       },
       "description": "Required MCP tools (may use wildcards)"
     },
@@ -63,7 +63,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^mcp\\.geox\\.[a-z0-9_\\.\\*]+$"
+        "pattern": "^mcp\\.GEOX\\.[a-z0-9_\\.\\*]+$"
       },
       "description": "Optional MCP tools for enhanced functionality"
     },
@@ -277,3 +277,4 @@
     }
   }
 }
+

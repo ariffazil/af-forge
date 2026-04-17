@@ -15,18 +15,18 @@
       "tools_list": ["well_state","well_log","well_pressure","well_readiness","well_init","well_anchor","well_check_floors"]
     },
     "GEOX": {
-      "url": "https://geoxarifOS.fastmcp.app/mcp",
-      "name": "geoxarifos",
+      "url": "https://GEOXarifOS.fastmcp.app/mcp",
+      "name": "GEOXarifos",
       "tools": 22,
       "status": "SEAL",
       "tools_list": [
-        "geox_well_load_bundle","geox_well_qc_logs","geox_well_compute_petrophysics",
-        "geox_section_interpret_strata","geox_seismic_load_line","geox_earth3d_load_volume",
-        "geox_earth3d_interpret_horizons","geox_earth3d_model_geometries",
-        "geox_map_get_context_summary","geox_time4d_verify_timing","geox_prospect_evaluate",
-        "geox_cross_summarize_evidence","geox_attribute_audit","geox_seismic_vision_review",
-        "geox_map_georeference","geox_well_digitize_log","geox_list_skills",
-        "geox_skill_metadata","geox_skill_dependencies","arifos_check_hold",
+        "GEOX_well_load_bundle","GEOX_well_qc_logs","GEOX_well_compute_petrophysics",
+        "GEOX_section_interpret_strata","GEOX_seismic_load_line","GEOX_earth3d_load_volume",
+        "GEOX_earth3d_interpret_horizons","GEOX_earth3d_model_geometries",
+        "GEOX_map_get_context_summary","GEOX_time4d_verify_timing","GEOX_prospect_evaluate",
+        "GEOX_cross_summarize_evidence","GEOX_attribute_audit","GEOX_seismic_vision_review",
+        "GEOX_map_georeference","GEOX_well_digitize_log","GEOX_list_skills",
+        "GEOX_skill_metadata","GEOX_skill_dependencies","arifos_check_hold",
         "arifos_compute_risk","arifos_judge_prospect"
       ]
     },
@@ -46,7 +46,7 @@
     }
   },
   "golden_path": {
-    "GEOX": "geox_compute_stoiip → geox_bridge_to_wealth",
+    "GEOX": "GEOX_compute_stoiip → GEOX_bridge_to_wealth",
     "WEALTH": "EMV calculation via earth_to_capital bridge",
     "arifOS": "SEAL/JUDGE verdict via arifOS MCP",
     "WELL": "W0 mirror — human veto always intact"
@@ -55,4 +55,5 @@
   "W0_SOVEREIGNTY_INVARIANT": true,
   "federation_complete": true
 }
+
 

@@ -74,3 +74,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     extract_figures(args.pdf, args.out, args.dpi)
+

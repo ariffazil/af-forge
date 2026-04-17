@@ -15,7 +15,7 @@ import pytest
 import numpy as np
 import asyncio
 
-from arifos.geox.tools.single_line_interpreter import (
+from arifos.GEOX.tools.single_line_interpreter import (
     SingleLineInterpreter,
     compute_attributes_2d,
     link_attributes_to_geology,
@@ -28,7 +28,7 @@ from arifos.geox.tools.single_line_interpreter import (
     _compute_envelope,
     _compute_dip_2d,
 )
-from arifos.geox.geox_tools import ToolRegistry
+from arifos.GEOX.GEOX_tools import ToolRegistry
 
 
 # -----------------------------------------------------------------------------
@@ -610,3 +610,4 @@ Bond et al. (2007) Reference:
 
 DITEMPA BUKAN DIBERI
 """
+

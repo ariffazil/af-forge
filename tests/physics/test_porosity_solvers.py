@@ -4,7 +4,7 @@ Verify against textbook cases.
 """
 
 import pytest
-from arifos.geox.physics.porosity_solvers import (
+from arifos.GEOX.physics.porosity_solvers import (
     VshSolver,
     DensityNeutronSolver,
     compute_bvw,
@@ -225,3 +225,4 @@ class TestPermeabilityProxy:
         
         assert k > 0
         assert "timur" in desc.lower()
+

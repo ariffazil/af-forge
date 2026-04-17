@@ -13,7 +13,7 @@
 #   F7  Humility   — uncertainty_floor defines minimum output uncertainty
 #   F9  Anti-Hantu — anomalous_risk tags prevent silent contrast illusions
 #
-# Epistemic tags (geox_status):
+# Epistemic tags (GEOX_status):
 #   CLAIM       — supported by physical law or peer-reviewed equation
 #   PLAUSIBLE   — consistent with practice, not formally derived here
 #   HYPOTHESIS  — testable speculation, requires validation
@@ -27,7 +27,7 @@
 #   later       — inversion, kinematic (requires prestack or external solver)
 
 version: "1.0"
-geox_version: "0.3.0"
+GEOX_version: "0.3.0"
 sealed: "2026-03-31"
 seal: "DITEMPA BUKAN DIBERI"
 floor_references: [F4, F7, F9]
@@ -55,7 +55,7 @@ classes:
         kernel: "3D window — typically 3×3 or 5×5 traces, 9–15 ms"
         anomalous_risk: low
         uncertainty_floor: 0.06
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         equation_ref: "Marfurt et al. (1998) — semblance-based coherence, Geophysics 63(4)"
         contrast_canon_notes: >
           High physical traceability. Low display-bias risk.
@@ -64,7 +64,7 @@ classes:
         hc_sensitive: false
         structure_sensitive: true
         implementation_complexity: intermediate
-        geox_priority: sprint_2
+        GEOX_priority: sprint_2
 
       - name: dip
         aliases: [local_dip, reflector_dip]
@@ -73,13 +73,13 @@ classes:
         kernel: "3D dip estimation window"
         anomalous_risk: low
         uncertainty_floor: 0.06
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         equation_ref: "Chopra & Marfurt (2007) — Seismic Attributes for Prospect Identification"
         contrast_canon_notes: "Reliable geometry descriptor. Artifacts at unconformities and noise zones."
         hc_sensitive: false
         structure_sensitive: true
         implementation_complexity: intermediate
-        geox_priority: sprint_2
+        GEOX_priority: sprint_2
 
       - name: azimuth
         aliases: [dip_azimuth, reflector_azimuth]
@@ -87,12 +87,12 @@ classes:
         computation: multi_trace
         anomalous_risk: low
         uncertainty_floor: 0.06
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         contrast_canon_notes: "Directional attribute — color wheel encoding can mislead. Always show alongside dip magnitude."
         hc_sensitive: false
         structure_sensitive: true
         implementation_complexity: intermediate
-        geox_priority: sprint_2
+        GEOX_priority: sprint_2
 
       - name: curvature_most_positive
         aliases: [k_pos, k1]
@@ -100,7 +100,7 @@ classes:
         computation: multi_trace
         anomalous_risk: medium
         uncertainty_floor: 0.08
-        geox_status: PLAUSIBLE
+        GEOX_status: PLAUSIBLE
         equation_ref: "Chopra & Marfurt (2007) — volumetric curvature"
         contrast_canon_notes: >
           Curvature amplifies noise; strong visual contrast does not equal strong geological signal.
@@ -109,7 +109,7 @@ classes:
         hc_sensitive: false
         structure_sensitive: true
         implementation_complexity: advanced
-        geox_priority: sprint_2
+        GEOX_priority: sprint_2
 
       - name: curvature_most_negative
         aliases: [k_neg, k2]
@@ -117,21 +117,21 @@ classes:
         computation: multi_trace
         anomalous_risk: medium
         uncertainty_floor: 0.08
-        geox_status: PLAUSIBLE
+        GEOX_status: PLAUSIBLE
         contrast_canon_notes: "Same risk profile as curvature_most_positive. Pair always."
         hc_sensitive: false
         structure_sensitive: true
         implementation_complexity: advanced
-        geox_priority: sprint_2
+        GEOX_priority: sprint_2
 
       - name: curvature_mean
         physical_axes: [surface_shape, structural_form]
         computation: multi_trace
         anomalous_risk: low
         uncertainty_floor: 0.07
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         implementation_complexity: advanced
-        geox_priority: sprint_2
+        GEOX_priority: sprint_2
 
       - name: fault_likelihood
         aliases: [fault_probability, edge_detection]
@@ -139,7 +139,7 @@ classes:
         computation: multi_trace
         anomalous_risk: medium
         uncertainty_floor: 0.09
-        geox_status: PLAUSIBLE
+        GEOX_status: PLAUSIBLE
         contrast_canon_notes: >
           Classical versions (gradient of coherence) have medium risk.
           ML/CNN versions (AI fault attribute) carry HIGH risk — see meta-attributes.
@@ -147,7 +147,7 @@ classes:
         hc_sensitive: false
         structure_sensitive: true
         implementation_complexity: intermediate
-        geox_priority: sprint_2
+        GEOX_priority: sprint_2
 
   # ---------------------------------------------------------------------------
   # CLASS 2 — AMPLITUDE / STRENGTH
@@ -170,7 +170,7 @@ classes:
         kernel: "Hilbert transform → analytic signal magnitude"
         anomalous_risk: medium
         uncertainty_floor: 0.08
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         equation_ref: "Taner et al. (1979) — complex seismic trace analysis, Geophysics 44(6)"
         contrast_canon_notes: >
           Strong visual contrast between gas sands and background is physically real —
@@ -179,7 +179,7 @@ classes:
         hc_sensitive: true
         structure_sensitive: false
         implementation_complexity: basic
-        geox_priority: sprint_1
+        GEOX_priority: sprint_1
 
       - name: rms_amplitude
         aliases: [rms_amp, amplitude_rms]
@@ -188,7 +188,7 @@ classes:
         kernel: "Windowed RMS over user-defined time gate"
         anomalous_risk: medium
         uncertainty_floor: 0.07
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         contrast_canon_notes: >
           Window length choice strongly affects visual pattern.
           Short windows → noise-sensitive. Long windows → smear thin beds.
@@ -196,25 +196,25 @@ classes:
         hc_sensitive: true
         structure_sensitive: false
         implementation_complexity: basic
-        geox_priority: sprint_1
+        GEOX_priority: sprint_1
 
       - name: peak_amplitude
         physical_axes: [maximum_positive_reflection, top_interface_contrast]
         computation: single_trace
         anomalous_risk: low
         uncertainty_floor: 0.06
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         implementation_complexity: basic
-        geox_priority: sprint_1
+        GEOX_priority: sprint_1
 
       - name: trough_amplitude
         physical_axes: [maximum_negative_reflection, base_interface_contrast]
         computation: single_trace
         anomalous_risk: low
         uncertainty_floor: 0.06
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         implementation_complexity: basic
-        geox_priority: sprint_1
+        GEOX_priority: sprint_1
 
       - name: reflection_intensity
         aliases: [power, trace_energy]
@@ -222,9 +222,9 @@ classes:
         computation: single_trace
         anomalous_risk: low
         uncertainty_floor: 0.06
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         implementation_complexity: basic
-        geox_priority: sprint_1
+        GEOX_priority: sprint_1
 
       - name: anomalous_contrast_index
         aliases: [aci, local_amplitude_anomaly]
@@ -233,7 +233,7 @@ classes:
         kernel: "Local window statistics: (amplitude - background_mean) / background_std"
         anomalous_risk: medium
         uncertainty_floor: 0.09
-        geox_status: ESTIMATE
+        GEOX_status: ESTIMATE
         equation_ref: "GEOX Contrast Canon — arifOS constitutional attribute (2026)"
         contrast_canon_notes: >
           The GEOX native attribute. Measures N-sigma deviation from local background.
@@ -243,7 +243,7 @@ classes:
         hc_sensitive: true
         structure_sensitive: false
         implementation_complexity: basic
-        geox_priority: sprint_1
+        GEOX_priority: sprint_1
 
   # ---------------------------------------------------------------------------
   # CLASS 3 — INSTANTANEOUS (COMPLEX TRACE)
@@ -266,7 +266,7 @@ classes:
         kernel: "arctan(imaginary / real) of analytic signal"
         anomalous_risk: low
         uncertainty_floor: 0.06
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         equation_ref: "Taner et al. (1979)"
         contrast_canon_notes: >
           Amplitude-independent — very useful for continuity without DHI bias.
@@ -275,7 +275,7 @@ classes:
         hc_sensitive: false
         structure_sensitive: true
         implementation_complexity: basic
-        geox_priority: sprint_1
+        GEOX_priority: sprint_1
 
       - name: instantaneous_frequency
         aliases: [inst_freq]
@@ -284,7 +284,7 @@ classes:
         kernel: "Time derivative of unwrapped instantaneous phase"
         anomalous_risk: high
         uncertainty_floor: 0.13
-        geox_status: PLAUSIBLE
+        GEOX_status: PLAUSIBLE
         equation_ref: "Taner et al. (1979)"
         contrast_canon_notes: >
           HIGH anomalous contrast risk. Instantaneous frequency is extremely
@@ -297,7 +297,7 @@ classes:
         hc_sensitive: true
         structure_sensitive: false
         implementation_complexity: basic
-        geox_priority: sprint_1
+        GEOX_priority: sprint_1
 
       - name: instantaneous_bandwidth
         aliases: [inst_bandwidth]
@@ -305,12 +305,12 @@ classes:
         computation: single_trace
         anomalous_risk: high
         uncertainty_floor: 0.13
-        geox_status: ESTIMATE
+        GEOX_status: ESTIMATE
         contrast_canon_notes: "Very noise-sensitive. Use only after structure-oriented smoothing."
         hc_sensitive: false
         structure_sensitive: false
         implementation_complexity: intermediate
-        geox_priority: later
+        GEOX_priority: later
 
       - name: cosine_of_instantaneous_phase
         aliases: [cos_phase]
@@ -318,10 +318,10 @@ classes:
         computation: single_trace
         anomalous_risk: low
         uncertainty_floor: 0.06
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         contrast_canon_notes: "Smoother version of instantaneous phase for display. Low risk."
         implementation_complexity: basic
-        geox_priority: sprint_1
+        GEOX_priority: sprint_1
 
   # ---------------------------------------------------------------------------
   # CLASS 4 — SPECTRAL / TIME-FREQUENCY
@@ -342,10 +342,10 @@ classes:
         computation: single_trace
         anomalous_risk: medium
         uncertainty_floor: 0.09
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         contrast_canon_notes: "Sensitive to bandwidth and noise floor. Smoothing required for geological interpretation."
         implementation_complexity: basic
-        geox_priority: sprint_3
+        GEOX_priority: sprint_3
 
       - name: spectral_decomposition_magnitude
         aliases: [spec_decomp, sdec_mag]
@@ -354,7 +354,7 @@ classes:
         kernel: "Short-time Fourier or CWT — magnitude at target frequency"
         anomalous_risk: medium
         uncertainty_floor: 0.10
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         equation_ref: "Partyka et al. (1999) — spectral decomposition, The Leading Edge"
         contrast_canon_notes: >
           Color blending of multiple frequency slices can create striking visual patterns
@@ -363,7 +363,7 @@ classes:
         hc_sensitive: true
         structure_sensitive: true
         implementation_complexity: intermediate
-        geox_priority: sprint_3
+        GEOX_priority: sprint_3
 
       - name: sweetness
         aliases: [sweetness_attribute]
@@ -372,7 +372,7 @@ classes:
         kernel: "envelope / sqrt(instantaneous_frequency)"
         anomalous_risk: high
         uncertainty_floor: 0.13
-        geox_status: PLAUSIBLE
+        GEOX_status: PLAUSIBLE
         contrast_canon_notes: >
           HIGH anomalous contrast risk. Inherits noise from instantaneous_frequency.
           Very visually striking in gas sands — but mathematical artifact zones
@@ -382,14 +382,14 @@ classes:
         hc_sensitive: true
         structure_sensitive: false
         implementation_complexity: intermediate
-        geox_priority: sprint_3
+        GEOX_priority: sprint_3
 
       - name: spectral_centroid_shift
         physical_axes: [frequency_attenuation, gas_absorption, Q_degradation]
         computation: single_trace
         anomalous_risk: high
         uncertainty_floor: 0.13
-        geox_status: HYPOTHESIS
+        GEOX_status: HYPOTHESIS
         contrast_canon_notes: >
           Theoretically sound (gas causes high-frequency attenuation below reservoir)
           but difficult to separate from processing-induced frequency changes.
@@ -397,7 +397,7 @@ classes:
         hc_sensitive: true
         structure_sensitive: false
         implementation_complexity: advanced
-        geox_priority: sprint_3
+        GEOX_priority: sprint_3
 
   # ---------------------------------------------------------------------------
   # CLASS 5 — AVO / ELASTIC / INVERSION
@@ -420,14 +420,14 @@ classes:
         kernel: "Shuey linearization fit across offset classes"
         anomalous_risk: medium
         uncertainty_floor: 0.10
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         equation_ref: "Shuey (1985) — Geophysics 50(4)"
         requires: [prestack_data, offset_gathers]
         contrast_canon_notes: "Requires prestack gathers. Post-stack approximations carry higher uncertainty."
         hc_sensitive: true
         structure_sensitive: false
         implementation_complexity: advanced
-        geox_priority: later
+        GEOX_priority: later
 
       - name: avo_gradient
         aliases: [avo_B]
@@ -436,14 +436,14 @@ classes:
         kernel: "Shuey linearization — angle-dependent slope"
         anomalous_risk: medium
         uncertainty_floor: 0.10
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         equation_ref: "Shuey (1985)"
         requires: [prestack_data, offset_gathers, well_control]
         contrast_canon_notes: "Cross-plot A vs B for fluid class discrimination. Requires rock physics calibration."
         hc_sensitive: true
         structure_sensitive: false
         implementation_complexity: advanced
-        geox_priority: later
+        GEOX_priority: later
 
       - name: acoustic_impedance
         aliases: [p_impedance, AI]
@@ -452,7 +452,7 @@ classes:
         kernel: "Post-stack inversion (model-based or sparse-spike)"
         anomalous_risk: medium
         uncertainty_floor: 0.10
-        geox_status: CLAIM
+        GEOX_status: CLAIM
         requires: [wavelet_extraction, low_frequency_model, well_ties]
         contrast_canon_notes: >
           Requires well tie and low-frequency model. Result is non-unique without constraints.
@@ -460,7 +460,7 @@ classes:
         hc_sensitive: true
         structure_sensitive: false
         implementation_complexity: advanced
-        geox_priority: later
+        GEOX_priority: later
 
       - name: vp_vs_ratio
         aliases: [vpvs]
@@ -468,10 +468,10 @@ classes:
         computation: multi_trace
         anomalous_risk: medium
         uncertainty_floor: 0.11
-        geox_status: PLAUSIBLE
+        GEOX_status: PLAUSIBLE
         requires: [prestack_data, elastic_inversion]
         implementation_complexity: advanced
-        geox_priority: later
+        GEOX_priority: later
 
   # ---------------------------------------------------------------------------
   # CLASS 6 — FACIES / PATTERN / CLASSIFICATION
@@ -493,7 +493,7 @@ classes:
         computation: multi_trace
         anomalous_risk: high
         uncertainty_floor: 0.13
-        geox_status: HYPOTHESIS
+        GEOX_status: HYPOTHESIS
         contrast_canon_notes: >
           HIGH anomalous contrast risk. SOM clusters may reflect acquisition geometry,
           processing differences, or noise clusters rather than geology.
@@ -503,7 +503,7 @@ classes:
         hc_sensitive: true
         structure_sensitive: true
         implementation_complexity: advanced
-        geox_priority: sprint_4
+        GEOX_priority: sprint_4
 
       - name: meta_fault_probability
         aliases: [cnn_fault_prob, ai_fault_attribute, deep_fault_likelihood]
@@ -512,7 +512,7 @@ classes:
         kernel: "CNN / U-Net segmentation on stacked attribute volumes"
         anomalous_risk: high
         uncertainty_floor: 0.15
-        geox_status: HYPOTHESIS
+        GEOX_status: HYPOTHESIS
         requires: [training_data, well_calibration, classical_attribute_inputs]
         contrast_canon_notes: >
           HIGH anomalous contrast risk. CNN fault probability can amplify
@@ -524,7 +524,7 @@ classes:
         hc_sensitive: false
         structure_sensitive: true
         implementation_complexity: advanced
-        geox_priority: sprint_4
+        GEOX_priority: sprint_4
 
       - name: seiscodeembedding
         aliases: [seiscod_latent, foundation_model_attribute]
@@ -533,7 +533,7 @@ classes:
         kernel: "SeisCoDE Vision Transformer — contrastive self-distillation (arxiv 2505.20518v1)"
         anomalous_risk: high
         uncertainty_floor: 0.15
-        geox_status: HYPOTHESIS
+        GEOX_status: HYPOTHESIS
         equation_ref: "Archibong et al. (2025) — SeisCoDE, arxiv 2505.20518v1 (note: v2 withdrawn)"
         requires: [seiscod_model_weights, gpu_inference]
         contrast_canon_notes: >
@@ -545,7 +545,7 @@ classes:
         hc_sensitive: true
         structure_sensitive: true
         implementation_complexity: advanced
-        geox_priority: sprint_4
+        GEOX_priority: sprint_4
 
   # ---------------------------------------------------------------------------
   # CLASS 7 — KINEMATIC / TIME-RELATED
@@ -566,10 +566,10 @@ classes:
         computation: multi_trace
         anomalous_risk: low
         uncertainty_floor: 0.07
-        geox_status: ESTIMATE
+        GEOX_status: ESTIMATE
         requires: [prestack_data, velocity_model]
         implementation_complexity: advanced
-        geox_priority: later
+        GEOX_priority: later
 
       - name: time_shift_4d
         aliases: [4d_time_shift, production_time_shift]
@@ -577,11 +577,11 @@ classes:
         computation: multi_trace
         anomalous_risk: medium
         uncertainty_floor: 0.10
-        geox_status: ESTIMATE
+        GEOX_status: ESTIMATE
         requires: [repeat_seismic_surveys, careful_cross_equalization]
         contrast_canon_notes: "Requires matched processing between baseline and monitor surveys. Misregistration = false 4D signal."
         implementation_complexity: advanced
-        geox_priority: later
+        GEOX_priority: later
 
 # ---------------------------------------------------------------------------
 # GEOX SPRINT MAP — implementation sequence
@@ -640,7 +640,7 @@ sprint_plan:
 # High-risk attributes that require mandatory GEOX_BLOCK check
 # ---------------------------------------------------------------------------
 
-geox_block_triggers:
+GEOX_block_triggers:
   mandatory_well_tie_required:
     - instantaneous_frequency
     - sweetness
@@ -657,3 +657,4 @@ geox_block_triggers:
     - acoustic_impedance     # 888_HOLD — resource estimation
     - avo_gradient           # 888_HOLD — fluid discrimination for drilling
     - vp_vs_ratio            # 888_HOLD — elastic inversion for reserves
+

@@ -20,21 +20,21 @@
 ## What Was Removed
 
 ### 1. Duplicate MCP Servers
-- ❌ `geox_mcp_server.py` (root)
-- ❌ `arifos/geox/mcp_server.py`
-- ❌ `arifos/geox/mcp_server_hardened.py`
-- ✅ `geox/server.py` (canonical)
+- ❌ `GEOX_mcp_server.py` (root)
+- ❌ `arifos/GEOX/mcp_server.py`
+- ❌ `arifos/GEOX/mcp_server_hardened.py`
+- ✅ `GEOX/server.py` (canonical)
 
 ### 2. Scattered Schemas
-- ❌ `geox_mcp_schemas.py`
-- ❌ `geox_schemas.py`
-- ❌ `arifos/geox/schemas/`
-- ✅ Consolidated in `geox/core/tool_registry.py`
+- ❌ `GEOX_mcp_schemas.py`
+- ❌ `GEOX_schemas.py`
+- ❌ `arifos/GEOX/schemas/`
+- ✅ Consolidated in `GEOX/core/tool_registry.py`
 
 ### 3. Legacy Tools
-- ❌ `geox_interpret_single_line.py` — Too complex
-- ❌ `geox_digitize_well_log` — Scaffold only
-- ❌ `geox_georeference_map` — Preview quality
+- ❌ `GEOX_interpret_single_line.py` — Too complex
+- ❌ `GEOX_digitize_well_log` — Scaffold only
+- ❌ `GEOX_georeference_map` — Preview quality
 - ❌ 12 other legacy tool files
 - ✅ 7 essential tools only
 
@@ -47,7 +47,7 @@
 
 ### 5. Archive/Legacy
 - ❌ `archive/` — Moved to `_deprecated/`
-- ❌ `arifos/geox/apps/legacy_ratlas`
+- ❌ `arifos/GEOX/apps/legacy_ratlas`
 - ❌ Mock/example code
 - ✅ Only production-ready code remains
 
@@ -56,13 +56,13 @@
 ## What Remains: The Essential 7
 
 ### 7 Tools
-1. `geox_compute_ac_risk` — **THE CORE**
-2. `geox_load_seismic_line`
-3. `geox_build_structural_candidates`
-4. `geox_verify_geospatial`
-5. `geox_feasibility_check`
-6. `geox_evaluate_prospect`
-7. `geox_earth_signals`
+1. `GEOX_compute_ac_risk` — **THE CORE**
+2. `GEOX_load_seismic_line`
+3. `GEOX_build_structural_candidates`
+4. `GEOX_verify_geospatial`
+5. `GEOX_feasibility_check`
+6. `GEOX_evaluate_prospect`
+7. `GEOX_earth_signals`
 
 ### 4 MCP Apps
 1. **AC_Risk Console** — Flagship governance
@@ -81,7 +81,7 @@
 
 ```
 GEOX/
-├── geox/                       # ← Python package (canonical)
+├── GEOX/                       # ← Python package (canonical)
 │   ├── __init__.py
 │   ├── server.py              # ← ONE MCP server
 │   ├── core/
@@ -200,3 +200,4 @@ Essence Revealed:    Earth Intelligence through ToAC
 
 *Earth Intelligence: Revealed*
 *DITEMPA BUKAN DIBERI — Forged, Not Given*
+

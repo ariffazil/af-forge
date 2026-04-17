@@ -4,10 +4,10 @@ test_petrophysics_tools.py — Tests for GEOX Petrophysics Phase B Tools
 DITEMPA BUKAN DIBERI
 
 Tests for 4 MCP petrophysics tools:
-- geox_select_sw_model
-- geox_compute_petrophysics
-- geox_validate_cutoffs
-- geox_petrophysical_hold_check
+- GEOX_select_sw_model
+- GEOX_compute_petrophysics
+- GEOX_validate_cutoffs
+- GEOX_petrophysical_hold_check
 
 36 tests total: 9 per tool (4 tools × 9 = 36)
 """
@@ -23,11 +23,11 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from geox_mcp_server import (
-    geox_select_sw_model,
-    geox_compute_petrophysics,
-    geox_validate_cutoffs,
-    geox_petrophysical_hold_check,
+from GEOX_mcp_server import (
+    GEOX_select_sw_model,
+    GEOX_compute_petrophysics,
+    GEOX_validate_cutoffs,
+    GEOX_petrophysical_hold_check,
     IS_FASTMCP_3,
 )
 
@@ -65,24 +65,24 @@ def get_content(result):
 
 @pytest.fixture
 def sample_interval_uri() -> str:
-    return "geox://well/WELL-001/interval/1500.0-1600.0/rock-state"
+    return "GEOX://well/WELL-001/interval/1500.0-1600.0/rock-state"
 
 
 @pytest.fixture
 def uncalibrated_interval_uri() -> str:
-    return "geox://well/WELL-uncalibrated/interval/1500.0-1600.0/rock-state-uncalibrated"
+    return "GEOX://well/WELL-uncalibrated/interval/1500.0-1600.0/rock-state-uncalibrated"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# geox_select_sw_model Tests (9 tests)
+# GEOX_select_sw_model Tests (9 tests)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class TestSelectSwModel:
-    """Tests for geox_select_sw_model tool."""
+    """Tests for GEOX_select_sw_model tool."""
     
     async def _call(self, **kwargs) -> dict:
         """Helper to call the tool."""
-        return await geox_select_sw_model(**kwargs)
+        return await GEOX_select_sw_model(**kwargs)
     
     @pytest.mark.asyncio
     async def test_basic_call(self, sample_interval_uri: str):
@@ -162,15 +162,15 @@ class TestSelectSwModel:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# geox_compute_petrophysics Tests (9 tests)
+# GEOX_compute_petrophysics Tests (9 tests)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class TestComputePetrophysics:
-    """Tests for geox_compute_petrophysics tool."""
+    """Tests for GEOX_compute_petrophysics tool."""
     
     async def _call(self, **kwargs) -> dict:
         """Helper to call the tool."""
-        return await geox_compute_petrophysics(**kwargs)
+        return await GEOX_compute_petrophysics(**kwargs)
     
     @pytest.mark.asyncio
     async def test_basic_computation(self, sample_interval_uri: str):
@@ -273,15 +273,15 @@ class TestComputePetrophysics:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# geox_validate_cutoffs Tests (9 tests)
+# GEOX_validate_cutoffs Tests (9 tests)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class TestValidateCutoffs:
-    """Tests for geox_validate_cutoffs tool."""
+    """Tests for GEOX_validate_cutoffs tool."""
     
     async def _call(self, **kwargs) -> dict:
         """Helper to call the tool."""
-        return await geox_validate_cutoffs(**kwargs)
+        return await GEOX_validate_cutoffs(**kwargs)
     
     @pytest.mark.asyncio
     async def test_basic_validation(self, sample_interval_uri: str):
@@ -383,15 +383,15 @@ class TestValidateCutoffs:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# geox_petrophysical_hold_check Tests (9 tests)
+# GEOX_petrophysical_hold_check Tests (9 tests)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class TestPetrophysicalHoldCheck:
-    """Tests for geox_petrophysical_hold_check tool."""
+    """Tests for GEOX_petrophysical_hold_check tool."""
     
     async def _call(self, **kwargs) -> dict:
         """Helper to call the tool."""
-        return await geox_petrophysical_hold_check(**kwargs)
+        return await GEOX_petrophysical_hold_check(**kwargs)
     
     @pytest.mark.asyncio
     async def test_basic_check(self, sample_interval_uri: str):
@@ -477,14 +477,14 @@ class TestPetrophysicsWorkflow:
     async def test_full_workflow(self, sample_interval_uri: str):
         """Test the full petrophysics workflow."""
         # Step 1: Select saturation model
-        sw_result = await geox_select_sw_model(interval_uri=sample_interval_uri)
+        sw_result = await GEOX_select_sw_model(interval_uri=sample_interval_uri)
         sw_structured = get_structured_content(sw_result)
         assert "admissible_models" in sw_structured
         recommended_model = sw_structured["recommended_model"]
         
         # Step 2: Compute petrophysics with recommended model
         if recommended_model:
-            comp_result = await geox_compute_petrophysics(
+            comp_result = await GEOX_compute_petrophysics(
                 interval_uri=sample_interval_uri,
                 model_id=recommended_model
             )
@@ -492,7 +492,7 @@ class TestPetrophysicsWorkflow:
             assert comp_structured["verdict"] == "COMPUTED"
         
         # Step 3: Validate cutoffs
-        cutoff_result = await geox_validate_cutoffs(
+        cutoff_result = await GEOX_validate_cutoffs(
             interval_uri=sample_interval_uri,
             cutoff_policy_id="POLICY-001"
         )
@@ -500,10 +500,11 @@ class TestPetrophysicsWorkflow:
         assert cutoff_structured["status"] == "VALIDATED"
         
         # Step 4: Hold check
-        hold_result = await geox_petrophysical_hold_check(interval_uri=sample_interval_uri)
+        hold_result = await GEOX_petrophysical_hold_check(interval_uri=sample_interval_uri)
         hold_structured = get_structured_content(hold_result)
         assert hold_structured["status"] == "SUCCESS"
 
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+

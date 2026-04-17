@@ -8,20 +8,20 @@ rest of GEOX and the existing test suite.
 
 from __future__ import annotations
 
-from arifos.geox.governance.validator import (
+from arifos.GEOX.governance.validator import (
     AggregateVerdict,
     ValidationResult,
     _parse_range,
 )
-from arifos.geox.governance.validator import (
-    GeoXValidator as _GovernanceGeoXValidator,
+from arifos.GEOX.governance.validator import (
+    GEOXValidator as _GovernanceGEOXValidator,
 )
 
 # Backward-compatible alias for older imports.
 BatchValidationResult = AggregateVerdict
 
 
-class GeoXValidator(_GovernanceGeoXValidator):
+class GEOXValidator(_GovernanceGEOXValidator):
     """Compatibility wrapper for the governance validator public import."""
 
     def __init__(self, name: str = "default_validator", strict_mode: bool = False):
@@ -53,7 +53,8 @@ class GeoXValidator(_GovernanceGeoXValidator):
 __all__ = [
     "AggregateVerdict",
     "BatchValidationResult",
-    "GeoXValidator",
+    "GEOXValidator",
     "ValidationResult",
     "_parse_range",
 ]
+

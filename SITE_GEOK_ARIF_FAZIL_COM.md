@@ -1,4 +1,4 @@
-# geox.arif-fazil.com — Site Specification
+# GEOX.arif-fazil.com — Site Specification
 
 > **Status:** SPECIFICATION READY  
 > **Authority:** Muhammad Arif bin Fazil  
@@ -23,13 +23,13 @@
 **What it is:** Machine interface for AI agents
 **Who uses it:** Claude, Cursor, other AI systems
 **Format:** JSON schemas, tool definitions, structured I/O
-**Location:** `geox.arif-fazil.com/mcp/`
+**Location:** `GEOX.arif-fazil.com/mcp/`
 
 ### Apps
 **What it is:** Human operator interfaces
 **Who uses it:** Geoscientists, technicians, decision-makers
 **Format:** Web UI, interactive tools, visual outputs
-**Location:** `geox.arif-fazil.com/apps/`
+**Location:** `GEOX.arif-fazil.com/apps/`
 
 ### The Relationship
 ```
@@ -62,33 +62,33 @@
 ### Seismic Tools
 | Tool | Status | Description |
 |------|--------|-------------|
-| `geox_load_seismic_line` | ✅ Live | Load seismic + generate contrast views |
-| `geox_build_structural_candidates` | ✅ Live | Multi-model structural interpretation |
-| `geox_interpret_single_line` | ✅ Live | Full governed interpreter |
-| `geox_extract_seismic_views` | ✅ Live | Contrast canon view generation |
-| `geox_create_overlay` | ✅ Live | Fault/horizon overlay creation |
+| `GEOX_load_seismic_line` | ✅ Live | Load seismic + generate contrast views |
+| `GEOX_build_structural_candidates` | ✅ Live | Multi-model structural interpretation |
+| `GEOX_interpret_single_line` | ✅ Live | Full governed interpreter |
+| `GEOX_extract_seismic_views` | ✅ Live | Contrast canon view generation |
+| `GEOX_create_overlay` | ✅ Live | Fault/horizon overlay creation |
 
 ### Governance Tools
 | Tool | Status | Description |
 |------|--------|-------------|
-| `geox_feasibility_check` | ✅ Live | Physical feasibility validation |
-| `geox_verify_geospatial` | ✅ Live | Coordinate verification |
-| `geox_evaluate_prospect` | ✅ Live | Prospect verdict with AC_Risk |
+| `GEOX_feasibility_check` | ✅ Live | Physical feasibility validation |
+| `GEOX_verify_geospatial` | ✅ Live | Coordinate verification |
+| `GEOX_evaluate_prospect` | ✅ Live | Prospect verdict with AC_Risk |
 
 ### Petrophysics Tools (Phase B)
 | Tool | Status | Description |
 |------|--------|-------------|
-| `geox_select_sw_model` | 🟡 Partial | Saturation model selection |
-| `geox_compute_petrophysics` | 🟡 Partial | Vsh, φ, Sw computation |
-| `geox_validate_cutoffs` | 🟡 Partial | Net/pay cutoff validation |
-| `geox_petrophysical_hold_check` | 🟡 Partial | Automatic hold triggers |
+| `GEOX_select_sw_model` | 🟡 Partial | Saturation model selection |
+| `GEOX_compute_petrophysics` | 🟡 Partial | Vsh, φ, Sw computation |
+| `GEOX_validate_cutoffs` | 🟡 Partial | Net/pay cutoff validation |
+| `GEOX_petrophysical_hold_check` | 🟡 Partial | Automatic hold triggers |
 
 ### Vision Tools (New)
 | Tool | Status | Description |
 |------|--------|-------------|
-| `geox_georeference_map` | 🔴 Scaffold | Map georeferencing with AC_Risk |
-| `geox_digitize_analog` | 🔴 Planned | Analog log/chart digitization |
-| `geox_compute_ac_risk` | ✅ Live | AC_Risk calculation for any operation |
+| `GEOX_georeference_map` | 🔴 Scaffold | Map georeferencing with AC_Risk |
+| `GEOX_digitize_analog` | 🔴 Planned | Analog log/chart digitization |
+| `GEOX_compute_ac_risk` | ✅ Live | AC_Risk calculation for any operation |
 
 ---
 
@@ -96,13 +96,13 @@
 
 ### Volume App
 - **Status:** ✅ Functional
-- **Path:** `arifos/geox/apps/volume_app/`
+- **Path:** `arifos/GEOX/apps/volume_app/`
 - **Features:** 3D volume rendering, slice views, horizon/fault overlays
 - **Backend:** cigvis adapter
 
 ### Prefab Views
 - **Status:** ✅ Functional
-- **Path:** `arifos/geox/apps/prefab_views.py`
+- **Path:** `arifos/GEOX/apps/prefab_views.py`
 - **Features:** MCP host UIs (Claude Desktop, Cursor) for all tools
 - **Views:** 9 view types covering seismic, petrophysics, governance
 
@@ -112,7 +112,7 @@
 
 ### Navigation
 ```
-geox.arif-fazil.com
+GEOX.arif-fazil.com
 ├── /              (Hero + overview)
 ├── /apps          (Operator tools)
 ├── /mcp           (Machine interface)
@@ -234,46 +234,46 @@ Verdict Examples:
 **Tool Catalog**
 ```yaml
 Core Geospatial:
-  - geox_georeference_raster:
+  - GEOX_georeference_raster:
       input: image_path, claimed_bounds
       output: geotiff_path, gcp_list, ac_risk, verdict
   
-  - geox_detect_gcp_candidates:
+  - GEOX_detect_gcp_candidates:
       input: image_path
       output: candidate_points, ocr_confidence
 
 Petrophysics:
-  - geox_digitize_chart:
+  - GEOX_digitize_chart:
       input: image_path, chart_type
       output: traced_curves, uncertainty, ratlas_validation
   
-  - geox_compute_petrophysics:
+  - GEOX_compute_petrophysics:
       input: interval_uri, model_id
       output: vsh, phi_t, phi_e, sw, uncertainty_envelopes
 
 Seismic:
-  - geox_generate_contrast_canon:
+  - GEOX_generate_contrast_canon:
       input: seismic_image
       output: 5_contrast_views, transform_metadata
   
-  - geox_interpret_with_governance:
+  - GEOX_interpret_with_governance:
       input: seismic_image, interpretation_goal
       output: hypotheses, consistency_score, ac_risk, verdict
   
-  - geox_extract_attributes:
+  - GEOX_extract_attributes:
       input: seismic_data, attribute_list
       output: attribute_maps, source_attribution, risk_flags
 
 Governance:
-  - geox_compute_ac_risk:
+  - GEOX_compute_ac_risk:
       input: operation_type, transform_stack, evidence_quality
       output: ac_risk, verdict, explanation, mitigation_suggestions
   
-  - geox_emit_verdict:
+  - GEOX_emit_verdict:
       input: evidence_bundle, confidence
       output: seal/qualify/hold/void, 888_hold_triggers
   
-  - geox_get_transform_log:
+  - GEOX_get_transform_log:
       input: operation_id
       output: full_transform_chain, provenance
 ```
@@ -281,7 +281,7 @@ Governance:
 **Sample Agent Workflow**
 ```python
 # Example: Agent interprets seismic section
-result = await mcp.geox_generate_contrast_canon(
+result = await mcp.GEOX_generate_contrast_canon(
     seismic_image="section_001.png"
 )
 
@@ -290,7 +290,7 @@ for view in result.views:
     analysis = await agent.analyze(view.image)
 
 # Agent requests governed interpretation
-interpretation = await mcp.geox_interpret_with_governance(
+interpretation = await mcp.GEOX_interpret_with_governance(
     seismic_image="section_001.png",
     interpretation_goal="Identify faults and estimate throw"
 )
@@ -431,11 +431,11 @@ Hosting: Cloudflare Pages / Vercel / Netlify
 - CDN for global access
 - Free tier sufficient
 
-Domain: geox.arif-fazil.com
+Domain: GEOX.arif-fazil.com
 - CNAME to hosting provider
 - SSL automatic
 
-MCP Endpoint: geox.arif-fazil.com/mcp/v1/
+MCP Endpoint: GEOX.arif-fazil.com/mcp/v1/
 - FastMCP server
 - SSE or stdio transport
 - OpenAPI schema
@@ -471,7 +471,7 @@ Site content pulls from:
 - [ ] Set up Astro/Next.js project
 - [ ] Create page structure
 - [ ] Write homepage copy
-- [ ] Deploy to geox.arif-fazil.com
+- [ ] Deploy to GEOX.arif-fazil.com
 
 ### Week 2: MCP Documentation
 - [ ] Auto-generate tool schemas
@@ -495,3 +495,4 @@ Site content pulls from:
 
 *DITEMPA BUKAN DIBERI*  
 *The site is the trust surface. Make it honest.*
+

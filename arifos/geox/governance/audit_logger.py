@@ -220,3 +220,4 @@ def get_audit_logger() -> AuditLogger:
     if _global_logger is None:
         _global_logger = AuditLogger()
     return _global_logger
+

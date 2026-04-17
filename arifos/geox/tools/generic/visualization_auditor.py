@@ -305,7 +305,7 @@ determine if it can be trusted as a representation of physical data.
         
         # Determine if visual can be trusted
         can_trust = (
-            verdict.to_geox_verdict() != GEOX_HOLD and
+            verdict.to_GEOX_verdict() != GEOX_HOLD and
             risk_level in ("LOW", "MEDIUM") and
             anomalous_score < 3.0
         )
@@ -320,3 +320,4 @@ determine if it can be trusted as a representation of physical data.
             recommendations=metadata.get("recommendations", []),
             transform_chain=transforms,
         )
+

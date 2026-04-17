@@ -9,7 +9,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           geox.arif-fazil.com                               │
+│                           GEOX.arif-fazil.com                               │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
@@ -124,31 +124,31 @@ NAVIGATION: / | /apps | /mcp | /theory | /docs
 │  ├─────────────────────────────────────────────────────────────────────┤   │
 │  │                                                                      │   │
 │  │ Core Geospatial:                                                     │   │
-│  │   geox_georeference_raster     🟡 SCAFFOLD                           │   │
-│  │   geox_detect_gcp_candidates   🟡 SCAFFOLD                           │   │
+│  │   GEOX_georeference_raster     🟡 SCAFFOLD                           │   │
+│  │   GEOX_detect_gcp_candidates   🟡 SCAFFOLD                           │   │
 │  │                                                                      │   │
 │  │ Seismic:                                                             │   │
-│  │   geox_load_seismic_line       ✅ LIVE                               │   │
-│  │   geox_build_structural_       ✅ LIVE                               │   │
+│  │   GEOX_load_seismic_line       ✅ LIVE                               │   │
+│  │   GEOX_build_structural_       ✅ LIVE                               │   │
 │  │            candidates                                                │   │
-│  │   geox_interpret_single_line   🟡 SCAFFOLD                           │   │
-│  │   geox_generate_contrast_canon ✅ LIVE                               │   │
+│  │   GEOX_interpret_single_line   🟡 SCAFFOLD                           │   │
+│  │   GEOX_generate_contrast_canon ✅ LIVE                               │   │
 │  │                                                                      │   │
 │  │ Governance:                                                          │   │
-│  │   geox_compute_ac_risk         ✅ LIVE                               │   │
-│  │   geox_emit_verdict            ✅ LIVE                               │   │
-│  │   geox_get_transform_log       ✅ LIVE                               │   │
+│  │   GEOX_compute_ac_risk         ✅ LIVE                               │   │
+│  │   GEOX_emit_verdict            ✅ LIVE                               │   │
+│  │   GEOX_get_transform_log       ✅ LIVE                               │   │
 │  │                                                                      │   │
 │  │ Petrophysics:                                                        │   │
-│  │   geox_digitize_chart          🔴 PLANNED                            │   │
-│  │   geox_compute_petrophysics    🟡 BETA                               │   │
+│  │   GEOX_digitize_chart          🔴 PLANNED                            │   │
+│  │   GEOX_compute_petrophysics    🟡 BETA                               │   │
 │  │                                                                      │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │ SAMPLE WORKFLOW                                                      │   │
 │  │                                                                      │   │
-│  │  result = await mcp.geox_load_seismic_line(                          │   │
+│  │  result = await mcp.GEOX_load_seismic_line(                          │   │
 │  │      line_id="MB-001"                                                │   │
 │  │  )                                                                   │   │
 │  │                                                                      │   │
@@ -261,3 +261,4 @@ NAVIGATION: / | /apps | /mcp | /theory | /docs
 ---
 
 *Visual reference complete. Use for implementation.*
+

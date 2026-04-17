@@ -334,19 +334,19 @@ server.tool("forge_remember", "Store memory.", { content: z.string(), reason: z.
 // ── Domain Tools (Tier 02/03) ────────────────────────────────────────────────
 
 // GEOX
-server.tool("geox_check_hazard", "Check physical hazard risk.", { location: z.string().optional() }, async (args) => {
+server.tool("GEOX_check_hazard", "Check physical hazard risk.", { location: z.string().optional() }, async (args) => {
   const tool = new GEOX_TOOLS[0]();
   const res = await tool.run(args, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
   return { content: [{ type: "text" as const, text: resultAsJson(res.output) }] };
 });
 
-server.tool("geox_subsurface_model", "Compute subsurface model.", { depth: z.number(), formation_type: z.string().optional() }, async (args) => {
+server.tool("GEOX_subsurface_model", "Compute subsurface model.", { depth: z.number(), formation_type: z.string().optional() }, async (args) => {
   const tool = new GEOX_TOOLS[1]();
   const res = await tool.run(args, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
   return { content: [{ type: "text" as const, text: resultAsJson(res.output) }] };
 });
 
-server.tool("geox_prospect_score", "Score geological prospect.", { latitude: z.number(), longitude: z.number(), trap_type: z.string().optional() }, async (args) => {
+server.tool("GEOX_prospect_score", "Score geological prospect.", { latitude: z.number(), longitude: z.number(), trap_type: z.string().optional() }, async (args) => {
   const tool = new GEOX_TOOLS[3]();
   const res = await tool.run(args, { sessionId: "mcp", workingDirectory: "/tmp", modeName: "internal_mode" });
   return { content: [{ type: "text" as const, text: resultAsJson(res.output) }] };
@@ -392,5 +392,6 @@ server.resource("forge://memory/working", "forge://memory/working", { mimeType: 
     }]
   };
 });
+
 
 

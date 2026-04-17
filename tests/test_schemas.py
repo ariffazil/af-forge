@@ -2,7 +2,7 @@
 GEOX Schema Tests
 DITEMPA BUKAN DIBERI
 
-Full pytest test suite for geox_schemas.py — all Pydantic v2 models,
+Full pytest test suite for GEOX_schemas.py — all Pydantic v2 models,
 field validators, model validators, and the export_json_schemas() utility.
 """
 
@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 import pytest
 from pydantic import ValidationError
 
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.GEOX_schemas import (
     CoordinatePoint,
     GeoPrediction,
     GeoInsight,
@@ -705,7 +705,7 @@ class TestExportJsonSchemas:
         "AttributeStack",
         "GeoRequest",
         "GeoResponse",
-        "GeoxMcpEnvelope",
+        "GEOXMcpEnvelope",
     }
 
     def test_returns_dict(self):
@@ -744,3 +744,4 @@ class TestExportJsonSchemas:
         gr_schema = schemas["GeoResponse"]
         props = gr_schema.get("properties", {})
         assert "verdict" in props
+

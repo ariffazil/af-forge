@@ -37,7 +37,7 @@ except ImportError:
     HAS_LASIO = False
     warnings.warn("lasio not installed — run: pip install lasio")
 
-from arifos.geox.init_000_anchor import (
+from arifos.GEOX.init_000_anchor import (
     GEOX_VERSION,
     ARIFOS_VERSION,
     INIT_ANCHOR_VERSION,
@@ -119,7 +119,7 @@ class InterpretationReport:
     n_points: int
     n_valid: int
     timestamp: str
-    geox_version: str
+    GEOX_version: str
     arifos_version: str
 
     # Input curves found
@@ -210,7 +210,7 @@ def interpret_las(
         (derived_curves_dict, InterpretationReport)
     """
     # Use WellLogConstants defaults for regional calibration
-    from arifos.geox.init_000_anchor import WellLogConstants as _WC
+    from arifos.GEOX.init_000_anchor import WellLogConstants as _WC
     _wcc = _WC()
     if matrix_density == 2.65:
         matrix_density = _wcc.RHO_MATRIX_SANDSTONE
@@ -461,7 +461,7 @@ def interpret_las(
     curve_stats = {name: stats(derived[name]) for name in all_curves}
 
     # Compute 888_HOLD triggers (constitutional compliance)
-    from arifos.geox.init_000_anchor import HOLD_TRIGGERS as _HT
+    from arifos.GEOX.init_000_anchor import HOLD_TRIGGERS as _HT
     hold_triggers: list[str] = []
     if valid_count == 0:
         hold_triggers.append(_HT["zero_well_control"])
@@ -484,7 +484,7 @@ def interpret_las(
         n_points=n,
         n_valid=valid_count,
         timestamp=time.strftime('%Y-%m-%dT%H:%M:%SZ'),
-        geox_version=GEOX_VERSION,
+        GEOX_version=GEOX_VERSION,
         arifos_version=ARIFOS_VERSION,
         input_curves=[c.mnemonic for c in las.curves],
         curves_used=curve_map,
@@ -787,3 +787,4 @@ if __name__ == '__main__':
         sys.exit(1)
 
     run_server(port)
+

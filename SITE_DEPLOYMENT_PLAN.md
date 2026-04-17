@@ -13,7 +13,7 @@
 
 External actions required (held):
 - [ ] Git push to main
-- [ ] DNS verification (geox.arif-fazil.com)
+- [ ] DNS verification (GEOX.arif-fazil.com)
 - [ ] Hosting deployment
 - [ ] SSL certificate
 - [ ] Macrostrat API key (if needed)
@@ -29,7 +29,7 @@ External actions required (held):
 ## Site Map: Verified Routes Only
 
 ```
-geox.arif-fazil.com
+GEOX.arif-fazil.com
 │
 ├── /                           [REQUIRED - Hero + truth table]
 │   ├── Hero: "GEOX is governed geospatial intelligence"
@@ -103,17 +103,17 @@ Every element maps to ONE of four states:
 | Element | Status | Evidence | Truth Verified? |
 |---------|--------|----------|-----------------|
 | Tool catalog | LIVE | Tools exist in codebase | ✅ Yes |
-| `geox_load_seismic_line` | LIVE | mcp_server.py | ✅ Yes |
-| `geox_build_structural_candidates` | LIVE | mcp_server.py | ✅ Yes |
-| `geox_interpret_single_line` | SCAFFOLD | Mock VLM backend | 🟡 Partial |
-| `geox_compute_ac_risk` | LIVE | ac_risk.py tested | ✅ Yes |
-| `geox_georeference_map` | SCAFFOLD | Basic tool exists | 🟡 Partial |
-| `geox_digitize_analog` | PLANNED | Architecture only | 🔴 No |
+| `GEOX_load_seismic_line` | LIVE | mcp_server.py | ✅ Yes |
+| `GEOX_build_structural_candidates` | LIVE | mcp_server.py | ✅ Yes |
+| `GEOX_interpret_single_line` | SCAFFOLD | Mock VLM backend | 🟡 Partial |
+| `GEOX_compute_ac_risk` | LIVE | ac_risk.py tested | ✅ Yes |
+| `GEOX_georeference_map` | SCAFFOLD | Basic tool exists | 🟡 Partial |
+| `GEOX_digitize_analog` | PLANNED | Architecture only | 🔴 No |
 | Sample workflows | LIVE | Can demonstrate | ✅ Yes |
 | Auth instructions | LIVE | Standard MCP | ✅ Yes |
 
-**Action:** Mark `geox_interpret_single_line` as SCAFFOLD (mock backend).  
-**Action:** Mark `geox_digitize_analog` as PLANNED (not clickable).
+**Action:** Mark `GEOX_interpret_single_line` as SCAFFOLD (mock backend).  
+**Action:** Mark `GEOX_digitize_analog` as PLANNED (not clickable).
 
 ---
 
@@ -211,7 +211,7 @@ NOT Claimed:
 ### Visual Separation
 ```css
 /* Clear visual distinction */
-.geox-tools { border: 2px solid #D4AF37; } /* GEOX gold */
+.GEOX-tools { border: 2px solid #D4AF37; } /* GEOX gold */
 .macrostrat-context { border: 1px solid #666; opacity: 0.9; }
 .context-label { font-size: 0.8em; color: #666; }
 ```
@@ -398,17 +398,17 @@ curl http://localhost:3000/docs
     <th>Status</th>
   </tr>
   <tr>
-    <td><code>geox_load_seismic_line</code></td>
+    <td><code>GEOX_load_seismic_line</code></td>
     <td>Load seismic + contrast views</td>
     <td><span class="badge live">LIVE</span></td>
   </tr>
   <tr>
-    <td><code>geox_compute_ac_risk</code></td>
+    <td><code>GEOX_compute_ac_risk</code></td>
     <td>Calculate Anomalous Contrast Risk</td>
     <td><span class="badge live">LIVE</span></td>
   </tr>
   <tr>
-    <td><code>geox_georeference_map</code></td>
+    <td><code>GEOX_georeference_map</code></td>
     <td>Map georeferencing with governance</td>
     <td><span class="badge scaffold">SCAFFOLD</span></td>
   </tr>
@@ -416,7 +416,7 @@ curl http://localhost:3000/docs
 
 <h2>Sample Workflow</h2>
 <pre><code>
-result = await mcp.geox_load_seismic_line(
+result = await mcp.GEOX_load_seismic_line(
     line_id="MB-001",
     survey_path="malay_basin/"
 )
@@ -500,3 +500,4 @@ npm run deploy
 
 *DITEMPA BUKAN DIBERI*  
 *Plan is forged. Execution is held. Release when ready.*
+

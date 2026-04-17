@@ -194,7 +194,7 @@ vault:      writes arifos_vault.wealth.transactions
 
 **Role:** Subsurface evidence, petrophysics, spatial validation, anomaly contrast
 **Runtime:** Python / FastMCP
-**Host path:** `/root/geox/geox/geox_mcp/fastmcp_server.py`
+**Host path:** `/root/GEOX/GEOX/GEOX_mcp/fastmcp_server.py`
 **Vault path:** DELEGATES to arifOS (`arifos_vault`)
 
 ### INIT (delegated)
@@ -216,15 +216,15 @@ GEOX never writes to vault_events directly.
 
 | Tool | Purpose | Key Args |
 |------|---------|----------|
-| `geox_well_load_bundle` | Load LAS/DLIS well logs | `well_id` |
-| `geox_well_qc_logs` | QC on loaded logs | `well_id` |
-| `geox_well_compute_petrophysics` | Sw, Vsh, porosity | `well_id`, `volume_id` |
-| `geox_seismic_load_line` | Load seismic line | `line_id` |
-| `geox_earth3d_load_volume` | Load 3D seismic volume | `volume_id` |
-| `geox_earth3d_interpret_horizons` | Horizon picking | `volume_id`, `mode` |
-| `geox_prospect_evaluate` | Hydrocarbon potential | `prospect_id`, `ac_risk_score` |
-| `geox_cross_summarize_evidence` | Causal evidence synthesis | `prospect_id` |
-| `geox_time4d_verify_timing` | Trap-charge timing | `prospect_id`, `trap_ma`, `charge_ma` |
+| `GEOX_well_load_bundle` | Load LAS/DLIS well logs | `well_id` |
+| `GEOX_well_qc_logs` | QC on loaded logs | `well_id` |
+| `GEOX_well_compute_petrophysics` | Sw, Vsh, porosity | `well_id`, `volume_id` |
+| `GEOX_seismic_load_line` | Load seismic line | `line_id` |
+| `GEOX_earth3d_load_volume` | Load 3D seismic volume | `volume_id` |
+| `GEOX_earth3d_interpret_horizons` | Horizon picking | `volume_id`, `mode` |
+| `GEOX_prospect_evaluate` | Hydrocarbon potential | `prospect_id`, `ac_risk_score` |
+| `GEOX_cross_summarize_evidence` | Causal evidence synthesis | `prospect_id` |
+| `GEOX_time4d_verify_timing` | Trap-charge timing | `prospect_id`, `trap_ma`, `charge_ma` |
 | `arifos_compute_risk` | AC_Risk formula (W_Risk) | `u_phys`, `transform_stack` |
 | `arifos_judge_prospect` | Constitutional verdict | `u_phys`, `transform_stack`, `truth_score` |
 | `arifos_check_hold` | 888_HOLD gate | `action`, `risk_class` |
@@ -321,5 +321,6 @@ For every consecutive pair (N, N+1) in vault_events ordered by id:
 ---
 
 *DITEMPA BUKAN DIBERI — 999 SEAL ALIVE*
+
 
 

@@ -302,3 +302,4 @@ GEOX is a governed, agentic geological intelligence coprocessor for arifOS. The 
 ---
 
 *GEOX Command Center Design Specification v1.0*
+

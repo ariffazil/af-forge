@@ -16,15 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.0] — 2026-04-09
 ### Added
-- **Modular Architecture**: Complete refactor into modular `arifos.geox` namespace.
-- **Phase B Petrophysics**: 4 new tools (`geox_calculate_saturation`, `geox_select_sw_model`, `geox_compute_petrophysics`, `geox_validate_cutoffs`).
+- **Modular Architecture**: Complete refactor into modular `arifos.GEOX` namespace.
+- **Phase B Petrophysics**: 4 new tools (`GEOX_calculate_saturation`, `GEOX_select_sw_model`, `GEOX_compute_petrophysics`, `GEOX_validate_cutoffs`).
 - **9 Prefab UI Views**: Interactive views for Seismic, Structural, Feasibility, and Petrophysics.
 - **37 Tests**: Comprehensive test suite for petrophysics logic and schema validation.
 - **App Manifest & Event Contracts**: Standardized Pydantic schemas for discovery and interaction.
 - **OpenAI Adapter Blueprint**: Scaffold for ChatGPT Apps integration.
 
 ### Changed
-- **geox_mcp_server.py**: Now a thin backward-compatible wrapper.
+- **GEOX_mcp_server.py**: Now a thin backward-compatible wrapper.
 - **Tool Outputs**: Standardized on `{ "_view": ..., **data }` dual-mode format.
 - **Wiki**: Updated to v0.5.0 standard with refined orchestration prompts.
 
@@ -36,3 +36,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 *DITEMPA BUKAN DIBERI — 999 SEAL ALIVE*
+

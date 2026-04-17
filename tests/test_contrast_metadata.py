@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import pytest
 
-from arifos.geox.tools.contrast_metadata import (
+from arifos.GEOX.tools.contrast_metadata import (
     ConfidenceClass,
     ContrastMetadata,
     ContrastSourceDomain,
@@ -356,3 +356,4 @@ class TestFactoryHelpers:
             proxy_name="seismic_texture",
         )
         assert cm.confidence_class.anomalous_contrast_risk == "medium"
+

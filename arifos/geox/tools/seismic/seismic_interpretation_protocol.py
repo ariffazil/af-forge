@@ -379,3 +379,4 @@ class SeismicInterpretationProtocol:
                 "success": self.state == ProtocolState.COMPLETE,
             },
         }
+

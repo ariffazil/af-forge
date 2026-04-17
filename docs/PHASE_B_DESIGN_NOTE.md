@@ -81,25 +81,25 @@ Phase B implements the **physics engine** and **human cockpit** for governed pet
 
 | User Action | MCP Call | Resource Update |
 |-------------|----------|-----------------|
-| Open well | `geox_load_well_log_bundle` | `las/bundle` |
+| Open well | `GEOX_load_well_log_bundle` | `las/bundle` |
 | Switch to Observed mode | — | Display `las/bundle` or `logs/canonical` |
 | Pick interval (top-base) | — | Subscribe to `interval/{t}-{b}/rock-state` |
-| Click "Select Model" | `geox_select_sw_model` | Returns admissible models |
+| Click "Select Model" | `GEOX_select_sw_model` | Returns admissible models |
 | Adjust Archie m=2.2 | — | Local state, preview only |
-| Click "Compute" | `geox_compute_petrophysics` | Updates `rock-state` resource |
-| Switch to Governance mode | `geox_validate_cutoffs` | Applies `cutoff-policy` |
-| Click "Check Hold" | `geox_petrophysical_hold_check` | Returns verdict |
+| Click "Compute" | `GEOX_compute_petrophysics` | Updates `rock-state` resource |
+| Switch to Governance mode | `GEOX_validate_cutoffs` | Applies `cutoff-policy` |
+| Click "Check Hold" | `GEOX_petrophysical_hold_check` | Returns verdict |
 
 ---
 
 ## 3. Petrophysics Tool Semantics
 
-### 3.1 `geox_select_sw_model`
+### 3.1 `GEOX_select_sw_model`
 
 **Purpose:** Evaluate which saturation models are physically admissible for this rock.
 
 **Input:**
-- `interval_uri`: `geox://well/{id}/interval/{top}-{base}/rock-state`
+- `interval_uri`: `GEOX://well/{id}/interval/{top}-{base}/rock-state`
 - `candidate_models`: ["archie", "simandoux", "indonesia", "dual_water"]
 
 **Logic:**
@@ -133,7 +133,7 @@ for model in candidates:
 
 **F2 Truth:** Rejected models must explain why.
 
-### 3.2 `geox_compute_petrophysics`
+### 3.2 `GEOX_compute_petrophysics`
 
 **Purpose:** Calculate Vsh, φ, Sw, permeability with uncertainty propagation.
 
@@ -173,7 +173,7 @@ for model in candidates:
 
 **F7 Humility:** Every derived quantity has confidence interval. Point estimates rejected.
 
-### 3.3 `geox_validate_cutoffs`
+### 3.3 `GEOX_validate_cutoffs`
 
 **Purpose:** Apply economic/policy cutoffs to classify net reservoir / net pay.
 
@@ -227,7 +227,7 @@ false_negative_risk = estimate_fn_risk(state, policy)
 
 **F2 Truth:** Cutoffs are policy decisions with economic basis, not physical laws.
 
-### 3.4 `geox_petrophysical_hold_check`
+### 3.4 `GEOX_petrophysical_hold_check`
 
 **Purpose:** Constitutional validation before SEAL.
 
@@ -265,8 +265,8 @@ false_negative_risk = estimate_fn_risk(state, policy)
 
 ### 4.1 @RIF (Reasoning)
 
-- Calls `geox_select_sw_model` to understand model options
-- Calls `geox_compute_petrophysics` to test hypotheses
+- Calls `GEOX_select_sw_model` to understand model options
+- Calls `GEOX_compute_petrophysics` to test hypotheses
 - Receives `RockFluidState` with uncertainty for reasoning
 
 ### 4.2 @WEALTH (Economics)
@@ -304,9 +304,9 @@ false_negative_risk = estimate_fn_risk(state, policy)
 
 **From Phase A (SEALED):**
 - ✅ `WellLogCurve`, `LogBundle` schemas
-- ✅ `geox://well/{id}/las/bundle` resource
-- ✅ `geox_load_well_log_bundle` tool
-- ✅ `geox_qc_logs` tool
+- ✅ `GEOX://well/{id}/las/bundle` resource
+- ✅ `GEOX_load_well_log_bundle` tool
+- ✅ `GEOX_qc_logs` tool
 
 **New for Phase B:**
 - Physics engine: saturation models, mixing laws
@@ -339,28 +339,28 @@ false_negative_risk = estimate_fn_risk(state, policy)
 ### MCP Resource Flow
 
 ```
-geox_load_well_log_bundle ──► las/bundle ──► Display (Observed mode)
+GEOX_load_well_log_bundle ──► las/bundle ──► Display (Observed mode)
                                     │
                                     ▼
-geox_qc_logs ──► qc/report ──► QC badges
+GEOX_qc_logs ──► qc/report ──► QC badges
                                     │
                                     ▼
 User picks interval ──► Subscribe to interval/{t}-{b}/rock-state
                                     │
                                     ▼
-geox_select_sw_model ◄─── las/bundle data
+GEOX_select_sw_model ◄─── las/bundle data
         │
         ▼
-User selects model ──► geox_compute_petrophysics
+User selects model ──► GEOX_compute_petrophysics
                           │
                           ▼
                    Updates rock-state (DERIVED)
                           │
                           ▼
-User switches mode ──► geox_validate_cutoffs ──► POLICY overlay
+User switches mode ──► GEOX_validate_cutoffs ──► POLICY overlay
                           │
                           ▼
-geox_petrophysical_hold_check ◄─── All above
+GEOX_petrophysical_hold_check ◄─── All above
         │
         ▼
    SEAL / QUALIFY / 888_HOLD
@@ -375,3 +375,4 @@ geox_petrophysical_hold_check ◄─── All above
 | F7 | Uncertainty bands mandatory, point estimates rejected |
 | F9 | Rw calibration required, no assumed values for SEAL |
 | F13 | 888_HOLD with explicit triggers, human override available |
+

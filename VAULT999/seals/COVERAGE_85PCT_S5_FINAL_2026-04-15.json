@@ -63,7 +63,7 @@ Budget status injected into `shortTermMemory` as `[333_MIND] Thermodynamic budge
 
 ---
 
-### R4: GEOXTool #2 — `geox_subsurface_model` ✅
+### R4: GEOXTool #2 — `GEOX_subsurface_model` ✅
 
 **File:** `src/tools/GEOXTools.ts` — now exports `GEOXCheckHazardTool` + `GEOXSubsurfaceModelTool`
 
@@ -166,8 +166,8 @@ This is the WEALTH tool that was the missing piece to hit 85%.
 | `apply_patches` | ApplyPatchesTool | guarded | arifOS |
 | `run_tests` | RunTestsTool | guarded | arifOS |
 | `run_command` | RunCommandTool | dangerous | arifOS |
-| **`geox_check_hazard`** | GEOXCheckHazardTool | guarded | **GEOX** |
-| **`geox_subsurface_model`** | GEOXSubsurfaceModelTool | guarded | **GEOX** |
+| **`GEOX_check_hazard`** | GEOXCheckHazardTool | guarded | **GEOX** |
+| **`GEOX_subsurface_model`** | GEOXSubsurfaceModelTool | guarded | **GEOX** |
 | **`wealth_evaluate_ROI`** | WealthEvaluateROITool | guarded | **WEALTH** |
 | **`wealth_compute_EMV`** | WealthComputeEMVTool | guarded | **WEALTH** |
 | **`wealth_thermodynamic_scan`** | WealthThermodynamicScanTool | guarded | **WEALTH** |
@@ -186,8 +186,8 @@ This is the WEALTH tool that was the missing piece to hit 85%.
 | `forge_remember` | 999_VAULT | — |
 | `forge_recall` | 999_VAULT | — |
 | `forge_ticket_status` | 888_JUDGE | — |
-| `geox_check_hazard` | 333_MIND | — |
-| `geox_subsurface_model` | 333_MIND | **NEW** |
+| `GEOX_check_hazard` | 333_MIND | — |
+| `GEOX_subsurface_model` | 333_MIND | **NEW** |
 | `wealth_evaluate_ROI` | 777_FORGE | — |
 | `wealth_thermodynamic_scan` | 777_FORGE | **NEW** |
 
@@ -260,4 +260,5 @@ This seal certifies that R1-R8 were completed in order, all 139 tests pass, buil
 **BUILD:** zero TS errors
 **DOCKER:** A-FORGE-bridge rebuilt
 **MOTTO:** *Ditempa Bukan Diberi* — Forged, Not Given
+
 

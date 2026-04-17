@@ -6,14 +6,14 @@
  */
 
 import {
-  GeoXEventBus,
+  GEOXEventBus,
   EventType,
   createInlineBus,
   createExternalBus,
   type AppInitializePayload,
   type HostCapabilities,
   type SecurityContext,
-  type GeoXEvent,
+  type GEOXEvent,
 } from './event_bus';
 
 /** App configuration */
@@ -58,8 +58,8 @@ export interface AppState {
  * - Tool calling
  * - Telemetry
  */
-export class GeoXAppRuntime {
-  private bus: GeoXEventBus;
+export class GEOXAppRuntime {
+  private bus: GEOXEventBus;
   private config: AppConfig;
   private state: AppState;
   private unsubs: (() => void)[] = [];
@@ -70,7 +70,7 @@ export class GeoXAppRuntime {
    * @param config - App configuration
    * @param bus - Optional event bus (creates default if not provided)
    */
-  constructor(config: AppConfig, bus?: GeoXEventBus) {
+  constructor(config: AppConfig, bus?: GEOXEventBus) {
     this.config = config;
     this.bus = bus || this.createDefaultBus();
     
@@ -89,7 +89,7 @@ export class GeoXAppRuntime {
   /**
    * Create the default event bus based on runtime environment.
    */
-  private createDefaultBus(): GeoXEventBus {
+  private createDefaultBus(): GEOXEventBus {
     // Detect if we're in an iframe (inline) or popup (external)
     const isIframe = window.parent !== window;
     
@@ -133,7 +133,7 @@ export class GeoXAppRuntime {
   /**
    * Handle initialization event from host.
    */
-  private handleInitialize(event: GeoXEvent<AppInitializePayload>): void {
+  private handleInitialize(event: GEOXEvent<AppInitializePayload>): void {
     const payload = event.payload;
     
     this.state = {
@@ -148,7 +148,7 @@ export class GeoXAppRuntime {
     // Validate capabilities
     const missingCapabilities = this.validateCapabilities(payload.hostCapabilities);
     if (missingCapabilities.length > 0) {
-      console.warn('[GeoXAppRuntime] Missing capabilities:', missingCapabilities);
+      console.warn('[GEOXAppRuntime] Missing capabilities:', missingCapabilities);
       this.reportError('capability_missing', { capabilities: missingCapabilities });
     }
 
@@ -162,7 +162,7 @@ export class GeoXAppRuntime {
   /**
    * Handle context patch from host.
    */
-  private handleContextPatch(event: GeoXEvent): void {
+  private handleContextPatch(event: GEOXEvent): void {
     if (typeof event.payload === 'object' && event.payload !== null) {
       this.state.data = {
         ...this.state.data,
@@ -175,7 +175,7 @@ export class GeoXAppRuntime {
   /**
    * Handle state sync request.
    */
-  private handleStateSync(event: GeoXEvent): void {
+  private handleStateSync(event: GEOXEvent): void {
     this.syncState();
   }
 
@@ -213,7 +213,7 @@ export class GeoXAppRuntime {
   /**
    * Get the event bus.
    */
-  getBus(): GeoXEventBus {
+  getBus(): GEOXEventBus {
     return this.bus;
   }
 
@@ -287,7 +287,7 @@ export class GeoXAppRuntime {
    * Override in subclass.
    */
   protected onInitialized(): void {
-    console.log('[GeoXAppRuntime] Initialized:', this.config.appId);
+    console.log('[GEOXAppRuntime] Initialized:', this.config.appId);
   }
 
   /**
@@ -320,3 +320,4 @@ export class GeoXAppRuntime {
     this.bus.destroy();
   }
 }
+

@@ -1,5 +1,5 @@
 """
-arifos/geox/tools/seismic_attributes_2d.py — 2D Single-Line Seismic Analysis Tool
+arifos/GEOX/tools/seismic_attributes_2d.py — 2D Single-Line Seismic Analysis Tool
 DITEMPA BUKAN DIBERI
 
 Plane 2 — Perception Layer: Single 2D seismic line workflow for Subsurface Forge.
@@ -30,20 +30,20 @@ from typing import Any
 
 import numpy as np
 
-from arifos.geox.base_tool import (
+from arifos.GEOX.base_tool import (
     BaseTool,
     GeoToolResult,
     _make_provenance,
     _make_quantity,
 )
-from arifos.geox.geox_schemas import CoordinatePoint
-from arifos.geox.seismic_attribute_taxonomy import (
+from arifos.GEOX.GEOX_schemas import CoordinatePoint
+from arifos.GEOX.seismic_attribute_taxonomy import (
     SEISMIC_ATTRIBUTES,
     get_governance_flags,
     is_high_contrast_risk,
 )
 
-logger = logging.getLogger("geox.tools.seismic_attributes_2d")
+logger = logging.getLogger("GEOX.tools.seismic_attributes_2d")
 
 
 class Line2DVerdict(str, Enum):
@@ -683,3 +683,4 @@ class SeismicAttributes2DTool(BaseTool):
             latency_ms=round(latency_ms, 2),
             success=True,
         )
+

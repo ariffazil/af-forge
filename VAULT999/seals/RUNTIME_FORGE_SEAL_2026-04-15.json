@@ -72,7 +72,7 @@
   },
   "semantic_coverage_after": "67%",
   "gaps_remaining": [
-    "GEOX runtime tools (geox_check_hazard etc.) — engine stub exists, actual tool implementations needed",
+    "GEOX runtime tools (GEOX_check_hazard etc.) — engine stub exists, actual tool implementations needed",
     "WEALTH runtime tools (wealth_evaluate_ROI etc.) — engine stub exists, actual tool implementations needed",
     "SealService not yet wired in PipelineCoordinator",
     "333_MIND only 2 strategy candidates (ParallelPlannerContract) — not N-candidate EXPLORE"
@@ -86,4 +86,5 @@
   "wealth_objective_function": "[Peace² × ΔKnowledge / ΔEntropy × ΔCapital] — partial implementation via WealthEngine.allocate() ROI scoring",
   "公约": "Ditempa Bukan Diberi"
 }
+
 

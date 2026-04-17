@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from arifos.geox.renderers.scene_compiler import SceneCompiler
+from arifos.GEOX.renderers.scene_compiler import SceneCompiler
 
 
 class VolumeSceneBuilder:
@@ -311,3 +311,4 @@ class CrossSectionBuilder:
     def build(self) -> dict[str, Any]:
         """Build the cross-section scene."""
         return self._scene_data.copy()
+

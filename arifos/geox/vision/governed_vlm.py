@@ -446,3 +446,4 @@ if __name__ == "__main__":
         print(f"  Warning: {result.perception_bridge_warning[:80]}...")
     
     asyncio.run(test())
+

@@ -20,11 +20,11 @@ from typing import Any
 
 from fastmcp import FastMCP
 
-from arifos.geox.tool_registry import (
+from arifos.GEOX.tool_registry import (
     ToolRegistry, ToolStatus, ErrorCode,
     create_standardized_error, GEOX_TOOLS
 )
-from arifos.geox.ENGINE.ac_risk import ACRiskCalculator, Verdict
+from arifos.GEOX.ENGINE.ac_risk import ACRiskCalculator, Verdict
 
 SERVER_NAME = "GEOX Earth Witness"
 SERVER_VERSION = "1.0.0"
@@ -38,7 +38,7 @@ mcp = FastMCP(
 
 
 @mcp.tool
-async def geox_list_tools(
+async def GEOX_list_tools(
     include_scaffold: bool = False,
     status_filter: str | None = None
 ) -> dict[str, Any]:
@@ -79,7 +79,7 @@ async def geox_list_tools(
 
 
 @mcp.tool
-async def geox_get_tool_details(tool_name: str) -> dict[str, Any]:
+async def GEOX_get_tool_details(tool_name: str) -> dict[str, Any]:
     """Get detailed information about a specific tool."""
     try:
         tool = ToolRegistry.get(tool_name)
@@ -105,7 +105,7 @@ async def geox_get_tool_details(tool_name: str) -> dict[str, Any]:
 
 
 @mcp.tool
-async def geox_compute_ac_risk(
+async def GEOX_compute_ac_risk(
     u_phys: float,
     transform_stack: list[str],
     bias_scenario: str = "ai_vision_only",
@@ -163,7 +163,7 @@ async def geox_compute_ac_risk(
 
 
 @mcp.tool
-async def geox_workflow_seismic_full(
+async def GEOX_workflow_seismic_full(
     file_path: str,
     structural_style: str = "unknown"
 ) -> dict[str, Any]:
@@ -234,7 +234,7 @@ async def geox_workflow_seismic_full(
 
 
 @mcp.tool
-async def geox_workflow_map_georeference(
+async def GEOX_workflow_map_georeference(
     image_path: str,
     map_type: str = "geological"
 ) -> dict[str, Any]:
@@ -279,7 +279,7 @@ async def geox_workflow_map_georeference(
 
 
 @mcp.tool
-async def geox_workflow_ac_risk_console(
+async def GEOX_workflow_ac_risk_console(
     operation_type: str,
     parameters: dict[str, Any]
 ) -> dict[str, Any]:
@@ -321,31 +321,31 @@ async def geox_workflow_ac_risk_console(
         )
 
 
-@mcp.resource("geox://capabilities")
+@mcp.resource("GEOX://capabilities")
 def get_capabilities() -> str:
     """Server capabilities resource."""
     caps = ToolRegistry.get_capabilities()
     return json.dumps(caps, indent=2)
 
 
-@mcp.resource("geox://workflows")
+@mcp.resource("GEOX://workflows")
 def get_workflows() -> str:
     """Available workflows documentation."""
     workflows = {
         "seismic_full": {
             "description": "Complete seismic interpretation pipeline",
             "steps": ["load", "build_candidates", "ac_risk", "verdict"],
-            "tool": "geox_workflow_seismic_full"
+            "tool": "GEOX_workflow_seismic_full"
         },
         "map_georeference": {
             "description": "Map georeferencing with AC_Risk assessment",
             "steps": ["load", "ocr", "georeference", "validate", "ac_risk"],
-            "tool": "geox_workflow_map_georeference"
+            "tool": "GEOX_workflow_map_georeference"
         },
         "ac_risk_console": {
             "description": "Interactive AC_Risk for any operation",
             "steps": ["select_operation", "input_parameters", "calculate", "review"],
-            "tool": "geox_workflow_ac_risk_console"
+            "tool": "GEOX_workflow_ac_risk_console"
         }
     }
     return json.dumps(workflows, indent=2)
@@ -356,3 +356,4 @@ if __name__ == "__main__":
     print(f"Tools: {len(GEOX_TOOLS)} registered")
     print(f"Seal: {SERVER_SEAL}")
     mcp.run()
+

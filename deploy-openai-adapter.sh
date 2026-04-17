@@ -22,8 +22,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-DEPLOY_DIR="/opt/arifos/geox"
-LOG_FILE="/var/log/geox-deploy-$(date +%Y%m%d-%H%M%S).log"
+DEPLOY_DIR="/opt/arifos/GEOX"
+LOG_FILE="/var/log/GEOX-deploy-$(date +%Y%m%d-%H%M%S).log"
 BACKUP_TAG="pre-openai-adapter-$(date +%Y%m%d-%H%M%S)"
 
 echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
@@ -59,7 +59,7 @@ cd "$DEPLOY_DIR"
 # Step 1: Pre-deployment Backup
 # ─────────────────────────────────────────────────────────────────────────────
 log "${BLUE}[1/8] Creating pre-deployment backup...${NC}"
-docker commit geox_server "$BACKUP_TAG" 2>/dev/null || log "${YELLOW}  Warning: Could not create container backup (may not exist)${NC}"
+docker commit GEOX_server "$BACKUP_TAG" 2>/dev/null || log "${YELLOW}  Warning: Could not create container backup (may not exist)${NC}"
 git stash push -m "$BACKUP_TAG" 2>/dev/null || true
 log "${GREEN}  ✓ Backup tag: $BACKUP_TAG${NC}"
 
@@ -77,11 +77,11 @@ log "${GREEN}  ✓ Code updated to commit: $GIT_COMMIT${NC}"
 # ─────────────────────────────────────────────────────────────────────────────
 log "${BLUE}[3/8] Verifying OpenAI Adapter files...${NC}"
 ADAPTER_FILES=(
-    "geox-gui/src/adapters/openai_types.ts"
-    "geox-gui/src/adapters/openai_adapter.ts"
-    "geox-gui/src/adapters/useOpenAI.ts"
-    "geox-gui/src/adapters/index.ts"
-    "geox-gui/src/adapters/openai_manifest.json"
+    "GEOX-gui/src/adapters/openai_types.ts"
+    "GEOX-gui/src/adapters/openai_adapter.ts"
+    "GEOX-gui/src/adapters/useOpenAI.ts"
+    "GEOX-gui/src/adapters/index.ts"
+    "GEOX-gui/src/adapters/openai_manifest.json"
 )
 
 for file in "${ADAPTER_FILES[@]}"; do
@@ -117,7 +117,7 @@ log "${YELLOW}  This may take 5-15 minutes...${NC}"
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
-docker compose build --no-cache --progress=plain geox_server 2>&1 | tee -a "$LOG_FILE"
+docker compose build --no-cache --progress=plain GEOX_server 2>&1 | tee -a "$LOG_FILE"
 
 if [ $? -eq 0 ]; then
     log "${GREEN}  ✓ Build successful${NC}"
@@ -130,15 +130,15 @@ fi
 # Step 7: Start Containers
 # ─────────────────────────────────────────────────────────────────────────────
 log "${BLUE}[7/8] Starting containers...${NC}"
-docker compose up -d geox_server 2>&1 | tee -a "$LOG_FILE"
+docker compose up -d GEOX_server 2>&1 | tee -a "$LOG_FILE"
 sleep 5
 
 # Check if container is running
-if docker ps | grep -q "geox_server"; then
+if docker ps | grep -q "GEOX_server"; then
     log "${GREEN}  ✓ Container running${NC}"
 else
     log "${RED}  ✗ Container failed to start${NC}"
-    docker compose logs --tail=50 geox_server | tee -a "$LOG_FILE"
+    docker compose logs --tail=50 GEOX_server | tee -a "$LOG_FILE"
     exit 1
 fi
 
@@ -148,7 +148,7 @@ fi
 log "${BLUE}[8/8] Verification...${NC}"
 
 # Health check
-HEALTH_STATUS=$(curl -s https://geox.arif-fazil.com/health || echo "FAILED")
+HEALTH_STATUS=$(curl -s https://GEOX.arif-fazil.com/health || echo "FAILED")
 if [ "$HEALTH_STATUS" = "OK" ]; then
     log "${GREEN}  ✓ Health check: OK${NC}"
 else
@@ -156,11 +156,11 @@ else
 fi
 
 # Version check
-VERSION=$(curl -s https://geox.arif-fazil.com/health/details | grep -o '"version": "[^"]*"' | cut -d'"' -f4 || echo "unknown")
+VERSION=$(curl -s https://GEOX.arif-fazil.com/health/details | grep -o '"version": "[^"]*"' | cut -d'"' -f4 || echo "unknown")
 log "${BLUE}  Version: $VERSION${NC}"
 
 # Check for Pilot tab
-PILOT_CHECK=$(curl -s https://geox.arif-fazil.com/ | grep -i "pilot" | head -1 || echo "NOT FOUND")
+PILOT_CHECK=$(curl -s https://GEOX.arif-fazil.com/ | grep -i "pilot" | head -1 || echo "NOT FOUND")
 if echo "$PILOT_CHECK" | grep -qi "pilot"; then
     log "${GREEN}  ✓ Pilot tab present${NC}"
 else
@@ -168,7 +168,7 @@ else
 fi
 
 # Check for OpenAI Adapter files in container
-ADAPTER_IN_CONTAINER=$(docker exec geox_server ls -la /app/geox-gui/src/adapters/ 2>/dev/null | wc -l)
+ADAPTER_IN_CONTAINER=$(docker exec GEOX_server ls -la /app/GEOX-gui/src/adapters/ 2>/dev/null | wc -l)
 if [ "$ADAPTER_IN_CONTAINER" -gt 0 ]; then
     log "${GREEN}  ✓ OpenAI Adapter files in container${NC}"
 else
@@ -185,16 +185,17 @@ echo -e "${GREEN}╚════════════════════
 echo ""
 echo -e "${BLUE}Commit:${NC} $GIT_COMMIT"
 echo -e "${BLUE}Version:${NC} v0.6.1 (OpenAI Adapter enabled)"
-echo -e "${BLUE}Health:${NC} https://geox.arif-fazil.com/health"
+echo -e "${BLUE}Health:${NC} https://GEOX.arif-fazil.com/health"
 echo -e "${BLUE}Log:${NC} $LOG_FILE"
 echo ""
 echo -e "${YELLOW}Verification commands:${NC}"
-echo "  curl https://geox.arif-fazil.com/health"
-echo "  curl https://geox.arif-fazil.com/health/details"
-echo "  docker compose logs -f geox_server"
+echo "  curl https://GEOX.arif-fazil.com/health"
+echo "  curl https://GEOX.arif-fazil.com/health/details"
+echo "  docker compose logs -f GEOX_server"
 echo ""
 echo -e "${YELLOW}Rollback if needed:${NC}"
-echo "  docker stop geox_server"
-echo "  docker start geox_server_$BACKUP_TAG"
+echo "  docker stop GEOX_server"
+echo "  docker start GEOX_server_$BACKUP_TAG"
 echo ""
 echo -e "${GREEN}DITEMPA BUKAN DIBERI — Forged, Not Given${NC}"
+

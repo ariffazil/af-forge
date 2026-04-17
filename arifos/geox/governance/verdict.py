@@ -20,7 +20,7 @@ class Verdict(str, Enum):
     VOID = "VOID"            # Non-compliant or data missing.
     BLOCK = "GEOX_BLOCK"     # Explicit safety/governance violation.
 
-class GeoxVerdictResult(BaseModel):
+class GEOXVerdictResult(BaseModel):
     verdict: Verdict
     explanation: str
     confidence: float = Field(default=0.0, ge=0.0, le=1.0)
@@ -29,25 +29,26 @@ class GeoxVerdictResult(BaseModel):
     delta_s: float = 0.0          # Thermodynamic entropy change.
     genius_score: float = 0.0    # Intelligence index.
 
-def determine_geox_verdict(risk: float, data_fidelity: str, has_well_ties: bool) -> GeoxVerdictResult:
+def determine_GEOX_verdict(risk: float, data_fidelity: str, has_well_ties: bool) -> GEOXVerdictResult:
     """Determine final tool output verdict."""
     if data_fidelity == "raster" and risk > 0.5:
-        return GeoxVerdictResult(
+        return GEOXVerdictResult(
             verdict=Verdict.HOLD,
             explanation="888_HOLD: High risk on limited fidelity raster data. See Bond et al (2007).",
             confidence=0.15,
             audit_id="F13-VETO-001"
         )
     if not has_well_ties:
-         return GeoxVerdictResult(
+         return GEOXVerdictResult(
             verdict=Verdict.QUALIFY,
             explanation="QUALIFY: Result is ungrounded by well data. Use with caution.",
             confidence=0.5,
             audit_id="F9-HANTU-001"
         )
-    return GeoxVerdictResult(
+    return GEOXVerdictResult(
         verdict=Verdict.SEAL,
         explanation="SEALED: Physically consistent and well-tied.",
         confidence=0.85,
         audit_id="F11-AUTH-001"
     )
+

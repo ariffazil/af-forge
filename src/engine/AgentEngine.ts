@@ -78,7 +78,7 @@ export type AgentEngineDependencies = {
 
 export class AgentEngine {
   private _routing: RoutingDecision | null = null;
-  private _geoxScenarios: Array<{ id: string; name: string; physicalConstraints: { environmentalImpact: number }; tag: string; groundingEvidence: string[] }> = [];
+  private _GEOXScenarios: Array<{ id: string; name: string; physicalConstraints: { environmentalImpact: number }; tag: string; groundingEvidence: string[] }> = [];
   private _wealthAllocations: Array<{ id: string; maruahScore: number }> = [];
   private _kernel: ArifOSKernel | null = null;
   private _pipeline?: import("./PipelineCoordinator.js").PipelineCoordinator;
@@ -225,19 +225,19 @@ export class AgentEngine {
     const routing: RoutingDecision = routeIntent(options.task);
 
     // === 333_MIND: GEOX + WEALTH Organ Activation ===
-    const geoxEngine = new GEOXEngine();
+    const GEOXEngine = new GEOXEngine();
     const wealthEngine = new WealthEngine();
 
     if (routing.primaryOrgan === "GEOX" || routing.secondaryOrgans.includes("GEOX")) {
-      const scenarios = await geoxEngine.generateScenarios(routing.primaryOrgan === "GEOX" ? "primary" : "secondary");
-      this._geoxScenarios = scenarios;
+      const scenarios = await GEOXEngine.generateScenarios(routing.primaryOrgan === "GEOX" ? "primary" : "secondary");
+      this._GEOXScenarios = scenarios;
     }
 
     if (routing.primaryOrgan === "WEALTH" || routing.secondaryOrgans.includes("WEALTH")) {
-      const geoxScenarios = this._geoxScenarios.length > 0
-        ? this._geoxScenarios
+      const GEOXScenarios = this._GEOXScenarios.length > 0
+        ? this._GEOXScenarios
         : [{ id: "default-scen", name: "Default", physicalConstraints: { maxExtractionRate: 500, seismicRiskIndex: 0.2, environmentalImpact: 0.3 }, probability: 0.7, tag: "ESTIMATE" as const, groundingEvidence: ["General knowledge"] }];
-      const allocations = await wealthEngine.allocate(geoxScenarios as import("../types/arifos.js").GEOXScenarioContract[]);
+      const allocations = await wealthEngine.allocate(GEOXScenarios as import("../types/arifos.js").GEOXScenarioContract[]);
       this._wealthAllocations = allocations.map((a: { id: string; maruahScore: number }) => ({ id: a.id, maruahScore: a.maruahScore }));
       const budgetStatus = wealthEngine.getBudgetStatus();
       shortTermMemory.append({
@@ -252,10 +252,10 @@ export class AgentEngine {
       content: `[222_THINK] Intent → ${routing.primaryOrgan} (conf=${routing.confidence.toFixed(2)}) | ${routing.reasoning}`,
     });
 
-    if (this._geoxScenarios.length > 0) {
+    if (this._GEOXScenarios.length > 0) {
       shortTermMemory.append({
         role: "system",
-        content: `[333_MIND] GEOX activated: ${this._geoxScenarios.map((s) => `${s.id}(${s.tag}[${s.physicalConstraints?.environmentalImpact ?? "?"}])`).join(", ")}`,
+        content: `[333_MIND] GEOX activated: ${this._GEOXScenarios.map((s) => `${s.id}(${s.tag}[${s.physicalConstraints?.environmentalImpact ?? "?"}])`).join(", ")}`,
       });
     }
 
@@ -268,7 +268,7 @@ export class AgentEngine {
 
     // === 555_HEART: Red-team F6 Maruah + F8 Grounding checks ===
     const heartViolations: string[] = [];
-    for (const scenario of this._geoxScenarios) {
+    for (const scenario of this._GEOXScenarios) {
       if ((scenario.physicalConstraints?.environmentalImpact ?? 0) > 0.6) {
         heartViolations.push("F6_MARUAH");
       }
@@ -420,7 +420,7 @@ export class AgentEngine {
 
     // === 888_JUDGE: Confidence evaluation (only when organ routing occurred) ===
     if (this._routing && (this._routing.primaryOrgan !== "CODE" || this._routing.secondaryOrgans.length > 0)) {
-      const organEvidence = (this._geoxScenarios.length + this._wealthAllocations.length) > 0 ? 1 : 0;
+      const organEvidence = (this._GEOXScenarios.length + this._wealthAllocations.length) > 0 ? 1 : 0;
       const agreementScore = this._wealthAllocations.length > 0
         ? this._wealthAllocations.reduce((acc, a) => acc * (a.maruahScore ?? 0.5), 0.5)
         : 0.5;
@@ -480,12 +480,12 @@ export class AgentEngine {
       const floorsProxy: FloorScores13 = {
         f1_amanah: permissionContext.holdEnabled ? 1.0 : (blockedDangerousActions > 0 ? 0.6 : 0.98),
         f2_truth: truthCheck.verdict === "PASS" ? 0.98 : (truthCheck.ungroundedClaims > 0 ? 0.8 : 0.9),
-        f3_tri_witness: this._geoxScenarios.length > 0 || this._wealthAllocations.length > 0 ? 0.98 : 0.95,
+        f3_tri_witness: this._GEOXScenarios.length > 0 || this._wealthAllocations.length > 0 ? 0.98 : 0.95,
         f4_clarity: 0.98,
         f5_peace: stewardshipCheck.verdict === "PASS" ? 0.98 : 0.85,
         f6_empathy: heartViolations.length === 0 ? 0.98 : 0.80,
         f7_humility: 0.98,
-        f8_genius: this._geoxScenarios.length > 0 ? 0.98 : 0.95,
+        f8_genius: this._GEOXScenarios.length > 0 ? 0.98 : 0.95,
         f9_antihantu: 0.98,
         f10_ontology: 0.98,
         f11_command: permissionContext.holdEnabled ? 1.0 : 0.98,
@@ -1166,3 +1166,4 @@ function countMemoryReferences(messages: AgentMessage[]): number {
     (message) => message.role === "assistant" && /\bmemory\b/i.test(message.content),
   ).length;
 }
+

@@ -49,7 +49,7 @@ export enum EventType {
 }
 
 /** Base event structure */
-export interface GeoXEvent<T = unknown> {
+export interface GEOXEvent<T = unknown> {
   /** Event type */
   type: EventType;
   /** Event source */
@@ -66,7 +66,7 @@ export interface GeoXEvent<T = unknown> {
 
 /** Host capabilities report */
 export interface HostCapabilities {
-  hostType: 'copilot' | 'claude' | 'openai' | 'geox-custom' | 'unknown';
+  hostType: 'copilot' | 'claude' | 'openai' | 'GEOX-custom' | 'unknown';
   version: string;
   supportedModes: ('inline' | 'external' | 'card' | 'text')[];
   maxInlineSize?: { width: number; height: number };
@@ -136,10 +136,10 @@ export interface AuthResultPayload {
 }
 
 /** Event handler type */
-export type EventHandler<T = unknown> = (event: GeoXEvent<T>) => void | Promise<void>;
+export type EventHandler<T = unknown> = (event: GEOXEvent<T>) => void | Promise<void>;
 
 /** Event filter type */
-export type EventFilter = (event: GeoXEvent) => boolean;
+export type EventFilter = (event: GEOXEvent) => boolean;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Event Bus Implementation
@@ -155,14 +155,14 @@ export type EventFilter = (event: GeoXEvent) => boolean;
  * - Trace ID propagation
  * - Connection state management
  */
-export class GeoXEventBus {
+export class GEOXEventBus {
   private targetWindow: Window;
   private targetOrigin: string;
   private handlers: Map<EventType, Set<EventHandler>> = new Map();
   private sequence: number = 0;
   private traceId: string;
   private isConnected: boolean = false;
-  private pendingEvents: GeoXEvent[] = [];
+  private pendingEvents: GEOXEvent[] = [];
   private messageListener: ((event: MessageEvent) => void) | null = null;
 
   /**
@@ -184,7 +184,7 @@ export class GeoXEventBus {
    * Generate a unique trace ID.
    */
   private generateTraceId(): string {
-    return `geox-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `GEOX-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
   /**
@@ -194,32 +194,32 @@ export class GeoXEventBus {
     this.messageListener = (event: MessageEvent) => {
       // Security: validate origin if specified
       if (this.targetOrigin !== '*' && event.origin !== this.targetOrigin) {
-        console.warn(`[GeoXEventBus] Rejected message from unexpected origin: ${event.origin}`);
+        console.warn(`[GEOXEventBus] Rejected message from unexpected origin: ${event.origin}`);
         return;
       }
 
       // Validate event structure
-      const geoXEvent = event.data as GeoXEvent;
-      if (!this.isValidEvent(geoXEvent)) {
+      const GEOXEvent = event.data as GEOXEvent;
+      if (!this.isValidEvent(GEOXEvent)) {
         return;
       }
 
       // Handle the event
-      this.handleIncomingEvent(geoXEvent);
+      this.handleIncomingEvent(GEOXEvent);
     };
 
     window.addEventListener('message', this.messageListener);
   }
 
   /**
-   * Validate that a message is a proper GeoXEvent.
+   * Validate that a message is a proper GEOXEvent.
    */
-  private isValidEvent(data: unknown): data is GeoXEvent {
+  private isValidEvent(data: unknown): data is GEOXEvent {
     if (typeof data !== 'object' || data === null) {
       return false;
     }
 
-    const event = data as Partial<GeoXEvent>;
+    const event = data as Partial<GEOXEvent>;
     
     return (
       typeof event.type === 'string' &&
@@ -233,7 +233,7 @@ export class GeoXEventBus {
   /**
    * Handle an incoming event.
    */
-  private handleIncomingEvent(event: GeoXEvent): void {
+  private handleIncomingEvent(event: GEOXEvent): void {
     // Update connection state on initialize
     if (event.type === EventType.APP_INITIALIZE) {
       this.isConnected = true;
@@ -247,7 +247,7 @@ export class GeoXEventBus {
         try {
           handler(event);
         } catch (error) {
-          console.error(`[GeoXEventBus] Handler error for ${event.type}:`, error);
+          console.error(`[GEOXEventBus] Handler error for ${event.type}:`, error);
         }
       });
     }
@@ -259,7 +259,7 @@ export class GeoXEventBus {
         try {
           handler(event);
         } catch (error) {
-          console.error(`[GeoXEventBus] Wildcard handler error:`, error);
+          console.error(`[GEOXEventBus] Wildcard handler error:`, error);
         }
       });
     }
@@ -269,7 +269,7 @@ export class GeoXEventBus {
    * Send an event to the target window.
    */
   send<T = unknown>(type: EventType, payload: T): void {
-    const event: GeoXEvent<T> = {
+    const event: GEOXEvent<T> = {
       type,
       source: 'app',
       timestamp: new Date().toISOString(),
@@ -290,11 +290,11 @@ export class GeoXEventBus {
   /**
    * Dispatch an event to the target window.
    */
-  private dispatch(event: GeoXEvent): void {
+  private dispatch(event: GEOXEvent): void {
     try {
       this.targetWindow.postMessage(event, this.targetOrigin);
     } catch (error) {
-      console.error('[GeoXEventBus] Failed to send event:', error);
+      console.error('[GEOXEventBus] Failed to send event:', error);
     }
   }
 
@@ -340,7 +340,7 @@ export class GeoXEventBus {
    * @param timeoutMs - Optional timeout in milliseconds
    * @returns Promise that resolves with the event
    */
-  once<T = unknown>(type: EventType, timeoutMs?: number): Promise<GeoXEvent<T>> {
+  once<T = unknown>(type: EventType, timeoutMs?: number): Promise<GEOXEvent<T>> {
     return new Promise((resolve, reject) => {
       const unsubscribe = this.on<T>(type, (event) => {
         unsubscribe();
@@ -467,9 +467,9 @@ export class GeoXEventBus {
  * 
  * Used by hosts (Copilot, Claude, etc.) to communicate with embedded apps.
  */
-export class GeoXHostBus {
+export class GEOXHostBus {
   private iframe: HTMLIFrameElement | null = null;
-  private bus: GeoXEventBus | null = null;
+  private bus: GEOXEventBus | null = null;
   private appOrigin: string;
 
   constructor(appOrigin: string) {
@@ -479,14 +479,14 @@ export class GeoXHostBus {
   /**
    * Attach to an iframe containing a GEOX App.
    */
-  attach(iframe: HTMLIFrameElement): GeoXEventBus {
+  attach(iframe: HTMLIFrameElement): GEOXEventBus {
     this.iframe = iframe;
     
     if (!iframe.contentWindow) {
       throw new Error('Iframe content window not available');
     }
 
-    this.bus = new GeoXEventBus(iframe.contentWindow, this.appOrigin);
+    this.bus = new GEOXEventBus(iframe.contentWindow, this.appOrigin);
     return this.bus;
   }
 
@@ -530,7 +530,7 @@ export class GeoXHostBus {
   /**
    * Get the underlying event bus.
    */
-  getBus(): GeoXEventBus | null {
+  getBus(): GEOXEventBus | null {
     return this.bus;
   }
 
@@ -554,10 +554,10 @@ export class GeoXHostBus {
  * Create an event bus for an inline (iframe) app.
  * 
  * @param hostOrigin - Origin of the host window
- * @returns GeoXEventBus instance
+ * @returns GEOXEventBus instance
  */
-export function createInlineBus(hostOrigin: string = '*'): GeoXEventBus {
-  return new GeoXEventBus(window.parent, hostOrigin);
+export function createInlineBus(hostOrigin: string = '*'): GEOXEventBus {
+  return new GEOXEventBus(window.parent, hostOrigin);
 }
 
 /**
@@ -565,18 +565,19 @@ export function createInlineBus(hostOrigin: string = '*'): GeoXEventBus {
  * 
  * @param opener - Opener window
  * @param hostOrigin - Origin of the host
- * @returns GeoXEventBus instance
+ * @returns GEOXEventBus instance
  */
-export function createExternalBus(opener: Window, hostOrigin: string): GeoXEventBus {
-  return new GeoXEventBus(opener, hostOrigin);
+export function createExternalBus(opener: Window, hostOrigin: string): GEOXEventBus {
+  return new GEOXEventBus(opener, hostOrigin);
 }
 
 /**
  * Create a host bus for embedding apps.
  * 
  * @param appOrigin - Origin of the embedded app
- * @returns GeoXHostBus instance
+ * @returns GEOXHostBus instance
  */
-export function createHostBus(appOrigin: string): GeoXHostBus {
-  return new GeoXHostBus(appOrigin);
+export function createHostBus(appOrigin: string): GEOXHostBus {
+  return new GEOXHostBus(appOrigin);
 }
+

@@ -2,7 +2,7 @@
 Petrophysical Hold Checker — Stub for Phase B
 DITEMPA BUKAN DIBERI
 
-Full implementation in Phase B: geox_petrophysical_hold_check tool.
+Full implementation in Phase B: GEOX_petrophysical_hold_check tool.
 """
 
 from dataclasses import dataclass
@@ -53,3 +53,4 @@ class PetrophysicalHoldChecker:
             required_actions=["Review triggers"] if triggers else [],
             can_override=len(triggers) > 0
         )
+

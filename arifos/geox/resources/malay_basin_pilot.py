@@ -113,15 +113,15 @@ MALAY_BASIN_GEOMETRY = {
 
 class MalayBasinPilotResource:
     """
-    URI: geox://basin/malay-basin/pilot
+    URI: GEOX://basin/malay-basin/pilot
     
     Integrated feasibility data for the Malay Basin demo.
     """
-    uri_template = "geox://basin/malay-basin/pilot"
+    uri_template = "GEOX://basin/malay-basin/pilot"
     
     async def read(self) -> dict[str, Any]:
         return {
-            "uri": "geox://basin/malay-basin/pilot",
+            "uri": "GEOX://basin/malay-basin/pilot",
             "stats": MALAY_BASIN_STATS,
             "phases": CREAMING_CURVE_PHASES,
             "play_types": PLAY_TYPES,
@@ -129,3 +129,4 @@ class MalayBasinPilotResource:
             "provenance": "GEOLOGICAL_SOCIETY_MALAYSIA_2018",
             "status": "DEMO_READY"
         }
+

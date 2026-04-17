@@ -239,3 +239,4 @@ class GassmannModel:
         phis = np.linspace(0, 0.5, 100)
         residuals = [residual(p) for p in phis]
         return phis[np.argmin(residuals)]
+

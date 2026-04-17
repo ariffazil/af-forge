@@ -1,9 +1,9 @@
 {
   "$schema": "https://gofastmcp.com/schemas/fastmcp.json",
-  "name": "geox-earth-witness",
+  "name": "GEOX-earth-witness",
   "version": "0.5.0",
   "description": "GEOX — Geological Intelligence Coprocessor for arifOS. Constitutional, event-sourced agent runtime for subsurface evaluation.",
-  "entrypoint": "geox_mcp_server.py:mcp",
+  "entrypoint": "GEOX_mcp_server.py:mcp",
   "transport": {
     "stdio": {
       "enabled": true
@@ -27,8 +27,8 @@
   },
   "tools": {
     "visibility": {
-      "model": ["geox_*"],
-      "app": ["geox_*"]
+      "model": ["GEOX_*"],
+      "app": ["GEOX_*"]
     }
   },
   "meta": {
@@ -38,3 +38,4 @@
     "license": "AGPL-3.0"
   }
 }
+

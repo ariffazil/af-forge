@@ -80,7 +80,7 @@ export const GeoContextSchema = z.object({
 export const EvidenceRefSchema = z.object({
   id: z.string(),
   kind: z.enum(['well', 'seismic', 'map', 'log', 'top', 'verdict']),
-  sourceUri: z.string(), // e.g. "opendtect://Well/A1" or "geox://storage/prospect_alpha"
+  sourceUri: z.string(), // e.g. "opendtect://Well/A1" or "GEOX://storage/prospect_alpha"
   timestamp: z.string().datetime(),
   version: z.string().optional(),
 });
@@ -153,7 +153,7 @@ export const AuditEventSchema = z.object({
 });
 
 export const AppManifestSchema = z.object({
-  appId: z.string().regex(/^geox\.[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*$/),
+  appId: z.string().regex(/^GEOX\.[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*$/),
   version: z.string(),
   dimension: DimensionEnum,
   domain: AppDomainEnum,
@@ -183,3 +183,4 @@ export type XYPoint = z.infer<typeof XYPointSchema>;
 export type XYZPoint = z.infer<typeof XYZPointSchema>;
 export type BoundingBox = z.infer<typeof BoundingBoxSchema>;
 export type AppManifest = z.infer<typeof AppManifestSchema>;
+

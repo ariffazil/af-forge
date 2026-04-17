@@ -291,3 +291,4 @@ When assigning vision tasks, use this template:
 *DITEMPA BUKAN DIBERI*  
 *Vision Intelligence: Governed, Not Given*  
 *AC_Risk: Calculated for Every Pixel*
+

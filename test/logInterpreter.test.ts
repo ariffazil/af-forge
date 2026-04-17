@@ -31,9 +31,9 @@ function makeRT(low: number, high: number, n: number): number[] {
   return values;
 }
 
-test("GEOXLogInterpreterTool — name is geox_log_interpreter", () => {
+test("GEOXLogInterpreterTool — name is GEOX_log_interpreter", () => {
   const tool = new GEOXLogInterpreterTool();
-  assert.equal(tool.name, "geox_log_interpreter");
+  assert.equal(tool.name, "GEOX_log_interpreter");
 });
 
 test("GEOXLogInterpreterTool — riskLevel is guarded", () => {

@@ -12,7 +12,7 @@ class HostRenderingMode(Enum):
     IFRAME_WEB_SHELL = "iframe_web_shell"
     STATIC_JSON = "static_json"
 
-class GeoxAppContract(BaseModel):
+class GEOXAppContract(BaseModel):
     """
     Canonical GEOX App Contract (F11 Authority).
     Defines the stable boundary between a GEOX app and its host.
@@ -45,10 +45,11 @@ class GeoxAppContract(BaseModel):
     class ConfigDict:
         use_enum_values = True
 
-class GeoxEvent(BaseModel):
+class GEOXEvent(BaseModel):
     """Canonical event structure for the app-host bridge."""
     event_id: str
     type: str
     payload: dict[str, Any] = Field(default_factory=dict)
     timestamp: str = Field(..., description="ISO8601 UTC")
     audit_id: str | None = None
+

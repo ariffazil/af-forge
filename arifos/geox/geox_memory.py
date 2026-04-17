@@ -24,9 +24,9 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
-from arifos.geox.geox_schemas import CoordinatePoint, GeoRequest, GeoResponse
+from arifos.GEOX.GEOX_schemas import CoordinatePoint, GeoRequest, GeoResponse
 
-logger = logging.getLogger("geox.memory")
+logger = logging.getLogger("GEOX.memory")
 
 # ---------------------------------------------------------------------------
 # GeoMemoryEntry
@@ -118,7 +118,7 @@ class GeoMemoryStore:
     def __init__(
         self,
         qdrant_client: Any | None = None,
-        collection: str = "geox_geological_memory",
+        collection: str = "GEOX_geological_memory",
     ) -> None:
         """
         Args:
@@ -450,7 +450,7 @@ class DualMemoryStore:
         self,
         qdrant_client: Any | None = None,
         macrostrat_tool: Any | None = None,
-        cache_dir: str = "./geox_memory_cache",
+        cache_dir: str = "./GEOX_memory_cache",
     ) -> None:
         self.qdrant = qdrant_client
         self._macrostrat = macrostrat_tool
@@ -530,7 +530,7 @@ class DualMemoryStore:
         """Fetch discrete geological facts from Macrostrat."""
         if not self._macrostrat:
             try:
-                from arifos.geox.tools.macrostrat_tool import MacrostratTool
+                from arifos.GEOX.tools.macrostrat_tool import MacrostratTool
                 self._macrostrat = MacrostratTool()
             except ImportError:
                 return [{"error": "MacrostratTool unavailable", "status": "VOID"}]
@@ -586,4 +586,5 @@ class DualMemoryStore:
 
         fused.sort(key=lambda x: x.get("confidence", 0), reverse=True)
         return fused
+
 

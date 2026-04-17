@@ -1,5 +1,5 @@
 """
-geox_schemas.py — Sovereign Witness Schema for subsurface intelligence.
+GEOX_schemas.py — Sovereign Witness Schema for subsurface intelligence.
 ═══════════════════════════════════════════════════════════════════════════════
 DITEMPA BUKAN DIBERI
 
@@ -597,3 +597,4 @@ class ContrastVerdict(BaseModel):
         if self.status in {"HOLD", "FAIL"}:
             self.requires_hold = True
         return self
+

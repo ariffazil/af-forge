@@ -6,7 +6,7 @@
 ## Current Site Structure
 
 ```
-geox-gui/
+GEOX-gui/
 ├── src/
 │   ├── App.tsx                    # Entry point ✅ Keep
 │   ├── components/
@@ -21,7 +21,7 @@ geox-gui/
 │   │   ├── WellContextDesk/       # Wells ✅ Keep
 │   │   └── WitnessBadges/         # Governance UI ✅ Keep
 │   ├── store/
-│   │   └── geoxStore.ts           # State management ✅ Keep
+│   │   └── GEOXStore.ts           # State management ✅ Keep
 │   ├── hooks/                     # MCP hooks ✅ Keep
 │   └── adapters/                  # OpenAI adapter ✅ Keep
 ├── dist/                          # Built assets
@@ -80,13 +80,13 @@ geox-gui/
    - Well Context Desk — LIVE
 
 3. THE 7 TOOLS (replaces 13 tools)
-   - geox_compute_ac_risk (CORE)
-   - geox_load_seismic_line
-   - geox_build_structural_candidates
-   - geox_verify_geospatial
-   - geox_feasibility_check
-   - geox_evaluate_prospect
-   - geox_earth_signals
+   - GEOX_compute_ac_risk (CORE)
+   - GEOX_load_seismic_line
+   - GEOX_build_structural_candidates
+   - GEOX_verify_geospatial
+   - GEOX_feasibility_check
+   - GEOX_evaluate_prospect
+   - GEOX_earth_signals
 
 4. CONSTITUTIONAL GOVERNANCE
    - F1 Amanah
@@ -152,10 +152,10 @@ CURRENT (9 tabs):          EIC (5 tabs):
 ## Deployment After Fix
 
 ```bash
-cd GEOX/geox-gui
+cd GEOX/GEOX-gui
 npm run build
-docker build -t geox/gui:latest .
-docker push geox/gui:latest
+docker build -t GEOX/gui:latest .
+docker push GEOX/gui:latest
 # Update docker-compose on server
 docker-compose up -d
 ```
@@ -163,3 +163,4 @@ docker-compose up -d
 ---
 
 *Audit complete. Proceeding with EIC-aligned fixes.*
+

@@ -36,8 +36,8 @@ This document maps the required updates across the arifOS ecosystem repositories
 
 ---
 
-## 3. `geox` (Earth/Physics Organ)
-*Location: `/root/geox`*
+## 3. `GEOX` (Earth/Physics Organ)
+*Location: `/root/GEOX`*
 
 ### Files to Update:
 *   **`README.md`**:
@@ -62,5 +62,6 @@ To synchronize the GitHub repositories, the following sequence will be executed 
 2.  Stage the changes (`git add .`).
 3.  Commit with standard semantic message: `docs(architecture): map AAA federation to SOT (v2026.04.16)`
 4.  Push to remote (`git push origin main` or equivalent).
+
 
 

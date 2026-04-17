@@ -44,12 +44,12 @@ GEOX has been elevated to **AAA GRADE — Large Earth Model** status. This repre
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │  LAYER 3: MCP SERVER (AAA Grade Tools)                               │   │
 │  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐  │   │
-│  │  │ geox_compute │ │ geox_load_   │ │ geox_build_  │ │ geox_verify_ │  │   │
+│  │  │ GEOX_compute │ │ GEOX_load_   │ │ GEOX_build_  │ │ GEOX_verify_ │  │   │
 │  │  │ _ac_risk     │ │ seismic_line │ │ structural_  │ │ geospatial   │  │   │
 │  │  │              │ │              │ │ candidates   │ │              │  │   │
 │  │  └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘  │   │
 │  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐  │   │
-│  │  │ geox_earth_  │ │ geox_malay_  │ │ geox_evalua- │ │ geox_list_   │  │   │
+│  │  │ GEOX_earth_  │ │ GEOX_malay_  │ │ GEOX_evalua- │ │ GEOX_list_   │  │   │
 │  │  │ signals      │ │ basin_pilot  │ │ te_prospect  │ │ tools        │  │   │
 │  │  └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘  │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
@@ -85,23 +85,23 @@ GEOX has been elevated to **AAA GRADE — Large Earth Model** status. This repre
 
 | Tool | AC_Risk | Floors | Description |
 |------|---------|--------|-------------|
-| `geox_compute_ac_risk` | ✅ | F2,F4,F7 | ToAC risk calculator with verdict |
-| `geox_load_seismic_line` | ❌ | F4 | Seismic loading with scale detection |
-| `geox_build_structural_candidates` | ❌ | F2,F7 | Multi-model interpretation |
+| `GEOX_compute_ac_risk` | ✅ | F2,F4,F7 | ToAC risk calculator with verdict |
+| `GEOX_load_seismic_line` | ❌ | F4 | Seismic loading with scale detection |
+| `GEOX_build_structural_candidates` | ❌ | F2,F7 | Multi-model interpretation |
 
 ### Preview Tools
 
 | Tool | Version | AC_Risk | Floors | Description |
 |------|---------|---------|--------|-------------|
-| `geox_interpret_single_line` | 0.9.0 | ✅ | F1,F2,F4,F7,F9,F13 | Full governed interpreter |
-| `geox_georeference_map` | 0.8.0 | ✅ | F2,F4 | Map georeferencing |
-| `geox_earth_signals` | 0.9.0 | ❌ | F2 | Live Earth observations |
+| `GEOX_interpret_single_line` | 0.9.0 | ✅ | F1,F2,F4,F7,F9,F13 | Full governed interpreter |
+| `GEOX_georeference_map` | 0.8.0 | ✅ | F2,F4 | Map georeferencing |
+| `GEOX_earth_signals` | 0.9.0 | ❌ | F2 | Live Earth observations |
 
 ### Scaffold Tools
 
 | Tool | Version | Status | Description |
 |------|---------|--------|-------------|
-| `geox_digitize_well_log` | 0.1.0 | 🔴 | Well log digitization (planned) |
+| `GEOX_digitize_well_log` | 0.1.0 | 🔴 | Well log digitization (planned) |
 
 ---
 
@@ -138,25 +138,25 @@ GEOX has been elevated to **AAA GRADE — Large Earth Model** status. This repre
 ### 1. AC_Risk Console (Flagship)
 - **Purpose:** Interactive ToAC risk exploration
 - **Features:** Real-time AC_Risk calculation, verdict display, history
-- **URI:** `https://geox.arif-fazil.com/apps/ac_risk_console/`
+- **URI:** `https://GEOX.arif-fazil.com/apps/ac_risk_console/`
 - **Floors:** F1, F2, F4, F7, F9, F11, F13
 
 ### 2. Basin Explorer
 - **Purpose:** Basin-scale geological mapping
 - **Features:** Interactive maps, play fairways, prospect evaluation
-- **URI:** `https://geox.arif-fazil.com/apps/basin_explorer/`
+- **URI:** `https://GEOX.arif-fazil.com/apps/basin_explorer/`
 - **Floors:** F1, F2, F4, F7, F11
 
 ### 3. Seismic Viewer
 - **Purpose:** 2D/3D seismic visualization
 - **Features:** Contrast controls, 888_HOLD overlays, depth tracking
-- **URI:** `https://geox.arif-fazil.com/apps/seismic_viewer/`
+- **URI:** `https://GEOX.arif-fazil.com/apps/seismic_viewer/`
 - **Floors:** F1, F2, F4, F7, F9, F11
 
 ### 4. Well Context Desk
 - **Purpose:** Well data browser with petrophysics
 - **Features:** Log viewer, document browser, AC_Risk widget
-- **URI:** `https://geox.arif-fazil.com/apps/well_context_desk/`
+- **URI:** `https://GEOX.arif-fazil.com/apps/well_context_desk/`
 - **Floors:** F1, F2, F4, F7, F9, F11, F13
 
 ---
@@ -173,15 +173,15 @@ GET /tools/{name}     → Tool details
 
 ### MCP Tools (JSON-RPC)
 ```
-geox_list_tools
-geox_compute_ac_risk
-geox_load_seismic_line
-geox_build_structural_candidates
-geox_feasibility_check
-geox_verify_geospatial
-geox_earth_signals
-geox_malay_basin_pilot
-geox_evaluate_prospect
+GEOX_list_tools
+GEOX_compute_ac_risk
+GEOX_load_seismic_line
+GEOX_build_structural_candidates
+GEOX_feasibility_check
+GEOX_verify_geospatial
+GEOX_earth_signals
+GEOX_malay_basin_pilot
+GEOX_evaluate_prospect
 ```
 
 ---
@@ -194,9 +194,9 @@ geox_evaluate_prospect
 docker-compose -f docker-compose.aaa.yml up -d
 
 # Services:
-# - geox-server-aaa: MCP Server on port 8000
-# - geox-apps: Static apps on port 8080
-# - geox-gui: React GUI on port 3000
+# - GEOX-server-aaa: MCP Server on port 8000
+# - GEOX-apps: Static apps on port 8080
+# - GEOX-gui: React GUI on port 3000
 # - redis: Caching layer
 ```
 
@@ -273,9 +273,9 @@ Governance Status:
   ✅ F13 Sovereign — Human veto active
 
 Deployment Status:
-  🟢 geox-server-aaa: Ready
-  🟢 geox-apps: Ready
-  🟢 geox-gui: Ready
+  🟢 GEOX-server-aaa: Ready
+  🟢 GEOX-apps: Ready
+  🟢 GEOX-gui: Ready
   🟢 redis-cache: Ready
 
 ═══════════════════════════════════════════════════════════════════════════════
@@ -298,3 +298,4 @@ Deployment Status:
 
 *Forged by arifOS | Earth Intelligence Level AGI*
 *DITEMPA BUKAN DIBERI — Forged, Not Given*
+

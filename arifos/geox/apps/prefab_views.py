@@ -101,7 +101,7 @@ def _floor_table(active: list[str]) -> Table:
 
 
 # ---------------------------------------------------------------------------
-# View 1 — geox_load_seismic_line
+# View 1 — GEOX_load_seismic_line
 # ---------------------------------------------------------------------------
 
 def seismic_section_view(
@@ -191,7 +191,7 @@ def seismic_section_view(
 
 
 # ---------------------------------------------------------------------------
-# View 2 — geox_build_structural_candidates
+# View 2 — GEOX_build_structural_candidates
 # ---------------------------------------------------------------------------
 
 def structural_candidates_view(
@@ -294,7 +294,7 @@ def structural_candidates_view(
 
 
 # ---------------------------------------------------------------------------
-# View 3 — geox_feasibility_check
+# View 3 — GEOX_feasibility_check
 # ---------------------------------------------------------------------------
 
 def feasibility_check_view(
@@ -377,7 +377,7 @@ def feasibility_check_view(
 
 
 # ---------------------------------------------------------------------------
-# View 4 — geox_verify_geospatial
+# View 4 — GEOX_verify_geospatial
 # ---------------------------------------------------------------------------
 
 def geospatial_view(
@@ -456,7 +456,7 @@ def geospatial_view(
 
 
 # ---------------------------------------------------------------------------
-# View 5 — geox_evaluate_prospect
+# View 5 — GEOX_evaluate_prospect
 # ---------------------------------------------------------------------------
 
 def prospect_verdict_view(
@@ -554,7 +554,7 @@ def prospect_verdict_view(
 
 
 # ---------------------------------------------------------------------------
-# View 6 — geox_select_sw_model (Petrophysics Phase B)
+# View 6 — GEOX_select_sw_model (Petrophysics Phase B)
 # ---------------------------------------------------------------------------
 
 def sw_model_selector_view(
@@ -648,7 +648,7 @@ def sw_model_selector_view(
 
 
 # ---------------------------------------------------------------------------
-# View 7 — geox_compute_petrophysics (Petrophysics Phase B)
+# View 7 — GEOX_compute_petrophysics (Petrophysics Phase B)
 # ---------------------------------------------------------------------------
 
 def petrophysics_compute_view(
@@ -732,7 +732,7 @@ def petrophysics_compute_view(
 
 
 # ---------------------------------------------------------------------------
-# View 8 — geox_validate_cutoffs (Petrophysics Phase B)
+# View 8 — GEOX_validate_cutoffs (Petrophysics Phase B)
 # ---------------------------------------------------------------------------
 
 def cutoff_validation_view(
@@ -816,7 +816,7 @@ def cutoff_validation_view(
 
 
 # ---------------------------------------------------------------------------
-# View 9 — geox_petrophysical_hold_check (Petrophysics Phase B)
+# View 9 — GEOX_petrophysical_hold_check (Petrophysics Phase B)
 # ---------------------------------------------------------------------------
 
 def petrophysical_hold_view(
@@ -914,3 +914,4 @@ def petrophysical_hold_view(
                 _floor_table(["F1", "F9", "F13"])
 
     return PrefabApp(view=view)
+

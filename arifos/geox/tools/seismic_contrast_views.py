@@ -116,3 +116,4 @@ def _get_stability_role(name: str) -> str:
         "soft_smooth": "Noise suppression check"
     }
     return roles.get(name, "Display variant")
+

@@ -12,8 +12,8 @@
                     🟢 GEOX EIC — ONLINE 🟢
 ═══════════════════════════════════════════════════════════════════
 
-Container:    geox_eic
-Image:        geox/eic:v2026.04.10
+Container:    GEOX_eic
+Image:        GEOX/eic:v2026.04.10
 Status:       Up (healthy)
 Port:         8000:8000
 Transport:    HTTP (Streamable HTTP)
@@ -42,7 +42,7 @@ curl http://localhost:8000/health/details | jq .
 curl http://localhost:8000/tools | jq '.tools[].name'
 
 # Logs
-docker logs geox_eic --tail 50
+docker logs GEOX_eic --tail 50
 ```
 
 ---
@@ -63,11 +63,11 @@ Status: ✅ Pushed
 
 | Attribute | Value |
 |-----------|-------|
-| **Image** | geox/eic:v2026.04.10 |
-| **Container** | geox_eic |
+| **Image** | GEOX/eic:v2026.04.10 |
+| **Container** | GEOX_eic |
 | **Status** | Up (healthy) |
 | **Port** | 8000:8000 |
-| **User** | geox (UID 1000) |
+| **User** | GEOX (UID 1000) |
 | **Transport** | HTTP |
 | **Health** | ✅ Passing |
 
@@ -88,12 +88,12 @@ Status: ✅ Pushed
 
 | Tool | Status | AC_Risk |
 |------|--------|---------|
-| `geox_compute_ac_risk` | Production | ✅ |
-| `geox_load_seismic_line` | Production | ❌ |
-| `geox_build_structural_candidates` | Production | ❌ |
-| `geox_interpret_single_line` | Preview | ✅ |
-| `geox_georeference_map` | Preview | ✅ |
-| `geox_earth_signals` | Preview | ❌ |
+| `GEOX_compute_ac_risk` | Production | ✅ |
+| `GEOX_load_seismic_line` | Production | ❌ |
+| `GEOX_build_structural_candidates` | Production | ❌ |
+| `GEOX_interpret_single_line` | Preview | ✅ |
+| `GEOX_georeference_map` | Preview | ✅ |
+| `GEOX_earth_signals` | Preview | ❌ |
 
 ---
 
@@ -121,7 +121,7 @@ Status: ✅ Pushed
                     
               Status: 🟢 LIVE & HEALTHY
               
-         Container: geox_eic
+         Container: GEOX_eic
          Port: 8000
          Transport: HTTP
          
@@ -140,10 +140,11 @@ Status: ✅ Pushed
 
 1. **Test** — Verify all 6 tools via API
 2. **Integrate** — Connect Claude/Copilot to localhost:8000
-3. **Monitor** — Watch logs: `docker logs -f geox_eic`
+3. **Monitor** — Watch logs: `docker logs -f GEOX_eic`
 4. **Scale** — Use docker-compose.enterprise.yml for HA
 
 ---
 
 *Earth Intelligence Core: Deployed & Sealed*
 *DITEMPA BUKAN DIBERI — Forged, Not Given*
+

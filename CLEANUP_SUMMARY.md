@@ -62,8 +62,8 @@ Domains (8):
   cross_     — Evidence, dimensions, health
 
 Exceptions (2 UI-critical aliases retained):
-  geox_project_well_trajectory  — Cockpit UI dependency
-  geox_get_tools_registry       — UI registry endpoint
+  GEOX_project_well_trajectory  — Cockpit UI dependency
+  GEOX_get_tools_registry       — UI registry endpoint
 ```
 
 ---
@@ -91,11 +91,11 @@ Exceptions (2 UI-critical aliases retained):
 
 7. **`GEOX/registries/map.py`**
    - Removed 7 alias functions
-   - Retained `geox_project_well_trajectory` (UI requirement)
+   - Retained `GEOX_project_well_trajectory` (UI requirement)
 
 8. **`GEOX/registries/cross.py`**
    - Removed 5 alias functions
-   - Retained `geox_get_tools_registry` (UI requirement)
+   - Retained `GEOX_get_tools_registry` (UI requirement)
 
 ---
 
@@ -172,3 +172,4 @@ result = await physics_compute_stoiip({
 **DITEMPA BUKAN DIBERI** — Forged through cleanup, verified through physics.
 
 *Operation completed: 2026-04-11*
+

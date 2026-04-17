@@ -32,12 +32,12 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.GEOX_schemas import (
     CoordinatePoint,
     GeoQuantity,
     ProvenanceRecord,
 )
-from arifos.geox.geox_tools import BaseTool, GeoToolResult
+from arifos.GEOX.GEOX_tools import BaseTool, GeoToolResult
 
 # ---------------------------------------------------------------------------
 # Malay Basin geophysical parameter ranges
@@ -315,3 +315,4 @@ if __name__ == "__main__":
         print(f"Seed: {result.metadata['seed']}")
 
     asyncio.run(_selftest())
+

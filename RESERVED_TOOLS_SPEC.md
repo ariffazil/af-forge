@@ -9,13 +9,13 @@
 
 ## 🟡 TIER 02 — PHYSICS ENGINES (GEOX)
 
-### ⚒️ TOOL T02_44 — `geox_basin_model`
+### ⚒️ TOOL T02_44 — `GEOX_basin_model`
 **Cognitive Role:** Thermal and burial history reconstruction.
 - **Input:** `well_ids`, `stratigraphic_units`, `heat_flow_mW_m2`, `compaction_model`, `time_range_Ma`.
 - **Output:** `burial_curve`, `maturity_ro`, `hydrocarbon_generation_window`.
 - **Axioms:** Λ2, Λ5.
 
-### ⚒️ TOOL T02_45 — `geox_fracture_network`
+### ⚒️ TOOL T02_45 — `GEOX_fracture_network`
 **Cognitive Role:** Natural fracture characterization and permeability tensor.
 - **Input:** `scene_id`, `image_log_refs`, `stress_orientation_deg`, `overburden_MPa`.
 - **Output:** `fracture_density`, `dominant_strike`, `permeability_tensor`.
@@ -186,3 +186,4 @@
 **Cognitive Role:** Managed autonomous scaling and resource acquisition.
 - **Input:** `required_compute`, `task_complexity`, `risk_threshold`.
 - **Output:** `upscale_authorization`, `provisioned_resources`, `safety_lock_status`.
+

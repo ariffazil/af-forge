@@ -35,8 +35,8 @@ from typing import Any, Literal
 
 import numpy as np
 
-from arifos.geox.base_tool import _make_provenance
-from arifos.geox.geox_mcp_schemas import (
+from arifos.GEOX.base_tool import _make_provenance
+from arifos.GEOX.GEOX_mcp_schemas import (
     GEOXIngestResult,
     GEOXSeismicImageInput,
     ImageSourceType,
@@ -336,3 +336,4 @@ async def ingest_seismic_array(
         provenance=prov_dict,
         telemetry=telemetry,
     )
+

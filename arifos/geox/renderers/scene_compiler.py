@@ -4,10 +4,10 @@ GEOX Scene Compiler — DITEMPA BUKAN DIBERI
 Compiles canonical GEOX state into neutral render primitives.
 
 Canonical state types:
-- GeoXDisplayState → 2D display scene
-- GeoXCrossSectionState → Cross-section scene
-- GeoXSeismicSectionState → Seismic section scene
-- GeoXTriAppState → Multi-view coordinated scene
+- GEOXDisplayState → 2D display scene
+- GEOXCrossSectionState → Cross-section scene
+- GEOXSeismicSectionState → Seismic section scene
+- GEOXTriAppState → Multi-view coordinated scene
 
 Output: NeutralScene with primitives ready for any renderer adapter.
 """
@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from arifos.geox.renderers.primitives import (
+from arifos.GEOX.renderers.primitives import (
     BoundingBox,
     LegendEntry,
     LegendPrimitive,
@@ -48,8 +48,8 @@ class SceneCompiler:
         Dispatch compilation based on state type.
 
         Args:
-            canonical_state: GeoXDisplayState, GeoXCrossSectionState,
-                          GeoXSeismicSectionState, or GeoXTriAppState
+            canonical_state: GEOXDisplayState, GEOXCrossSectionState,
+                          GEOXSeismicSectionState, or GEOXTriAppState
 
         Returns:
             Neutral renderable scene
@@ -69,7 +69,7 @@ class SceneCompiler:
 
     def compile_cross_section(self, state: dict[str, Any]) -> NeutralScene:
         """
-        Compile GeoXCrossSectionState to neutral scene.
+        Compile GEOXCrossSectionState to neutral scene.
 
         Cross sections are INTERPRETED earth model products.
         Must distinguish observed vs inferred.
@@ -125,7 +125,7 @@ class SceneCompiler:
 
     def compile_seismic_section(self, state: dict[str, Any]) -> NeutralScene:
         """
-        Compile GeoXSeismicSectionState to neutral scene.
+        Compile GEOXSeismicSectionState to neutral scene.
 
         Seismic sections are OBSERVATIONAL sensor products.
         QC badges must be prominent.
@@ -200,7 +200,7 @@ class SceneCompiler:
 
     def compile_tri_app(self, state: dict[str, Any]) -> NeutralScene:
         """
-        Compile GeoXTriAppState for multi-view coordinated scene.
+        Compile GEOXTriAppState for multi-view coordinated scene.
 
         Used for linking Map + Cross Section + Seismic Section.
         """
@@ -230,7 +230,7 @@ class SceneCompiler:
         return scene
 
     def compile_display(self, state: dict[str, Any]) -> NeutralScene:
-        """Compile generic GeoXDisplayState."""
+        """Compile generic GEOXDisplayState."""
         scene = NeutralScene()
         scene.metadata = SceneMetadata(title=state.get("display_id", "Display"))
 
@@ -419,3 +419,4 @@ class SceneCompiler:
             )
 
         return legend
+

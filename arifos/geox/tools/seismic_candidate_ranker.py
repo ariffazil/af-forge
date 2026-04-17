@@ -51,3 +51,4 @@ async def rank_candidates(
         ))
 
     return sorted(candidates, key=lambda x: x.stability_score, reverse=True)
+

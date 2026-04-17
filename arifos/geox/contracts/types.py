@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 # Base Types
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class GeoXStatus(str, Enum):
+class GEOXStatus(str, Enum):
     """Canonical status values for GEOX operations."""
     SEAL = "SEAL"
     SABAR = "SABAR"
@@ -52,12 +52,12 @@ class ProvenanceTag(str, Enum):
     INTERPRETED = "INTERPRETED"
 
 
-class GeoXResult(BaseModel):
+class GEOXResult(BaseModel):
     """Base result structure for all GEOX operations."""
-    status: GeoXStatus
+    status: GEOXStatus
     timestamp: datetime
     seal: str = "DITEMPA BUKAN DIBERI"
-    geox_version: str = "0.5.0"
+    GEOX_version: str = "0.5.0"
     floor_verdicts: FloorVerdicts = Field(default_factory=FloorVerdicts)
     provenance_tag: ProvenanceTag = ProvenanceTag.DERIVED
     
@@ -87,7 +87,7 @@ class SwStats(BaseModel):
     max: float
 
 
-class SwCalculationResult(GeoXResult):
+class SwCalculationResult(GEOXResult):
     """Result from water saturation calculation."""
     model: SwModel
     nominal_sw: float
@@ -96,7 +96,7 @@ class SwCalculationResult(GeoXResult):
     requires_hold: bool = False
 
 
-class SwModelAdmissibilityResult(GeoXResult):
+class SwModelAdmissibilityResult(GEOXResult):
     """Result from Sw model selection/admissibility check."""
     well_id: str
     recommended_model: str
@@ -107,7 +107,7 @@ class SwModelAdmissibilityResult(GeoXResult):
     confidence: float
 
 
-class PetrophysicsResult(GeoXResult):
+class PetrophysicsResult(GEOXResult):
     """Full petrophysics calculation result."""
     well_id: str
     sw_model_used: SwModel
@@ -125,7 +125,7 @@ class PetrophysicsResult(GeoXResult):
     audit_id: str
 
 
-class CutoffValidationResult(GeoXResult):
+class CutoffValidationResult(GEOXResult):
     """Cutoff policy validation result."""
     well_id: str
     policy_id: str
@@ -146,7 +146,7 @@ class CutoffValidationResult(GeoXResult):
     audit_id: str
 
 
-class PetrophysicsHoldResult(GeoXResult):
+class PetrophysicsHoldResult(GEOXResult):
     """888_HOLD result for constitutional violations."""
     well_id: str
     hold_id: str
@@ -170,7 +170,7 @@ class SeismicView(BaseModel):
     note: str
 
 
-class SeismicLineResult(GeoXResult):
+class SeismicLineResult(GEOXResult):
     """Result from seismic line loading."""
     line_id: str
     survey_path: str
@@ -186,7 +186,7 @@ class StructuralCandidate(BaseModel):
     parameters: dict[str, Any]
 
 
-class StructuralCandidatesResult(GeoXResult):
+class StructuralCandidatesResult(GEOXResult):
     """Result from structural candidate generation."""
     line_id: str
     candidates: list[StructuralCandidate]
@@ -199,7 +199,7 @@ class StructuralCandidatesResult(GeoXResult):
 # Evaluation Types
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class ProspectEvaluationResult(GeoXResult):
+class ProspectEvaluationResult(GEOXResult):
     """Result from prospect evaluation."""
     prospect_id: str
     interpretation_id: str
@@ -208,7 +208,7 @@ class ProspectEvaluationResult(GeoXResult):
     reason: str
 
 
-class FeasibilityResult(GeoXResult):
+class FeasibilityResult(GEOXResult):
     """Result from feasibility check."""
     plan_id: str
     constraints: list[str]
@@ -216,7 +216,7 @@ class FeasibilityResult(GeoXResult):
     grounding_confidence: float
 
 
-class GeospatialVerificationResult(GeoXResult):
+class GeospatialVerificationResult(GEOXResult):
     """Result from geospatial verification."""
     lat: float
     lon: float
@@ -239,7 +239,7 @@ class MemoryEntry(BaseModel):
     basin: str | None = None
 
 
-class MemoryQueryResult(GeoXResult):
+class MemoryQueryResult(GEOXResult):
     """Result from memory query."""
     query: str
     basin_filter: str | None = None
@@ -252,10 +252,10 @@ class MemoryQueryResult(GeoXResult):
 # Health Types
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class HealthResult(GeoXResult):
+class HealthResult(GEOXResult):
     """Server health check result."""
     ok: bool = True
-    service: str = "geox-earth-witness"
+    service: str = "GEOX-earth-witness"
     fastmcp_version: str = ""
     prefab_ui: bool = False
     seismic_engine: bool = False
@@ -273,3 +273,4 @@ class AppIntent(BaseModel):
     params: dict[str, Any] = Field(default_factory=dict)
     preferred_mode: Literal["inline", "external"] = "inline"
     session_token: str | None = None
+

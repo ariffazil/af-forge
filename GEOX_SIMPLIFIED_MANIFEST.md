@@ -31,7 +31,7 @@
 
 ```
 GEOX/
-├── geox/                          # ← Canonical Python package
+├── GEOX/                          # ← Canonical Python package
 │   ├── __init__.py
 │   ├── server.py                  # ← ONE MCP server (AAA Grade)
 │   ├── tool_registry.py           # ← Unified tool definitions
@@ -57,18 +57,18 @@ GEOX/
 
 | Tool | Purpose | Status |
 |------|---------|--------|
-| `geox_compute_ac_risk` | ToAC calculation — THE CORE | ✅ Production |
-| `geox_load_seismic_line` | Seismic with scale validation | ✅ Production |
-| `geox_build_structural_candidates` | Multi-model interpretation | ✅ Production |
-| `geox_verify_geospatial` | Coordinate grounding | ✅ Production |
-| `geox_feasibility_check` | Constitutional firewall | ✅ Production |
-| `geox_evaluate_prospect` | Prospect verdict with HOLD | ✅ Production |
-| `geox_earth_signals` | Live Earth observations | ✅ Production |
+| `GEOX_compute_ac_risk` | ToAC calculation — THE CORE | ✅ Production |
+| `GEOX_load_seismic_line` | Seismic with scale validation | ✅ Production |
+| `GEOX_build_structural_candidates` | Multi-model interpretation | ✅ Production |
+| `GEOX_verify_geospatial` | Coordinate grounding | ✅ Production |
+| `GEOX_feasibility_check` | Constitutional firewall | ✅ Production |
+| `GEOX_evaluate_prospect` | Prospect verdict with HOLD | ✅ Production |
+| `GEOX_earth_signals` | Live Earth observations | ✅ Production |
 
 **Removed:**
-- ❌ `geox_interpret_single_line` — Too complex, overlaps with candidates
-- ❌ `geox_digitize_well_log` — Scaffold, not ready
-- ❌ `geox_georeference_map` — Preview quality, defer to v2
+- ❌ `GEOX_interpret_single_line` — Too complex, overlaps with candidates
+- ❌ `GEOX_digitize_well_log` — Scaffold, not ready
+- ❌ `GEOX_georeference_map` — Preview quality, defer to v2
 
 ---
 
@@ -95,7 +95,7 @@ curl http://localhost:8000/health
 
 # Use
 echo '{"u_phys": 0.3, "transform_stack": ["linear"]}' | \
-  python -m geox.client compute_ac_risk
+  python -m GEOX.client compute_ac_risk
 ```
 
 ---
@@ -117,3 +117,4 @@ echo '{"u_phys": 0.3, "transform_stack": ["linear"]}' | \
 
 *DITEMPA BUKAN DIBERI — Forged, Not Given*
 *Earth Intelligence: Revealed through subtraction*
+

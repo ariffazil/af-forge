@@ -35,3 +35,4 @@ async def check_structure_rules(candidates: list[STRUCT_CANDIDATE]) -> list[STRU
         valid_candidates.append(cand)
 
     return valid_candidates
+

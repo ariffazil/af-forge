@@ -101,7 +101,7 @@ allowed_tools:
 # ---------------------------------------------------------------------------
 
 pipeline:
-  pipeline_id: "geox-v0.1"
+  pipeline_id: "GEOX-v0.1"
   stages:
     - "000_INIT"
     - "111_THINK"
@@ -170,12 +170,12 @@ memory:
 
   # Qdrant settings (used when backend: qdrant)
   qdrant_url: "http://qdrant:6333"
-  collection: "geox_geological_memory"
+  collection: "GEOX_geological_memory"
   vector_size: 1536            # OpenAI text-embedding-3-small output dim
   distance: "Cosine"
 
   # JSONL export path for HuggingFace Dataset upload
-  export_path: "/data/geox_memory_export.jsonl"
+  export_path: "/data/GEOX_memory_export.jsonl"
 
 # ---------------------------------------------------------------------------
 # Earth Model Conventions
@@ -233,7 +233,7 @@ output:
     level: "INFO"
     format: "%(asctime)s [%(name)s] %(levelname)s: %(message)s"
     log_to_file: false
-    log_file_path: "/var/log/geox/geox.log"
+    log_file_path: "/var/log/GEOX/GEOX.log"
 
 # ---------------------------------------------------------------------------
 # Geological Domain Settings
@@ -276,3 +276,4 @@ geology:
     oil_window_max_ro: 1.35  # %Ro
     gas_window_min_ro: 1.35  # %Ro
     overmature_min_ro: 3.00  # %Ro
+

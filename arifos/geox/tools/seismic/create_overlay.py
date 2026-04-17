@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from PIL import Image, ImageOps, ImageDraw
 
-OUTPUT_DIR = Path("geox_output")
+OUTPUT_DIR = Path("GEOX_output")
 OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 
 async def create_overlay(base_image_path: str, features: List[Dict[str, Any]], overlay_type: str = "faults") -> Path:
@@ -46,3 +46,4 @@ async def create_overlay(base_image_path: str, features: List[Dict[str, Any]], o
     base.save(output_path)
 
     return output_path
+

@@ -285,12 +285,12 @@ class ContrastGovernedTool(ABC):
         
         # Check conflation risk
         verdict, triggers, metadata = assess_conflation_risk(taxonomy, self.domain)
-        geox_verdict = verdict.to_geox_verdict()
+        GEOX_verdict = verdict.to_GEOX_verdict()
         
-        if geox_verdict == GEOX_HOLD:
+        if GEOX_verdict == GEOX_HOLD:
             return GEOX_HOLD, f"CONFLATION RISK: {metadata.get('risk_level', 'unknown')}"
         
-        if geox_verdict == GEOX_BLOCK:
+        if GEOX_verdict == GEOX_BLOCK:
             return GEOX_BLOCK, "CRITICAL CONFLATION RISK: Visual and physical conflation detected"
         
         # All checks passed
@@ -329,3 +329,4 @@ def contrast_governed(domain: str = "generic"):
         
         return wrapper
     return decorator
+

@@ -302,3 +302,4 @@ def is_within_window(ts: datetime, window: tuple[datetime, datetime]) -> bool:
     end = _ensure_utc(end)
 
     return start <= ts <= end
+

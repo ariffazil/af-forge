@@ -43,14 +43,14 @@ This document outlines the strict PR-by-PR sequence to implement the 5-Plane Zer
 
 ## Phase 3: GEOX & Adversarial Advisory
 
-### PR-08: `geox(provenance): add GEOX provenance wrapper`
-- **Files:** `arifosmcp/geox/provenance.py`, `arifosmcp/geox/witness_hash.py`
-- **Tests:** `tests/geox/test_provenance.py`
+### PR-08: `GEOX(provenance): add GEOX provenance wrapper`
+- **Files:** `arifosmcp/GEOX/provenance.py`, `arifosmcp/GEOX/witness_hash.py`
+- **Tests:** `tests/GEOX/test_provenance.py`
 - **Acceptance Criteria:** Data ingestion tools (`well_load_bundle`, etc.) generate `witness_hash` and provenance metadata. Missing provenance triggers warnings, not halts.
 
-### PR-09: `geox(provenance): attach hashes to GEOX compute outputs`
-- **Files:** `arifosmcp/adapters/geox_adapter.py`
-- **Tests:** `tests/geox/test_compute_hashes.py`
+### PR-09: `GEOX(provenance): attach hashes to GEOX compute outputs`
+- **Files:** `arifosmcp/adapters/GEOX_adapter.py`
+- **Tests:** `tests/GEOX/test_compute_hashes.py`
 - **Acceptance Criteria:** GEOX compute and verification tools output `witness_hash`, `input_hash`, and `state_hash`. Backwards compatible with existing clients.
 
 ### PR-10: `security(validation): add Adversarial layer in advisory mode`
@@ -75,13 +75,13 @@ This document outlines the strict PR-by-PR sequence to implement the 5-Plane Zer
 - **Tests:** `tests/security/test_forge_lock.py`
 - **Acceptance Criteria:** **Third hard gate.** `arifos_forge` strictly REJECTS execution if `decision_packet.verdict != SEAL` or if the `manifest_hash` (input, state, actor, session, nonce) fails validation.
 
-### PR-14: `geox(provenance): enforce GEOX provenance for consequential outputs`
-- **Files:** `arifosmcp/adapters/geox_adapter.py`
-- **Tests:** `tests/geox/test_consequential_enforcement.py`
+### PR-14: `GEOX(provenance): enforce GEOX provenance for consequential outputs`
+- **Files:** `arifosmcp/adapters/GEOX_adapter.py`
+- **Tests:** `tests/GEOX/test_consequential_enforcement.py`
 - **Acceptance Criteria:** `physics_judge_verdict`, `prospect_evaluate`, etc., return `HOLD` or `VOID` if upstream `witness_hash` or provenance is missing.
 
 ### PR-15: `security(gate): harden ACP escalation surface`
-- **Files:** `arifosmcp/adapters/geox_adapter.py`
+- **Files:** `arifosmcp/adapters/GEOX_adapter.py`
 - **Tests:** `tests/security/test_acp_hardening.py`
 - **Acceptance Criteria:** `physics_acp_grant_seal` strictly requires a `SEALED` identity state, human approval token, proposal hash lock, and current state snapshot.
 
@@ -96,3 +96,4 @@ This document outlines the strict PR-by-PR sequence to implement the 5-Plane Zer
 - **Files:** `arifosmcp/runtime/rest_routes.py`, `arifosmcp/planes/*.py`
 - **Tests:** `tests/security/test_fail_closed.py`
 - **Acceptance Criteria:** **Absolute zero-loophole posture.** Any request missing a schema, stage, identity, or operating outside the explicit call graph is instantly `VOID`. Silent fallbacks to `ANONYMOUS` are impossible.
+

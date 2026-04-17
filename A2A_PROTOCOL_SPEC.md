@@ -27,7 +27,7 @@ Every message between agents must be wrapped in this envelope.
   "payload": {
     "tool_call": "wealth_evaluate_ROI",
     "arguments": { ... },
-    "grounding_refs": ["geox://scene/alpha-1"]
+    "grounding_refs": ["GEOX://scene/alpha-1"]
   },
   "signature": "ED25519_SIG"
 }
@@ -46,3 +46,4 @@ Every message between agents must be wrapped in this envelope.
 ### 🔗 3. TRUST ANCHORING
 
 The **Architect (Arif)** is the root of the trust chain. All `seal_tokens` must be traceable back to a session initiated with a valid `actor_id` anchored to the Architect's identity.
+

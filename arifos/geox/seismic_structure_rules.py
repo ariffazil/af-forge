@@ -35,8 +35,8 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
-from arifos.geox.base_tool import _make_provenance
-from arifos.geox.geox_mcp_schemas import (
+from arifos.GEOX.base_tool import _make_provenance
+from arifos.GEOX.GEOX_mcp_schemas import (
     GEOXStructuralCandidate,
     GEOXStructuralCandidateSet,
     StructuralCandidateType,
@@ -532,3 +532,4 @@ async def generate_structural_candidates(
             "seal": "DITEMPA BUKAN DIBERI",
         },
     )
+

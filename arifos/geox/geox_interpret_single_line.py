@@ -15,12 +15,12 @@ Chains all 7 pipeline stages:
 Output: GEOXInterpretationResult — AI-proposed interpretation, NOT ground truth.
 
 MCP verbs exposed:
-  - geox_load_seismic_image → Stage 1
-  - geox_generate_contrast_views → Stage 2
-  - geox_extract_image_features → Stage 3
-  - geox_build_structural_candidates → Stages 4-5
-  - geox_rank_structural_models → Stage 6
-  - geox_interpret_single_line → Stages 1-7 (full pipeline)
+  - GEOX_load_seismic_image → Stage 1
+  - GEOX_generate_contrast_views → Stage 2
+  - GEOX_extract_image_features → Stage 3
+  - GEOX_build_structural_candidates → Stages 4-5
+  - GEOX_rank_structural_models → Stage 6
+  - GEOX_interpret_single_line → Stages 1-7 (full pipeline)
 
 Constitutional floors:
   F1  Amanah — Full provenance chain
@@ -50,19 +50,19 @@ from typing import Any
 
 import numpy as np
 
-from arifos.geox.base_tool import BaseTool, GeoToolResult, _make_provenance
-from arifos.geox.geox_mcp_schemas import (
+from arifos.GEOX.base_tool import BaseTool, GeoToolResult, _make_provenance
+from arifos.GEOX.GEOX_mcp_schemas import (
     GEOXConceptualBias,
     GEOXInterpretationResult,
     ImageSourceType,
     Line2DVerdict,
     TimeDepthDomain,
 )
-from arifos.geox.seismic_candidate_ranker import build_structural_models
-from arifos.geox.seismic_contrast_views import generate_contrast_views
-from arifos.geox.seismic_feature_extract import extract_features
-from arifos.geox.seismic_image_ingest import ingest_seismic_array
-from arifos.geox.seismic_structure_rules import generate_structural_candidates
+from arifos.GEOX.seismic_candidate_ranker import build_structural_models
+from arifos.GEOX.seismic_contrast_views import generate_contrast_views
+from arifos.GEOX.seismic_feature_extract import extract_features
+from arifos.GEOX.seismic_image_ingest import ingest_seismic_array
+from arifos.GEOX.seismic_structure_rules import generate_structural_candidates
 
 BOND_REFERENCE = (
     "Bond, C. E., Gibbs, A. D., Shipton, Z. K., & Jones, S. (2007). "
@@ -192,7 +192,7 @@ async def interpret_single_line(
         provenance=prov,
         telemetry={
             "stage": 7,
-            "pipeline": "geox_interpret_single_line",
+            "pipeline": "GEOX_interpret_single_line",
             "latency_ms": round(pipeline_latency_ms, 2),
             "n_views": len(view_set.views),
             "n_candidates": len(candidate_set.candidates),
@@ -318,7 +318,7 @@ def _build_validation_recommendations(
 
 class GEOXInterpretSingleLineTool(BaseTool):
     """
-    GEOX MCP tool: geox_interpret_single_line
+    GEOX MCP tool: GEOX_interpret_single_line
 
     Main orchestrator for the 7-stage governed seismic interpretation pipeline.
     """
@@ -383,3 +383,4 @@ class GEOXInterpretSingleLineTool(BaseTool):
             },
             latency_ms=round(latency_ms, 2),
         )
+

@@ -11,14 +11,14 @@ Supports:
 - Static snapshot export
 
 App visible tools:
-- geox_open_volume_context
-- geox_volume_render_snapshot
-- geox_volume_launch_interactive
+- GEOX_open_volume_context
+- GEOX_volume_render_snapshot
+- GEOX_volume_launch_interactive
 
 Backend tools (hidden from model):
-- geox_renderer_cigvis_build_nodes
-- geox_renderer_cigvis_render_png
-- geox_renderer_cigvis_launch_server
+- GEOX_renderer_cigvis_build_nodes
+- GEOX_renderer_cigvis_render_png
+- GEOX_renderer_cigvis_launch_server
 """
 
 from __future__ import annotations
@@ -28,11 +28,11 @@ from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
 
-from arifos.geox.renderers import CigvisAdapter, SceneCompiler
-from arifos.geox.renderers.export import RenderExporter
-from arifos.geox.volume_context import VolumeSceneBuilder
+from arifos.GEOX.renderers import CigvisAdapter, SceneCompiler
+from arifos.GEOX.renderers.export import RenderExporter
+from arifos.GEOX.volume_context import VolumeSceneBuilder
 
-logger = logging.getLogger("geox.apps.volume_app")
+logger = logging.getLogger("GEOX.apps.volume_app")
 
 
 class VolumeApp:
@@ -42,7 +42,7 @@ class VolumeApp:
     Manages volume scenes and rendering via cigvis adapter.
     """
 
-    def __init__(self, output_dir: str = "/tmp/geox_volume"):
+    def __init__(self, output_dir: str = "/tmp/GEOX_volume"):
         self.scene_compiler = SceneCompiler()
         self.renderer_adapter = CigvisAdapter(output_dir=output_dir)
         self.exporter = RenderExporter(output_dir=output_dir)
@@ -280,3 +280,4 @@ class VolumeApp:
             del self._active_contexts[context_id]
             return True
         return False
+

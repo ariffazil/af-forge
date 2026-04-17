@@ -10,7 +10,7 @@ import { WealthEngine } from "../src/engine/WealthEngine.js";
 async function runLoop() {
   const intent = "Optimize development for Field X under climate and maruah constraints.";
   const kernel = new ArifOSKernel(intent, "session-v0.1-field-x");
-  const geox = new GEOXEngine();
+  const GEOX = new GEOXEngine();
   const wealth = new WealthEngine();
 
   console.log(`[000 INIT] Intent: ${intent}`);
@@ -23,9 +23,9 @@ async function runLoop() {
 
   // 333 EXPLORE
   kernel.transition("333");
-  const scenarios = await geox.generateScenarios("Field X");
+  const scenarios = await GEOX.generateScenarios("Field X");
   const allocations = await wealth.allocate(scenarios);
-  kernel.injectContext("geox_scenarios", scenarios);
+  kernel.injectContext("GEOX_scenarios", scenarios);
   kernel.injectContext("wealth_allocations", allocations);
   console.log(`[333 EXPLORE] Generated ${scenarios.length} physical scenarios and resource allocations.`);
 
@@ -60,3 +60,4 @@ async function runLoop() {
 }
 
 runLoop().catch(console.error);
+

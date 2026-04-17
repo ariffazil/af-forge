@@ -4,8 +4,8 @@ from pathlib import Path
 
 import numpy as np
 
-from arifos.geox.renderers.cigvis_adapter import CigvisAdapter
-from arifos.geox.renderers.primitives import (
+from arifos.GEOX.renderers.cigvis_adapter import CigvisAdapter
+from arifos.GEOX.renderers.primitives import (
     FaultPrimitive,
     RenderColor,
     SliceDirection,
@@ -32,7 +32,7 @@ def test_volume_slice_to_node_uses_cigvis_v020_api(monkeypatch):
         captured["kwargs"] = kwargs
         return ["slice-node", "line-node"]
 
-    monkeypatch.setattr("arifos.geox.renderers.cigvis_adapter.cigvis.create_slices", fake_create_slices)
+    monkeypatch.setattr("arifos.GEOX.renderers.cigvis_adapter.cigvis.create_slices", fake_create_slices)
 
     nodes = adapter._volume_slice_to_node(volume_slice)
 
@@ -63,7 +63,7 @@ def test_surface_to_node_uses_create_surfaces(monkeypatch):
         return ["surface-node"]
 
     monkeypatch.setattr(
-        "arifos.geox.renderers.cigvis_adapter.cigvis.create_surfaces",
+        "arifos.GEOX.renderers.cigvis_adapter.cigvis.create_surfaces",
         fake_create_surfaces,
     )
 
@@ -96,7 +96,7 @@ def test_fault_to_node_uses_create_points(monkeypatch):
         captured["kwargs"] = kwargs
         return "fault-node"
 
-    monkeypatch.setattr("arifos.geox.renderers.cigvis_adapter.cigvis.create_points", fake_create_points)
+    monkeypatch.setattr("arifos.GEOX.renderers.cigvis_adapter.cigvis.create_points", fake_create_points)
 
     nodes = adapter._fault_to_node(fault)
 
@@ -125,7 +125,7 @@ def test_well_to_node_uses_create_well_logs(monkeypatch):
         return ["well-node"]
 
     monkeypatch.setattr(
-        "arifos.geox.renderers.cigvis_adapter.cigvis.vispyplot.create_well_logs",
+        "arifos.GEOX.renderers.cigvis_adapter.cigvis.vispyplot.create_well_logs",
         fake_create_well_logs,
     )
 
@@ -149,7 +149,7 @@ def test_render_snapshot_uses_plot3d_savename(monkeypatch, tmp_path):
         captured["kwargs"] = kwargs
         Path(kwargs["savename"]).write_bytes(b"png")
 
-    monkeypatch.setattr("arifos.geox.renderers.cigvis_adapter.cigvis.plot3D", fake_plot3d)
+    monkeypatch.setattr("arifos.GEOX.renderers.cigvis_adapter.cigvis.plot3D", fake_plot3d)
 
     result = adapter.render_snapshot(
         {"nodes": ["node-a"], "metadata": {"title": "demo"}},
@@ -179,11 +179,11 @@ def test_launch_interactive_uses_viserplot_server(monkeypatch):
         captured["kwargs"] = kwargs
 
     monkeypatch.setattr(
-        "arifos.geox.renderers.cigvis_adapter.cigvis.viserplot.create_server",
+        "arifos.GEOX.renderers.cigvis_adapter.cigvis.viserplot.create_server",
         fake_create_server,
     )
     monkeypatch.setattr(
-        "arifos.geox.renderers.cigvis_adapter.cigvis.viserplot.plot3D",
+        "arifos.GEOX.renderers.cigvis_adapter.cigvis.viserplot.plot3D",
         fake_plot3d,
     )
 
@@ -212,7 +212,7 @@ def test_compile_cross_section_well_creates_cigvis_node(monkeypatch):
         return ["well-node"]
 
     monkeypatch.setattr(
-        "arifos.geox.renderers.cigvis_adapter.cigvis.vispyplot.create_well_logs",
+        "arifos.GEOX.renderers.cigvis_adapter.cigvis.vispyplot.create_well_logs",
         fake_create_well_logs,
     )
 
@@ -241,3 +241,4 @@ def test_compile_cross_section_well_creates_cigvis_node(monkeypatch):
     assert captured["points"].shape == (3, 3)
     assert scene["metadata"]["primitive_count"] == 1
     assert scene["metadata"]["title"] == "Section A"
+

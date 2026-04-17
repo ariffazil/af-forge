@@ -13,7 +13,7 @@ from typing import List, Dict, Any, Tuple
 import numpy as np
 from PIL import Image, ImageOps, ImageFilter
 
-from arifos.geox.ENGINE.contrast_wrapper import contrast_governed_tool
+from arifos.GEOX.ENGINE.contrast_wrapper import contrast_governed_tool
 
 def encode_image_to_base64(img: Image.Image) -> str:
     """Helper to convert PIL Image to base64 PNG."""
@@ -57,3 +57,4 @@ async def extract_seismic_views(seismic_data: str) -> List[Dict[str, str]]:
         {"label": "High Saliency (Equalized)", "base64": v2_base64, "mimeType": "image/png"},
         {"label": "Structural Edge Enhancement", "base64": v3_base64, "mimeType": "image/png"}
     ]
+

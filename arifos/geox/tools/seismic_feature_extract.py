@@ -44,3 +44,4 @@ async def extract_lineaments(views: list[GEOX_SEISMIC_VIEW]) -> list[list[GEOPRO
         all_lineaments.append(view_lineaments)
 
     return all_lineaments
+

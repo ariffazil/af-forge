@@ -104,25 +104,25 @@ function computeUncertaintyBand(domainScores: { GEOX: number; WEALTH: number; CO
 }
 
 export function routeIntent(intent: string): RoutingDecision {
-  const geox = scoreKeywordMatch(intent, GEOX_KEYWORDS);
+  const GEOX = scoreKeywordMatch(intent, GEOX_KEYWORDS);
   const wealth = scoreKeywordMatch(intent, WEALTH_KEYWORDS);
   const code = scoreKeywordMatch(intent, CODE_KEYWORDS);
   const mixed = scoreKeywordMatch(intent, MIXED_INDICATORS);
 
   const domainScores = {
-    GEOX: geox.count,
+    GEOX: GEOX.count,
     WEALTH: wealth.count,
     CODE: code.count,
   };
-  const total = geox.count + wealth.count + code.count;
+  const total = GEOX.count + wealth.count + code.count;
 
   // Determine primary domain
   let primaryOrgan: IntentDomain;
-  if (geox.count > wealth.count && geox.count > code.count) {
+  if (GEOX.count > wealth.count && GEOX.count > code.count) {
     primaryOrgan = "GEOX";
-  } else if (wealth.count > geox.count && wealth.count > code.count) {
+  } else if (wealth.count > GEOX.count && wealth.count > code.count) {
     primaryOrgan = "WEALTH";
-  } else if (code.count > geox.count && code.count > wealth.count) {
+  } else if (code.count > GEOX.count && code.count > wealth.count) {
     primaryOrgan = "CODE";
   } else if (total === 0) {
     primaryOrgan = "CODE"; // Default to code agent when no signal
@@ -133,7 +133,7 @@ export function routeIntent(intent: string): RoutingDecision {
 
   // Secondary organs (any domain with score > 0 but not primary)
   const secondary: IntentDomain[] = [];
-  if (geox.count > 0 && primaryOrgan !== "GEOX") secondary.push("GEOX");
+  if (GEOX.count > 0 && primaryOrgan !== "GEOX") secondary.push("GEOX");
   if (wealth.count > 0 && primaryOrgan !== "WEALTH") secondary.push("WEALTH");
   if (code.count > 0 && primaryOrgan !== "CODE") secondary.push("CODE");
 
@@ -141,7 +141,7 @@ export function routeIntent(intent: string): RoutingDecision {
 
   // Reasoning string
   const parts: string[] = [];
-  if (geox.count > 0) parts.push(`GEOX[${geox.count}]: ${geox.matches.slice(0, 3).join(", ")}${geox.count > 3 ? "..." : ""}`);
+  if (GEOX.count > 0) parts.push(`GEOX[${GEOX.count}]: ${GEOX.matches.slice(0, 3).join(", ")}${GEOX.count > 3 ? "..." : ""}`);
   if (wealth.count > 0) parts.push(`WEALTH[${wealth.count}]: ${wealth.matches.slice(0, 3).join(", ")}${wealth.count > 3 ? "..." : ""}`);
   if (code.count > 0) parts.push(`CODE[${code.count}]: ${code.matches.slice(0, 3).join(", ")}${code.count > 3 ? "..." : ""}`);
   if (mixed.count > 0) parts.push(`MIXED[${mixed.count}]`);
@@ -171,7 +171,7 @@ export function routeIntent(intent: string): RoutingDecision {
     confidence,
     primaryOrgan,
     secondaryOrgans: secondary,
-    triggers: [...geox.matches, ...wealth.matches, ...code.matches],
+    triggers: [...GEOX.matches, ...wealth.matches, ...code.matches],
     uncertaintyBand,
     recommendedNextStage,
     reasoning,

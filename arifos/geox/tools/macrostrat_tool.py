@@ -1,5 +1,5 @@
 """
-arifos/geox/tools/macrostrat_tool.py — Macrostrat API Adapter
+arifos/GEOX/tools/macrostrat_tool.py — Macrostrat API Adapter
 DITEMPA BUKAN DIBERI
 
 A hardened adapter for the Macrostrat geological API. 
@@ -19,17 +19,17 @@ import httpx
 _CACHE: dict[str, tuple[float, Any]] = {}
 _CACHE_TTL_SECONDS: float = 3600.0  # 1 hour — geology doesn't change fast
 
-from arifos.geox.base_tool import (
+from arifos.GEOX.base_tool import (
     BaseTool,
     GeoToolResult,
 )
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.GEOX_schemas import (
     CoordinatePoint,
     GeoQuantity,
     ProvenanceRecord,
 )
 
-logger = logging.getLogger("geox.tools.macrostrat")
+logger = logging.getLogger("GEOX.tools.macrostrat")
 
 class MacrostratTool(BaseTool):
     """
@@ -203,4 +203,5 @@ class MacrostratTool(BaseTool):
         """Ping the Macrostrat API status."""
         # Simple placeholder for connectivity check
         return True
+
 

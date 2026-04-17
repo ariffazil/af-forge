@@ -6,7 +6,7 @@
     - generic [ref=e7]:
       - text: Visit
       - link "cloudflare.com" [ref=e8] [cursor=pointer]:
-        - /url: https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_522&utm_campaign=geox.arif-fazil.com
+        - /url: https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_522&utm_campaign=GEOX.arif-fazil.com
       - text: for more information.
     - generic [ref=e9]: 2026-04-09 01:05:32 UTC
   - generic [ref=e12]:
@@ -16,14 +16,14 @@
       - text: Working
     - generic [ref=e18]:
       - link [ref=e20] [cursor=pointer]:
-        - /url: https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_522&utm_campaign=geox.arif-fazil.com
+        - /url: https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_522&utm_campaign=GEOX.arif-fazil.com
       - text: Kuala Lumpur
       - heading "Cloudflare" [level=3] [ref=e23]:
         - link "Cloudflare" [ref=e24] [cursor=pointer]:
-          - /url: https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_522&utm_campaign=geox.arif-fazil.com
+          - /url: https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_522&utm_campaign=GEOX.arif-fazil.com
       - text: Working
     - generic [ref=e25]:
-      - text: geox.arif-fazil.com
+      - text: GEOX.arif-fazil.com
       - heading "Host" [level=3] [ref=e29]
       - text: Error
   - generic [ref=e31]:
@@ -51,4 +51,4 @@
     - generic [ref=e48]:
       - text: Performance & security by
       - link "Cloudflare" [ref=e49] [cursor=pointer]:
-        - /url: https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_522&utm_campaign=geox.arif-fazil.com
+        - /url: https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_522&utm_campaign=GEOX.arif-fazil.com

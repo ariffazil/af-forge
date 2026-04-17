@@ -226,3 +226,4 @@ class SyntheticSeismic:
         time_idx = np.argmin(np.abs(synthetic.time - t_target))
         
         return synthetic.traces[time_idx, :]
+

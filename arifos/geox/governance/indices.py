@@ -1,5 +1,5 @@
 """
-arifos/geox/governance/indices.py — Operational Governance Indices
+arifos/GEOX/governance/indices.py — Operational Governance Indices
 
 Codifies the 'Fast, Cheap, Safe' trilemma into computable metrics
 based on arifOS mechanical constraints (Tokens, Latency, Energy).
@@ -68,3 +68,4 @@ def get_verdict_advice(indices: dict[str, float]) -> str:
         return "HAZARD_DETECTED: Critical irreversibility. 888_HOLD enforced."
 
     return "STABLE: Standard operational parameters."
+

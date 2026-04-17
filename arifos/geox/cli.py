@@ -1,5 +1,5 @@
 """
-arifos/geox/cli.py — GEOX CLI Entrypoint
+arifos/GEOX/cli.py — GEOX CLI Entrypoint
 
 A hardened CLI for geological coprocessor intelligence.
 Exposes evaluation, memory, and health tools to the command line.
@@ -11,13 +11,13 @@ import sys
 
 import yaml
 
-from arifos.geox.geox_agent import GeoXAgent, GeoXConfig
-from arifos.geox.geox_init import verify_and_exit_if_void
-from arifos.geox.geox_schemas import CoordinatePoint, GeoRequest
+from arifos.GEOX.GEOX_agent import GEOXAgent, GEOXConfig
+from arifos.GEOX.GEOX_init import verify_and_exit_if_void
+from arifos.GEOX.GEOX_schemas import CoordinatePoint, GeoRequest
 
 
 def main():
-    """Main entrypoint for the `geox` CLI command."""
+    """Main entrypoint for the `GEOX` CLI command."""
 
     # Hardened ignition and check
     foundation = verify_and_exit_if_void()
@@ -55,22 +55,22 @@ def main():
 
     elif args.command == "config":
         if args.show:
-                print(yaml.dump(GeoXConfig().model_dump(), sort_keys=False))
+                print(yaml.dump(GEOXConfig().model_dump(), sort_keys=False))
 
     else:
         parser.print_help()
 
 async def run_evaluate(args):
     """Execution wrapper for eval command."""
-    config = GeoXConfig(risk_tolerance=args.risk)
-    agent = GeoXAgent(config=config)
+    config = GEOXConfig(risk_tolerance=args.risk)
+    agent = GEOXAgent(config=config)
 
     request = GeoRequest(
         query=args.query,
         location=CoordinatePoint(latitude=args.lat, longitude=args.lon),
         basin=args.basin,
         risk_tolerance=args.risk,
-        requester_id="geox-cli"
+        requester_id="GEOX-cli"
     )
 
     print(f"[*] Initializing GEOX Pipeline for: {args.basin}...")
@@ -89,3 +89,4 @@ async def run_evaluate(args):
 
 if __name__ == "__main__":
     main()
+

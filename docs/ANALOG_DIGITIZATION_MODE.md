@@ -61,3 +61,4 @@ Before digitization, the MCP tool returns a **Registration Manifest**.
 ---
 
 *Spec initialized by Gemini CLI | 2026.04.11*
+

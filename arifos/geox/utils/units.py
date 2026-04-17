@@ -326,3 +326,4 @@ def format_quantity(value: float, unit: GeoUnit, uncertainty: float) -> str:
         unc_str = f"{abs_uncertainty:.4f}"
 
     return f"{val_str} ± {unc_str} {unit_str}"
+

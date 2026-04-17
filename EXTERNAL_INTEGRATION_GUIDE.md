@@ -134,7 +134,7 @@ GEOX provides:
 | [seismiqb](https://github.com/BEEugene/seismiqb) | DL for seismic (horizons, faults, geobodies) | Model architectures, training patterns |
 | [MS seismic-deeplearning](https://github.com/microsoft/seismic-deeplearning/) | Curated models + training | Production-ready pipelines |
 | [Seismic-App](https://github.com/gecos-lab/Seismic-App) | SAM2 + seismic GUI | Image-centric segmentation pattern |
-| [GeoX](https://github.com/Alpha-Innovator/GeoX) / [GeoGround](https://github.com/zytx121/GeoGround) / [GeoPixel](https://github.com/mbzuai-oryx/GeoPixel) | Geo VLMs | Vision encoders for RS/maps |
+| [GEOX](https://github.com/Alpha-Innovator/GEOX) / [GeoGround](https://github.com/zytx121/GeoGround) / [GeoPixel](https://github.com/mbzuai-oryx/GeoPixel) | Geo VLMs | Vision encoders for RS/maps |
 
 ### Integration Architecture
 ```
@@ -159,7 +159,7 @@ GEOX provides:
 │ Stage 2: External Model Inference                            │
 │   ├── seismiqb attributes (physics path)                     │
 │   ├── SAM segmentation (image path)                          │
-│   └── GeoX VLM (language path)                               │
+│   └── GEOX VLM (language path)                               │
 │ Stage 3: Cross-View Consistency (GEOX native)                │
 │   └── Flag features only appearing under enhancement         │
 │ Stage 4: Physics Reconciliation (GEOX native)                │
@@ -217,12 +217,12 @@ def compute_attribute_with_risk(attribute_type, source_type):
 
 ---
 
-## 5. Vision-Language Backends (GeoX + GeoGround + GeoPixel)
+## 5. Vision-Language Backends (GEOX + GeoGround + GeoPixel)
 
 ### External Resources
 | Resource | What It Provides |
 |----------|------------------|
-| [GeoX](https://github.com/Alpha-Innovator/GeoX) | RS vision encoders + VLM |
+| [GEOX](https://github.com/Alpha-Innovator/GEOX) | RS vision encoders + VLM |
 | [GeoGround](https://github.com/zytx121/GeoGround) | Grounding for RS imagery |
 | [GeoPixel](https://github.com/mbzuai-oryx/GeoPixel) | Fine-grained geo semantic segmentation |
 | [G-RSIM](https://github.com/mbzuai-oryx/GeoPixel) | Remote sensing interpretation models |
@@ -231,7 +231,7 @@ def compute_attribute_with_risk(attribute_type, source_type):
 ### Integration Pattern
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ EXTERNAL: GeoX / GeoGround / GeoPixel (Vision Towers)        │
+│ EXTERNAL: GEOX / GeoGround / GeoPixel (Vision Towers)        │
 │ ├── Pre-trained RS vision encoders                           │
 │ ├── High-res image tokenizers                                │
 │ └── Domain-finetuned VLM heads                               │
@@ -241,7 +241,7 @@ def compute_attribute_with_risk(attribute_type, source_type):
 │ GEOX: Adapter Layer                                          │
 │ ├── Input: seismic/map image                                 │
 │ ├── Preprocess: Contrast Canon (5 views)                     │
-│ ├── External VLM inference (GeoX/etc)                        │
+│ ├── External VLM inference (GEOX/etc)                        │
 │ └── Postprocess: AC_Risk calculation                         │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -278,7 +278,7 @@ def compute_attribute_with_risk(attribute_type, source_type):
 
 ### Month 3: Attributes & VLM
 - [ ] Read Nature 2025 paper, encode attribute risks
-- [ ] Evaluate GeoX/GeoGround/GeoPixel
+- [ ] Evaluate GEOX/GeoGround/GeoPixel
 - [ ] Build adapter for best tower
 - [ ] End-to-end testing
 
@@ -335,7 +335,7 @@ if result.verdict == Verdict.HOLD:
 | Analog Digitization | WebPlotDigitizer pattern + Geomega | Physics validation + AC_Risk | 4-6 months |
 | Seismic Vision | seismiqb + Seismic-App | Multi-view + AC_Risk | 6-8 months |
 | Attributes | seismiqb + Nature 2025 | Transform-aware metadata | 2-3 months |
-| VLM | GeoX/GeoGround/GeoPixel | ToAC governance layer | 3-4 months |
+| VLM | GEOX/GeoGround/GeoPixel | ToAC governance layer | 3-4 months |
 
 **Net acceleration: 18-25 months of development**
 
@@ -343,3 +343,4 @@ if result.verdict == Verdict.HOLD:
 
 *DITEMPA BUKAN DIBERI*  
 *Leverage external strength. Add GEOX governance. Forge faster.*
+

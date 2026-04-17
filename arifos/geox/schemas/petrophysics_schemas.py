@@ -4,10 +4,10 @@ petrophysics_schemas.py — Governed Petrophysics Pipeline Schemas
 DITEMPA BUKAN DIBERI
 
 Pydantic v2 schemas for the petrophysics MCP tool pipeline:
-  1. geox_select_sw_model     — model admissibility from QC flags
-  2. geox_compute_petrophysics — full property pipeline
-  3. geox_validate_cutoffs    — apply CutoffPolicy
-  4. geox_petrophysical_hold_check — trigger 888_HOLD on floor violations
+  1. GEOX_select_sw_model     — model admissibility from QC flags
+  2. GEOX_compute_petrophysics — full property pipeline
+  3. GEOX_validate_cutoffs    — apply CutoffPolicy
+  4. GEOX_petrophysical_hold_check — trigger 888_HOLD on floor violations
 
 Provenance tags used in this module:
   RAW       — direct instrument reading, no correction
@@ -30,7 +30,7 @@ import uuid
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-from arifos.geox.THEORY.contrast_taxonomy import ClaimTag
+from arifos.GEOX.THEORY.contrast_taxonomy import ClaimTag
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -145,7 +145,7 @@ class LogQCFlags(BaseModel):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SwModelAdmissibility — output of geox_select_sw_model
+# SwModelAdmissibility — output of GEOX_select_sw_model
 # ─────────────────────────────────────────────────────────────────────────────
 
 class SwModelAdmissibility(BaseModel):
@@ -206,7 +206,7 @@ class SwModelAdmissibility(BaseModel):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PetrophysicsInput — input for geox_compute_petrophysics
+# PetrophysicsInput — input for GEOX_compute_petrophysics
 # ─────────────────────────────────────────────────────────────────────────────
 
 class PetrophysicsInput(BaseModel):
@@ -293,7 +293,7 @@ class PetrophysicsInput(BaseModel):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PetrophysicsOutput — output of geox_compute_petrophysics
+# PetrophysicsOutput — output of GEOX_compute_petrophysics
 # ─────────────────────────────────────────────────────────────────────────────
 
 class PetrophysicsOutput(BaseModel):
@@ -379,7 +379,7 @@ class PetrophysicsOutput(BaseModel):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# CutoffPolicy — schema for geox_validate_cutoffs
+# CutoffPolicy — schema for GEOX_validate_cutoffs
 # ─────────────────────────────────────────────────────────────────────────────
 
 class CutoffPolicy(BaseModel):
@@ -437,7 +437,7 @@ class CutoffPolicy(BaseModel):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# CutoffValidationResult — output of geox_validate_cutoffs
+# CutoffValidationResult — output of GEOX_validate_cutoffs
 # ─────────────────────────────────────────────────────────────────────────────
 
 class CutoffValidationResult(BaseModel):
@@ -501,7 +501,7 @@ class CutoffValidationResult(BaseModel):
 
 class PetrophysicsHold(BaseModel):
     """
-    Explicit 888_HOLD raised by geox_petrophysical_hold_check.
+    Explicit 888_HOLD raised by GEOX_petrophysical_hold_check.
 
     Never silently ignored — any floor violation must surface an explicit
     PetrophysicsHold with a documented reason and the violated floor.
@@ -521,7 +521,7 @@ class PetrophysicsHold(BaseModel):
         ...,
         description=(
             "Tool or check that triggered the hold "
-            "(e.g. 'geox_petrophysical_hold_check', 'geox_validate_cutoffs')."
+            "(e.g. 'GEOX_petrophysical_hold_check', 'GEOX_validate_cutoffs')."
         ),
     )
     violated_floors: list[str] = Field(
@@ -560,3 +560,4 @@ class PetrophysicsHold(BaseModel):
         return self
 
     model_config = {"json_schema_extra": {"title": "PetrophysicsHold"}}
+

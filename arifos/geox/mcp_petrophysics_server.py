@@ -7,11 +7,11 @@ Resources: Application-controlled context with stable URIs
 Tools: Model-controlled actions for computation
 
 URI Schemes:
-- geox://well/{well_id}/las/bundle
-- geox://well/{well_id}/logs/canonical
-- geox://well/{well_id}/interval/{top}-{base}/rock-state
-- geox://well/{well_id}/cutoff-policy/{policy_id}
-- geox://well/{well_id}/qc/report
+- GEOX://well/{well_id}/las/bundle
+- GEOX://well/{well_id}/logs/canonical
+- GEOX://well/{well_id}/interval/{top}-{base}/rock-state
+- GEOX://well/{well_id}/cutoff-policy/{policy_id}
+- GEOX://well/{well_id}/qc/report
 """
 
 from __future__ import annotations
@@ -25,25 +25,25 @@ try:
 except ImportError:
     raise ImportError("fastmcp required. Install: pip install fastmcp")
 
-from arifos.geox.resources.well_resources import get_resource
-from arifos.geox.tools.petrophysics import (
+from arifos.GEOX.resources.well_resources import get_resource
+from arifos.GEOX.tools.petrophysics import (
     LogBundleLoader,
     load_bundle_from_store,
     store_bundle,
     QCEngine,
     generate_qc_report,
 )
-from arifos.geox.tools.petrophysics.property_calculator import (
+from arifos.GEOX.tools.petrophysics.property_calculator import (
     PetrophysicsCalculator,
     load_rock_state,
     store_rock_state,
 )
-from arifos.geox.tools.petrophysics.cutoff_validator import (
+from arifos.GEOX.tools.petrophysics.cutoff_validator import (
     CutoffValidator,
     load_cutoff_policy,
 )
-from arifos.geox.tools.petrophysics.hold_checker import PetrophysicalHoldChecker
-from arifos.geox.tools.petrophysics.model_selector import SaturationModelSelector
+from arifos.GEOX.tools.petrophysics.hold_checker import PetrophysicalHoldChecker
+from arifos.GEOX.tools.petrophysics.model_selector import SaturationModelSelector
 
 # Initialize MCP server
 mcp = FastMCP(
@@ -60,48 +60,48 @@ GEOX_SEAL = "DITEMPA BUKAN DIBERI"
 # MCP RESOURCES (Application-Controlled Context)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@mcp.resource("geox://well/{well_id}/las/bundle")
+@mcp.resource("GEOX://well/{well_id}/las/bundle")
 async def resource_well_bundle(well_id: str) -> dict[str, Any]:
     """
     Canonical LAS/DLIS bundle with parsed header, curves, and QC status.
     Provenance: RAW
     """
-    return await get_resource(f"geox://well/{well_id}/las/bundle")
+    return await get_resource(f"GEOX://well/{well_id}/las/bundle")
 
 
-@mcp.resource("geox://well/{well_id}/logs/canonical")
+@mcp.resource("GEOX://well/{well_id}/logs/canonical")
 async def resource_canonical_logs(well_id: str) -> dict[str, Any]:
     """
     Curves with environmental corrections applied.
     Provenance: CORRECTED
     """
-    return await get_resource(f"geox://well/{well_id}/logs/canonical")
+    return await get_resource(f"GEOX://well/{well_id}/logs/canonical")
 
 
-@mcp.resource("geox://well/{well_id}/interval/{top}-{base}/rock-state")
+@mcp.resource("GEOX://well/{well_id}/interval/{top}-{base}/rock-state")
 async def resource_rock_state(well_id: str, top: str, base: str) -> dict[str, Any]:
     """
     Petrophysical interpretation for a specific interval.
     Provenance: DERIVED
     """
-    return await get_resource(f"geox://well/{well_id}/interval/{top}-{base}/rock-state")
+    return await get_resource(f"GEOX://well/{well_id}/interval/{top}-{base}/rock-state")
 
 
-@mcp.resource("geox://well/{well_id}/cutoff-policy/{policy_id}")
+@mcp.resource("GEOX://well/{well_id}/cutoff-policy/{policy_id}")
 async def resource_cutoff_policy(well_id: str, policy_id: str) -> dict[str, Any]:
     """
     Active cutoff policy for this well/formation.
     Provenance: POLICY
     """
-    return await get_resource(f"geox://well/{well_id}/cutoff-policy/{policy_id}")
+    return await get_resource(f"GEOX://well/{well_id}/cutoff-policy/{policy_id}")
 
 
-@mcp.resource("geox://well/{well_id}/qc/report")
+@mcp.resource("GEOX://well/{well_id}/qc/report")
 async def resource_qc_report(well_id: str) -> dict[str, Any]:
     """
     Quality control findings for all well data.
     """
-    return await get_resource(f"geox://well/{well_id}/qc/report")
+    return await get_resource(f"GEOX://well/{well_id}/qc/report")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -109,7 +109,7 @@ async def resource_qc_report(well_id: str) -> dict[str, Any]:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @mcp.tool()
-async def geox_load_well_log_bundle(
+async def GEOX_load_well_log_bundle(
     well_id: str,
     sources: list[str],
     depth_reference: str = "MD",
@@ -132,7 +132,7 @@ async def geox_load_well_log_bundle(
         
         return {
             "status": "SUCCESS",
-            "uri": f"geox://well/{well_id}/las/bundle",
+            "uri": f"GEOX://well/{well_id}/las/bundle",
             "well_id": well_id,
             "well_name": bundle.well_name,
             "curves_loaded": len(bundle.curves),
@@ -152,7 +152,7 @@ async def geox_load_well_log_bundle(
 
 
 @mcp.tool()
-async def geox_qc_logs(well_id: str) -> dict[str, Any]:
+async def GEOX_qc_logs(well_id: str) -> dict[str, Any]:
     """
     Flag washouts, missing sections, bad hole, tool conflicts, unit inconsistencies.
     
@@ -168,7 +168,7 @@ async def geox_qc_logs(well_id: str) -> dict[str, Any]:
         
         return {
             "status": "SUCCESS",
-            "uri": f"geox://well/{well_id}/qc/report",
+            "uri": f"GEOX://well/{well_id}/qc/report",
             "well_id": well_id,
             "overall_status": report.overall,
             "curve_count": len(report.curve_reports),
@@ -184,7 +184,7 @@ async def geox_qc_logs(well_id: str) -> dict[str, Any]:
 
 
 @mcp.tool()
-async def geox_select_sw_model(
+async def GEOX_select_sw_model(
     interval_uri: str,
     candidate_models: list[str] = None,
 ) -> dict[str, Any]:
@@ -193,7 +193,7 @@ async def geox_select_sw_model(
     and calibration support.
     
     Args:
-        interval_uri: geox://well/{id}/interval/{top}-{base}/rock-state
+        interval_uri: GEOX://well/{id}/interval/{top}-{base}/rock-state
         candidate_models: List of models to evaluate
     
     Returns:
@@ -203,9 +203,9 @@ async def geox_select_sw_model(
         candidate_models = ["archie", "simandoux", "indonesia", "dual_water"]
     
     # Parse interval URI
-    # Format: geox://well/{well_id}/interval/{top}-{base}/rock-state
+    # Format: GEOX://well/{well_id}/interval/{top}-{base}/rock-state
     try:
-        parts = interval_uri.replace("geox://well/", "").split("/")
+        parts = interval_uri.replace("GEOX://well/", "").split("/")
         well_id = parts[0]
         interval_part = parts[2] if len(parts) > 2 else "0-0"
         top_str, base_str = interval_part.split("-")
@@ -221,7 +221,7 @@ async def geox_select_sw_model(
         if state is None:
             return {
                 "status": "NOT_FOUND",
-                "message": "No rock state found. Run geox_compute_petrophysics first.",
+                "message": "No rock state found. Run GEOX_compute_petrophysics first.",
             }
         
         selector = SaturationModelSelector()
@@ -259,7 +259,7 @@ async def geox_select_sw_model(
 
 
 @mcp.tool()
-async def geox_compute_petrophysics(
+async def GEOX_compute_petrophysics(
     interval_uri: str,
     model_id: str,
     model_params: dict = None,
@@ -270,7 +270,7 @@ async def geox_compute_petrophysics(
     with uncertainty envelopes.
     
     Args:
-        interval_uri: geox://well/{id}/interval/{top}-{base}/rock-state
+        interval_uri: GEOX://well/{id}/interval/{top}-{base}/rock-state
         model_id: Saturation model to use
         model_params: Model parameters {a, m, n, rw, ...}
         compute_uncertainty: Whether to propagate uncertainty
@@ -280,7 +280,7 @@ async def geox_compute_petrophysics(
     """
     # Parse interval URI
     try:
-        parts = interval_uri.replace("geox://well/", "").split("/")
+        parts = interval_uri.replace("GEOX://well/", "").split("/")
         well_id = parts[0]
         interval_part = parts[2] if len(parts) > 2 else "0-0"
         top_str, base_str = interval_part.split("-")
@@ -304,7 +304,7 @@ async def geox_compute_petrophysics(
         
         return {
             "status": "SUCCESS",
-            "uri": f"geox://well/{well_id}/interval/{top}-{base}/rock-state",
+            "uri": f"GEOX://well/{well_id}/interval/{top}-{base}/rock-state",
             "well_id": well_id,
             "interval": {"top": top, "base": base},
             "model_used": model_id,
@@ -324,7 +324,7 @@ async def geox_compute_petrophysics(
 
 
 @mcp.tool()
-async def geox_validate_cutoffs(
+async def GEOX_validate_cutoffs(
     interval_uri: str,
     cutoff_policy_id: str,
 ) -> dict[str, Any]:
@@ -333,7 +333,7 @@ async def geox_validate_cutoffs(
     Distinguishes physics from policy.
     
     Args:
-        interval_uri: geox://well/{id}/interval/{top}-{base}/rock-state
+        interval_uri: GEOX://well/{id}/interval/{top}-{base}/rock-state
         cutoff_policy_id: Policy to apply
     
     Returns:
@@ -341,7 +341,7 @@ async def geox_validate_cutoffs(
     """
     try:
         # Parse interval URI
-        parts = interval_uri.replace("geox://well/", "").split("/")
+        parts = interval_uri.replace("GEOX://well/", "").split("/")
         well_id = parts[0]
         interval_part = parts[2] if len(parts) > 2 else "0-0"
         top_str, base_str = interval_part.split("-")
@@ -377,7 +377,7 @@ async def geox_validate_cutoffs(
 
 
 @mcp.tool()
-async def geox_petrophysical_hold_check(interval_uri: str) -> dict[str, Any]:
+async def GEOX_petrophysical_hold_check(interval_uri: str) -> dict[str, Any]:
     """
     Automatic 888_HOLD trigger detection for petrophysics.
     
@@ -390,14 +390,14 @@ async def geox_petrophysical_hold_check(interval_uri: str) -> dict[str, Any]:
     - Cutoffs without economic basis
     
     Args:
-        interval_uri: geox://well/{id}/interval/{top}-{base}/rock-state
+        interval_uri: GEOX://well/{id}/interval/{top}-{base}/rock-state
     
     Returns:
         SEAL / QUALIFY / 888_HOLD verdict
     """
     try:
         # Parse interval URI
-        parts = interval_uri.replace("geox://well/", "").split("/")
+        parts = interval_uri.replace("GEOX://well/", "").split("/")
         well_id = parts[0]
         interval_part = parts[2] if len(parts) > 2 else "0-0"
         top_str, base_str = interval_part.split("-")
@@ -425,7 +425,7 @@ async def geox_petrophysical_hold_check(interval_uri: str) -> dict[str, Any]:
 
 
 @mcp.tool()
-async def geox_petrophysics_health() -> dict[str, Any]:
+async def GEOX_petrophysics_health() -> dict[str, Any]:
     """Server health check with constitutional floor status."""
     return {
         "ok": True,
@@ -434,19 +434,19 @@ async def geox_petrophysics_health() -> dict[str, Any]:
         "seal": GEOX_SEAL,
         "phase": "A",
         "resources": [
-            "geox://well/{well_id}/las/bundle",
-            "geox://well/{well_id}/logs/canonical",
-            "geox://well/{well_id}/interval/{top}-{base}/rock-state",
-            "geox://well/{well_id}/cutoff-policy/{policy_id}",
-            "geox://well/{well_id}/qc/report",
+            "GEOX://well/{well_id}/las/bundle",
+            "GEOX://well/{well_id}/logs/canonical",
+            "GEOX://well/{well_id}/interval/{top}-{base}/rock-state",
+            "GEOX://well/{well_id}/cutoff-policy/{policy_id}",
+            "GEOX://well/{well_id}/qc/report",
         ],
         "tools": [
-            "geox_load_well_log_bundle",
-            "geox_qc_logs",
-            "geox_select_sw_model",
-            "geox_compute_petrophysics",
-            "geox_validate_cutoffs",
-            "geox_petrophysical_hold_check",
+            "GEOX_load_well_log_bundle",
+            "GEOX_qc_logs",
+            "GEOX_select_sw_model",
+            "GEOX_compute_petrophysics",
+            "GEOX_validate_cutoffs",
+            "GEOX_petrophysical_hold_check",
         ],
         "constitutional_floors": ["F1", "F2", "F4", "F7", "F9", "F11", "F13"],
         "timestamp": datetime.utcnow().isoformat(),
@@ -480,3 +480,4 @@ if __name__ == "__main__":
         mcp.run(transport="http", host=args.host, port=args.port)
     else:
         mcp.run()
+

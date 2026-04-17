@@ -6,11 +6,11 @@ MCP resources provide application-controlled context with stable URIs.
 These are NOT tools — they are data that both UI and LLMs can reference.
 
 URI Schemes:
-- geox://well/{well_id}/las/bundle
-- geox://well/{well_id}/logs/canonical
-- geox://well/{well_id}/interval/{top}-{base}/rock-state
-- geox://well/{well_id}/cutoff-policy/{policy_id}
-- geox://well/{well_id}/qc/report
+- GEOX://well/{well_id}/las/bundle
+- GEOX://well/{well_id}/logs/canonical
+- GEOX://well/{well_id}/interval/{top}-{base}/rock-state
+- GEOX://well/{well_id}/cutoff-policy/{policy_id}
+- GEOX://well/{well_id}/qc/report
 """
 
 from __future__ import annotations
@@ -18,12 +18,12 @@ from __future__ import annotations
 from typing import Any
 from datetime import datetime
 
-from arifos.geox.tools.petrophysics.log_bundle_loader import (
+from arifos.GEOX.tools.petrophysics.log_bundle_loader import (
     load_bundle_from_store,
     store_bundle,
     apply_environmental_corrections,
 )
-from arifos.geox.tools.petrophysics.qc_engine import (
+from arifos.GEOX.tools.petrophysics.qc_engine import (
     generate_qc_report,
     load_qc_report,
 )
@@ -39,19 +39,19 @@ class Resource:
 
 class WellLogBundleResource(Resource):
     """
-    URI: geox://well/{well_id}/las/bundle
+    URI: GEOX://well/{well_id}/las/bundle
     
     Canonical LAS/DLIS bundle with parsed header, curves, and QC status.
     Provenance: RAW
     """
-    uri_template = "geox://well/{well_id}/las/bundle"
+    uri_template = "GEOX://well/{well_id}/las/bundle"
     
     async def read(self, well_id: str) -> dict[str, Any]:
         """Return the log bundle for this well."""
         bundle = await load_bundle_from_store(well_id)
         
         return {
-            "uri": f"geox://well/{well_id}/las/bundle",
+            "uri": f"GEOX://well/{well_id}/las/bundle",
             "well_id": well_id,
             "well_name": bundle.well_name,
             "source_files": bundle.source_files,
@@ -90,12 +90,12 @@ class WellLogBundleResource(Resource):
 
 class CanonicalLogsResource(Resource):
     """
-    URI: geox://well/{well_id}/logs/canonical
+    URI: GEOX://well/{well_id}/logs/canonical
     
     Curves with environmental corrections applied.
     Provenance: CORRECTED
     """
-    uri_template = "geox://well/{well_id}/logs/canonical"
+    uri_template = "GEOX://well/{well_id}/logs/canonical"
     
     async def read(self, well_id: str) -> dict[str, Any]:
         """Return environmentally-corrected curves."""
@@ -103,7 +103,7 @@ class CanonicalLogsResource(Resource):
         corrected = await apply_environmental_corrections(bundle)
         
         return {
-            "uri": f"geox://well/{well_id}/logs/canonical",
+            "uri": f"GEOX://well/{well_id}/logs/canonical",
             "well_id": well_id,
             "well_name": bundle.well_name,
             "corrections_applied": corrected.get("corrections", []),
@@ -119,35 +119,35 @@ class CanonicalLogsResource(Resource):
                 for c in corrected.get("curves", bundle.curves.values())
             },
             "provenance": "CORRECTED",
-            "note": "Full data available via geox_load_well_log_bundle tool",
+            "note": "Full data available via GEOX_load_well_log_bundle tool",
         }
 
 
 class IntervalRockStateResource(Resource):
     """
-    URI: geox://well/{well_id}/interval/{top}-{base}/rock-state
+    URI: GEOX://well/{well_id}/interval/{top}-{base}/rock-state
     
     Petrophysical interpretation for a specific interval.
     Provenance: DERIVED
     """
-    uri_template = "geox://well/{well_id}/interval/{top}-{base}/rock-state"
+    uri_template = "GEOX://well/{well_id}/interval/{top}-{base}/rock-state"
     
     async def read(self, well_id: str, top: float, base: float) -> dict[str, Any]:
         """Return rock state for interval."""
         # Import here to avoid circular dependency
-        from arifos.geox.tools.petrophysics.property_calculator import load_rock_state
+        from arifos.GEOX.tools.petrophysics.property_calculator import load_rock_state
         
         state = await load_rock_state(well_id, top, base)
         
         if state is None:
             return {
-                "uri": f"geox://well/{well_id}/interval/{top}-{base}/rock-state",
+                "uri": f"GEOX://well/{well_id}/interval/{top}-{base}/rock-state",
                 "error": "No rock state found for this interval",
-                "available_actions": ["Run geox_compute_petrophysics tool"],
+                "available_actions": ["Run GEOX_compute_petrophysics tool"],
             }
         
         return {
-            "uri": f"geox://well/{well_id}/interval/{top}-{base}/rock-state",
+            "uri": f"GEOX://well/{well_id}/interval/{top}-{base}/rock-state",
             "well_id": well_id,
             "interval": {"top_m": top, "base_m": base},
             "state_id": state.state_id,
@@ -189,27 +189,27 @@ class IntervalRockStateResource(Resource):
 
 class CutoffPolicyResource(Resource):
     """
-    URI: geox://well/{well_id}/cutoff-policy/{policy_id}
+    URI: GEOX://well/{well_id}/cutoff-policy/{policy_id}
     
     Active cutoff policy for this well/formation.
     Provenance: POLICY
     """
-    uri_template = "geox://well/{well_id}/cutoff-policy/{policy_id}"
+    uri_template = "GEOX://well/{well_id}/cutoff-policy/{policy_id}"
     
     async def read(self, well_id: str, policy_id: str) -> dict[str, Any]:
         """Return cutoff policy."""
-        from arifos.geox.tools.petrophysics.cutoff_validator import load_cutoff_policy
+        from arifos.GEOX.tools.petrophysics.cutoff_validator import load_cutoff_policy
         
         policy = await load_cutoff_policy(policy_id)
         
         if policy is None:
             return {
-                "uri": f"geox://well/{well_id}/cutoff-policy/{policy_id}",
+                "uri": f"GEOX://well/{well_id}/cutoff-policy/{policy_id}",
                 "error": "Policy not found",
             }
         
         return {
-            "uri": f"geox://well/{well_id}/cutoff-policy/{policy_id}",
+            "uri": f"GEOX://well/{well_id}/cutoff-policy/{policy_id}",
             "policy_id": policy_id,
             "policy_name": policy.policy_name,
             "version": policy.version,
@@ -243,11 +243,11 @@ class CutoffPolicyResource(Resource):
 
 class QCReportResource(Resource):
     """
-    URI: geox://well/{well_id}/qc/report
+    URI: GEOX://well/{well_id}/qc/report
     
     Quality control findings for all well data.
     """
-    uri_template = "geox://well/{well_id}/qc/report"
+    uri_template = "GEOX://well/{well_id}/qc/report"
     
     async def read(self, well_id: str) -> dict[str, Any]:
         """Return QC report."""
@@ -255,13 +255,13 @@ class QCReportResource(Resource):
         
         if report is None:
             return {
-                "uri": f"geox://well/{well_id}/qc/report",
+                "uri": f"GEOX://well/{well_id}/qc/report",
                 "error": "No QC report found",
-                "available_actions": ["Run geox_qc_logs tool"],
+                "available_actions": ["Run GEOX_qc_logs tool"],
             }
         
         return {
-            "uri": f"geox://well/{well_id}/qc/report",
+            "uri": f"GEOX://well/{well_id}/qc/report",
             "well_id": well_id,
             "generated": report.report_generated.isoformat() if report.report_generated else None,
             "overall_status": report.overall,
@@ -298,13 +298,13 @@ async def get_resource(uri: str) -> dict[str, Any]:
     """
     Route a URI to the appropriate resource handler.
     
-    Parses URI pattern: geox://well/{well_id}/...
+    Parses URI pattern: GEOX://well/{well_id}/...
     """
-    if not uri.startswith("geox://well/"):
+    if not uri.startswith("GEOX://well/"):
         return {"error": f"Invalid GEOX URI: {uri}"}
     
     # Parse URI
-    parts = uri.replace("geox://well/", "").split("/")
+    parts = uri.replace("GEOX://well/", "").split("/")
     well_id = parts[0]
     resource_type = parts[1] if len(parts) > 1 else ""
     
@@ -331,3 +331,4 @@ async def get_resource(uri: str) -> dict[str, Any]:
         return await QCReportResource().read(well_id)
     
     return {"error": f"Unknown resource path: {uri}"}
+

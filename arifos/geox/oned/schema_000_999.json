@@ -247,7 +247,7 @@
         "inversion_result": "from 777",
         "witness_evidence": {
           "human_geoscientist": "expert review of result",
-          "geox_physics": "residuals within physical bounds?",
+          "GEOX_physics": "residuals within physical bounds?",
           "external_data": "production data, core measurements"
         }
       },
@@ -352,3 +352,4 @@
   
   "telemetry_format": "[GEOX-1D | {stage} | well:{well_id} | misfit:{misfit:.4f} | floors:{floors} | {status}]"
 }
+

@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 from typing import List, Dict, Any, Optional
-from geox.shared.contracts.schemas import (
+from GEOX.shared.contracts.schemas import (
     Verdict, VerdictStatus, RiskAssessment, RiskFactor, 
     EvidenceObject, EvidenceKind
 )
@@ -76,3 +76,4 @@ class SovereignJudge:
 
 # Global Access Instance
 judge = SovereignJudge()
+

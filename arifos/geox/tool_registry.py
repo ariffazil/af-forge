@@ -39,8 +39,8 @@ class UnifiedToolRegistry:
     """Registry of all hardened GEOX tools."""
     
     _registry: dict[str, ToolMetadata] = {
-        "geox_load_seismic_line": ToolMetadata(
-            name="geox_load_seismic_line",
+        "GEOX_load_seismic_line": ToolMetadata(
+            name="GEOX_load_seismic_line",
             version="1.0.0",
             description="Load seismic data and generate contrast canon views.",
             required_floors=["F4", "F11"],
@@ -48,8 +48,8 @@ class UnifiedToolRegistry:
             error_codes=["FILE_NOT_FOUND", "INVALID_FORMAT", "SCALE_UNKNOWN"],
             tags=["seismic", "vision"]
         ),
-        "geox_build_structural_candidates": ToolMetadata(
-            name="geox_build_structural_candidates",
+        "GEOX_build_structural_candidates": ToolMetadata(
+            name="GEOX_build_structural_candidates",
             version="1.0.0",
             description="Generate multi-model structural interpretations.",
             required_floors=["F7", "F11"],
@@ -57,8 +57,8 @@ class UnifiedToolRegistry:
             error_codes=["INTERPRETATION_FAILED", "INSUFFICIENT_DATA"],
             tags=["seismic", "structural"]
         ),
-        "geox_compute_ac_risk": ToolMetadata(
-            name="geox_compute_ac_risk",
+        "GEOX_compute_ac_risk": ToolMetadata(
+            name="GEOX_compute_ac_risk",
             version="1.1.0",
             description="Calculate Anomalous Contrast Risk (ToAC).",
             required_floors=["F4", "F7", "F11", "F13"],
@@ -66,8 +66,8 @@ class UnifiedToolRegistry:
             error_codes=["INVALID_COMPONENTS", "MISSING_TRANSFORM"],
             tags=["governance", "risk"]
         ),
-        "geox_feasibility_check": ToolMetadata(
-            name="geox_feasibility_check",
+        "GEOX_feasibility_check": ToolMetadata(
+            name="GEOX_feasibility_check",
             version="1.0.0",
             description="Verify physical feasibility of a geological plan.",
             required_floors=["F1", "F2", "F4", "F7", "F9", "F11", "F13"],
@@ -75,8 +75,8 @@ class UnifiedToolRegistry:
             error_codes=["PHYSICS_VIOLATION", "CONSTRAINT_MISMATCH"],
             tags=["governance", "physics"]
         ),
-        "geox_verify_geospatial": ToolMetadata(
-            name="geox_verify_geospatial",
+        "GEOX_verify_geospatial": ToolMetadata(
+            name="GEOX_verify_geospatial",
             version="1.0.0",
             description="Verify coordinates and jurisdictional boundaries.",
             required_floors=["F4", "F11"],
@@ -84,8 +84,8 @@ class UnifiedToolRegistry:
             error_codes=["OUT_OF_BOUNDS", "PROJECTION_ERROR"],
             tags=["gis", "spatial"]
         ),
-        "geox_evaluate_prospect": ToolMetadata(
-            name="geox_evaluate_prospect",
+        "GEOX_evaluate_prospect": ToolMetadata(
+            name="GEOX_evaluate_prospect",
             version="1.0.0",
             description="Generate governed verdict on a prospect.",
             required_floors=["F1", "F4", "F7", "F9", "F11", "F13"],
@@ -93,8 +93,8 @@ class UnifiedToolRegistry:
             error_codes=["INSUFFICIENT_GROUNDING", "VERDICT_VOID"],
             tags=["governance", "prospect"]
         ),
-        "geox_query_memory": ToolMetadata(
-            name="geox_query_memory",
+        "GEOX_query_memory": ToolMetadata(
+            name="GEOX_query_memory",
             version="1.0.0",
             description="Retrieve past evaluations from GEOX memory.",
             required_floors=["F11"],
@@ -102,8 +102,8 @@ class UnifiedToolRegistry:
             error_codes=["QUERY_FAILED", "STORE_UNAVAILABLE"],
             tags=["memory", "retrieval"]
         ),
-        "geox_query_macrostrat": ToolMetadata(
-            name="geox_query_macrostrat",
+        "GEOX_query_macrostrat": ToolMetadata(
+            name="GEOX_query_macrostrat",
             version="1.0.0",
             description="Retrieve regional stratigraphy from Macrostrat.",
             required_floors=["F2", "F7", "F11"],
@@ -111,8 +111,8 @@ class UnifiedToolRegistry:
             error_codes=["MACROSTRAT_API_ERROR", "NO_COVERAGE"],
             tags=["stratigraphy", "external"]
         ),
-        "geox_calculate_saturation": ToolMetadata(
-            name="geox_calculate_saturation",
+        "GEOX_calculate_saturation": ToolMetadata(
+            name="GEOX_calculate_saturation",
             version="1.0.0",
             description="Compute Sw with uncertainty propagation.",
             required_floors=["F2", "F4", "F7", "F13"],
@@ -129,3 +129,4 @@ class UnifiedToolRegistry:
     @classmethod
     def list_tools(cls) -> list[ToolMetadata]:
         return list(cls._registry.values())
+

@@ -8,12 +8,12 @@ Computes Vsh, porosity, Sw, BVW, permeability with uncertainty propagation.
 from datetime import datetime
 from typing import Any
 
-from arifos.geox.physics.saturation_models import (
+from arifos.GEOX.physics.saturation_models import (
     ArchieModel,
     SimandouxModel,
     ModelResult as SaturationResult,
 )
-from arifos.geox.physics.porosity_solvers import (
+from arifos.GEOX.physics.porosity_solvers import (
     VshSolver,
     DensityNeutronSolver,
     PorosityResult,
@@ -21,7 +21,7 @@ from arifos.geox.physics.porosity_solvers import (
     compute_bvw,
     compute_permeability_proxy,
 )
-from arifos.geox.schemas.petrophysics.rock_state import (
+from arifos.GEOX.schemas.petrophysics.rock_state import (
     RockFluidState,
     PorosityEstimate,
     WaterSaturationEstimate,
@@ -29,7 +29,7 @@ from arifos.geox.schemas.petrophysics.rock_state import (
     SaturationModelParameters,
     ProvenanceRecord,
 )
-from arifos.geox.schemas.geox_schemas import CoordinatePoint
+from arifos.GEOX.schemas.GEOX_schemas import CoordinatePoint
 
 
 # In-memory store
@@ -406,3 +406,4 @@ async def compute_petrophysics(
         base=base,
         propagate_uncertainty=propagate_uncertainty,
     )
+

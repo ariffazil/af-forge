@@ -2,10 +2,10 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { GEOXEngine } from "../src/engine/GEOXEngine.js";
 
-const geox = new GEOXEngine();
+const GEOX = new GEOXEngine();
 
 test("GEOXEngine — generateScenarios returns array of GEOXScenarioContract", async () => {
-  const scenarios = await geox.generateScenarios("primary");
+  const scenarios = await GEOX.generateScenarios("primary");
   assert.ok(Array.isArray(scenarios));
   assert.ok(scenarios.length > 0);
   for (const s of scenarios) {
@@ -18,13 +18,13 @@ test("GEOXEngine — generateScenarios returns array of GEOXScenarioContract", a
 });
 
 test("GEOXEngine — primary scenario has higher probability", async () => {
-  const primary = await geox.generateScenarios("primary");
-  const secondary = await geox.generateScenarios("secondary");
+  const primary = await GEOX.generateScenarios("primary");
+  const secondary = await GEOX.generateScenarios("secondary");
   assert.ok(primary[0].probability >= secondary[0].probability);
 });
 
 test("GEOXEngine — scenario has physicalConstraints with maxExtractionRate", async () => {
-  const scenarios = await geox.generateScenarios("primary");
+  const scenarios = await GEOX.generateScenarios("primary");
   const s = scenarios[0];
   assert.ok(typeof s.physicalConstraints.maxExtractionRate === "number");
   assert.ok(typeof s.physicalConstraints.seismicRiskIndex === "number");
@@ -32,7 +32,7 @@ test("GEOXEngine — scenario has physicalConstraints with maxExtractionRate", a
 });
 
 test("GEOXEngine — HYPOTHESIS tag has fewer grounding evidence", async () => {
-  const scenarios = await geox.generateScenarios("primary");
+  const scenarios = await GEOX.generateScenarios("primary");
   const hypothesis = scenarios.find((s) => s.tag === "HYPOTHESIS");
   const estimate = scenarios.find((s) => s.tag === "ESTIMATE");
   assert.ok(hypothesis);
@@ -41,7 +41,7 @@ test("GEOXEngine — HYPOTHESIS tag has fewer grounding evidence", async () => {
 });
 
 test("GEOXEngine — all scenarios have groundingEvidence array", async () => {
-  const scenarios = await geox.generateScenarios("primary");
+  const scenarios = await GEOX.generateScenarios("primary");
   for (const s of scenarios) {
     assert.ok(Array.isArray(s.groundingEvidence));
   }
@@ -50,7 +50,7 @@ test("GEOXEngine — all scenarios have groundingEvidence array", async () => {
 test("WealthEngine — allocate returns WealthAllocationContract array", async () => {
   const { WealthEngine } = await import("../src/engine/WealthEngine.js");
   const wealth = new WealthEngine();
-  const scenarios = await geox.generateScenarios("primary");
+  const scenarios = await GEOX.generateScenarios("primary");
   const allocations = await wealth.allocate(scenarios);
   assert.ok(Array.isArray(allocations));
   for (const a of allocations) {
@@ -96,7 +96,7 @@ test("WealthEngine — HYPOTHESIS scenarios get higher knowledgeDelta", async ()
 test("WealthEngine — ROI object has financial, knowledge, peace components", async () => {
   const { WealthEngine } = await import("../src/engine/WealthEngine.js");
   const wealth = new WealthEngine();
-  const scenarios = await geox.generateScenarios("primary");
+  const scenarios = await GEOX.generateScenarios("primary");
   const allocations = await wealth.allocate(scenarios);
   for (const a of allocations) {
     assert.ok(typeof a.expectedROI.financial === "number");

@@ -15,8 +15,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Any
 
-from arifos.geox.base_tool import BaseTool, GeoToolResult, _make_provenance
-from arifos.geox.geox_schemas import CoordinatePoint, GeoQuantity
+from arifos.GEOX.base_tool import BaseTool, GeoToolResult, _make_provenance
+from arifos.GEOX.GEOX_schemas import CoordinatePoint, GeoQuantity
 
 
 class LEMBackend(ABC):
@@ -174,3 +174,4 @@ class LEMBridgeTool(BaseTool):
                 success=False,
                 error=f"LEM Backend Error: {str(e)}"
             )
+

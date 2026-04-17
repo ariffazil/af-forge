@@ -113,3 +113,4 @@ main().catch((error: unknown) => {
   process.stderr.write(`agent-workbench failed: ${message}\n`);
   process.exitCode = 1;
 });
+

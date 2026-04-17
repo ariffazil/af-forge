@@ -21,7 +21,7 @@ class AppManifest(BaseModel):
     Canonical GEOX App Manifest.
     Defines the identity, capabilities, and transport for a microfrontend.
     """
-    app_id: str = Field(..., description="Unique identifier: geox.[domain].[name]")
+    app_id: str = Field(..., description="Unique identifier: GEOX.[domain].[name]")
     version: str = Field(..., description="Version of the application.")
     dimension: str = Field(..., description="The canonical dimension (PROSPECT, WELL, etc.)")
     domain: str = Field(..., description="Geoscientific domain: seismic, petrophysics, geology, etc.")
@@ -53,15 +53,16 @@ class AppManifest(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "app_id": "geox.seismic.viewer",
+                "app_id": "GEOX.seismic.viewer",
                 "version": "1.0.0",
                 "dimension": "EARTH_3D",
                 "domain": "seismic",
                 "title": "Seismic Section Viewer",
                 "ui_entry": {
-                    "resource_uri": "https://geox.apps/seismic-viewer",
+                    "resource_uri": "https://GEOX.apps/seismic-viewer",
                     "version": "1.2.0"
                 },
-                "tools_required": ["geox_load_seismic_line", "geox_build_structural_candidates"]
+                "tools_required": ["GEOX_load_seismic_line", "GEOX_build_structural_candidates"]
             }
         }
+

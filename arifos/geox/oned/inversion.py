@@ -267,3 +267,4 @@ class JointInversion1D:
             return self.invert_gradient(prior_profile, obs_seismic, obs_logs, **kwargs)
         else:
             raise NotImplementedError("Monte Carlo not yet implemented")
+

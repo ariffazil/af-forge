@@ -36,3 +36,4 @@ Machines propose. Machines reconcile. The Sovereign (Human) disposes.
 
 ---
 *DITEMPA BUKAN DIBERI.*
+

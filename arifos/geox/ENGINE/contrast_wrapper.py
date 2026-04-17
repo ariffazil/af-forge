@@ -18,11 +18,11 @@ import functools
 from collections.abc import Callable
 from typing import Any, TypeVar
 
-from arifos.geox.schemas.continuity import ContinuityRecord, HardenedToolOutput
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.schemas.continuity import ContinuityRecord, HardenedToolOutput
+from arifos.GEOX.GEOX_schemas import (
     ContrastMetadata,
-    GeoxGovernance,
-    GeoxUncertainty,
+    GEOXGovernance,
+    GEOXUncertainty,
 )
 
 T = TypeVar("T")
@@ -243,3 +243,4 @@ def compute_contrast_verdict(
 
 
 contrast_governed = contrast_governed_tool  # Alias for backward compatibility
+

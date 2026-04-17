@@ -60,7 +60,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
 )
-logger = logging.getLogger("geox.mcp.aaa")
+logger = logging.getLogger("GEOX.mcp.aaa")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # GEOX AAA Configuration
@@ -86,7 +86,7 @@ mcp = FastMCP(
 # ═══════════════════════════════════════════════════════════════════════════════
 
 try:
-    from arifos.geox.tool_registry import (
+    from arifos.GEOX.tool_registry import (
         ToolRegistry, ToolStatus, ErrorCode, create_standardized_error,
         GEOX_TOOLS
     )
@@ -101,7 +101,7 @@ except ImportError as e:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 try:
-    from arifos.geox.apps.prefab_views import (
+    from arifos.GEOX.apps.prefab_views import (
         seismic_section_view,
         structural_candidates_view,
         feasibility_check_view,
@@ -118,7 +118,7 @@ except ImportError:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 try:
-    from arifos.geox.geox_memory import GeoMemoryStore
+    from arifos.GEOX.GEOX_memory import GeoMemoryStore
     _memory_store = GeoMemoryStore()
     _HAS_MEMORY = True
 except Exception as e:
@@ -127,8 +127,8 @@ except Exception as e:
     logger.info("ℹ️ Memory store unavailable: %s", e)
 
 try:
-    from arifos.geox.tools.macrostrat_tool import MacrostratTool
-    from arifos.geox.geox_schemas import CoordinatePoint
+    from arifos.GEOX.tools.macrostrat_tool import MacrostratTool
+    from arifos.GEOX.GEOX_schemas import CoordinatePoint
     _macrostrat = MacrostratTool()
     _HAS_MACROSTRAT = True
 except Exception as e:
@@ -137,7 +137,7 @@ except Exception as e:
     logger.info("ℹ️ Macrostrat unavailable: %s", e)
 
 try:
-    from arifos.geox.tools.seismic.seismic_single_line_tool import SeismicSingleLineTool
+    from arifos.GEOX.tools.seismic.seismic_single_line_tool import SeismicSingleLineTool
     _HAS_SEISMIC = True
 except ImportError:
     _HAS_SEISMIC = False
@@ -166,7 +166,7 @@ try:
         }
         return JSONResponse({
             "ok": True,
-            "service": "geox-large-earth-model",
+            "service": "GEOX-large-earth-model",
             "version": GEOX_VERSION,
             "tier": LEM_TIER,
             "mode": "constitutional-governance-aaa",
@@ -299,8 +299,8 @@ def _create_success_response(
 # AAA GRADE MCP TOOLS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@mcp.tool(name="geox_list_tools")
-async def geox_list_tools(
+@mcp.tool(name="GEOX_list_tools")
+async def GEOX_list_tools(
     include_scaffold: bool = False,
     status_filter: str | None = None
 ) -> dict:
@@ -341,14 +341,14 @@ async def geox_list_tools(
     }
     
     return _create_success_response(
-        tool_name="geox_list_tools",
+        tool_name="GEOX_list_tools",
         content=f"Listed {len(tools)} GEOX tools. {caps['tool_count']['production']} production-grade. DITEMPA BUKAN DIBERI.",
         structured_content=structured
     )
 
 
-@mcp.tool(name="geox_compute_ac_risk")
-async def geox_compute_ac_risk(
+@mcp.tool(name="GEOX_compute_ac_risk")
+async def GEOX_compute_ac_risk(
     u_phys: float,
     transform_stack: list[str],
     bias_scenario: str = "ai_vision_only",
@@ -440,15 +440,15 @@ async def geox_compute_ac_risk(
     }
     
     return _create_success_response(
-        tool_name="geox_compute_ac_risk",
+        tool_name="GEOX_compute_ac_risk",
         content=f"AC_Risk calculation complete. Verdict: {verdict}. {explanation}",
         structured_content=structured,
         ac_risk={"score": ac_risk, "verdict": verdict}
     )
 
 
-@mcp.tool(name="geox_load_seismic_line")
-async def geox_load_seismic_line(
+@mcp.tool(name="GEOX_load_seismic_line")
+async def GEOX_load_seismic_line(
     line_id: str,
     survey_path: str = "default_survey",
     generate_views: bool = True,
@@ -492,7 +492,7 @@ async def geox_load_seismic_line(
     }
     
     return _create_success_response(
-        tool_name="geox_load_seismic_line",
+        tool_name="GEOX_load_seismic_line",
         content=(
             f"🔥 AAA Grade: Seismic line '{line_id}' IGNITED from '{survey_path}'. "
             "Scale validation pending (F4 Clarity). ToAC contrast canon active. "
@@ -502,8 +502,8 @@ async def geox_load_seismic_line(
     )
 
 
-@mcp.tool(name="geox_build_structural_candidates")
-async def geox_build_structural_candidates(
+@mcp.tool(name="GEOX_build_structural_candidates")
+async def GEOX_build_structural_candidates(
     line_id: str,
     focus_area: str | None = None,
     max_candidates: int = 3,
@@ -553,7 +553,7 @@ async def geox_build_structural_candidates(
     }
     
     return _create_success_response(
-        tool_name="geox_build_structural_candidates",
+        tool_name="GEOX_build_structural_candidates",
         content=(
             f"🔥 AAA Grade: Generated {len(candidates)} structural candidates for '{line_id}'. "
             "Non-uniqueness principle active (F2 Truth). "
@@ -564,8 +564,8 @@ async def geox_build_structural_candidates(
     )
 
 
-@mcp.tool(name="geox_feasibility_check")
-async def geox_feasibility_check(
+@mcp.tool(name="GEOX_feasibility_check")
+async def GEOX_feasibility_check(
     plan_id: str,
     constraints: list[str],
 ) -> dict:
@@ -617,7 +617,7 @@ async def geox_feasibility_check(
     }
     
     return _create_success_response(
-        tool_name="geox_feasibility_check",
+        tool_name="GEOX_feasibility_check",
         content=(
             f"🔥 AAA Grade Feasibility: Plan '{plan_id}' — {verdict}. "
             f"Grounding confidence: {grounding_confidence:.0%}. "
@@ -627,8 +627,8 @@ async def geox_feasibility_check(
     )
 
 
-@mcp.tool(name="geox_verify_geospatial")
-async def geox_verify_geospatial(
+@mcp.tool(name="GEOX_verify_geospatial")
+async def GEOX_verify_geospatial(
     lat: float,
     lon: float,
     radius_m: float = 1000.0,
@@ -684,7 +684,7 @@ async def geox_verify_geospatial(
     }
     
     return _create_success_response(
-        tool_name="geox_verify_geospatial",
+        tool_name="GEOX_verify_geospatial",
         content=(
             f"🔥 AAA Grade: Coordinates ({lat:.6f}, {lon:.6f}) verified. "
             f"Province: {geological_province}. Jurisdiction: EEZ_Grounded_AAA. "
@@ -694,8 +694,8 @@ async def geox_verify_geospatial(
     )
 
 
-@mcp.tool(name="geox_earth_signals")
-async def geox_earth_signals(
+@mcp.tool(name="GEOX_earth_signals")
+async def GEOX_earth_signals(
     lat: float,
     lon: float,
     radius_km: float = 300.0,
@@ -797,7 +797,7 @@ async def geox_earth_signals(
     }
     
     return _create_success_response(
-        tool_name="geox_earth_signals",
+        tool_name="GEOX_earth_signals",
         content=(
             f"🔥 AAA Grade Earth Signals for ({lat:.4f}, {lon:.4f}). "
             f"Found {earthquakes['count']} earthquakes. "
@@ -808,8 +808,8 @@ async def geox_earth_signals(
     )
 
 
-@mcp.tool(name="geox_malay_basin_pilot")
-async def geox_malay_basin_pilot(
+@mcp.tool(name="GEOX_malay_basin_pilot")
+async def GEOX_malay_basin_pilot(
     query_type: str = "full",
     play_filter: str | None = None,
     figure_ref: str | None = None,
@@ -821,7 +821,7 @@ async def geox_malay_basin_pilot(
     All data includes F11 Authority audit trail.
     """
     try:
-        from arifos.geox.resources.malay_basin_pilot import MalayBasinPilotResource
+        from arifos.GEOX.resources.malay_basin_pilot import MalayBasinPilotResource
         resource = MalayBasinPilotResource()
         data = await resource.read()
     except Exception as e:
@@ -870,7 +870,7 @@ async def geox_malay_basin_pilot(
     }
     
     return _create_success_response(
-        tool_name="geox_malay_basin_pilot",
+        tool_name="GEOX_malay_basin_pilot",
         content=(
             f"🔥 AAA Grade Malay Basin Pilot ({query_type}) loaded. "
             "Foundations grounded in GSM-702001. "
@@ -880,8 +880,8 @@ async def geox_malay_basin_pilot(
     )
 
 
-@mcp.tool(name="geox_evaluate_prospect")
-async def geox_evaluate_prospect(
+@mcp.tool(name="GEOX_evaluate_prospect")
+async def GEOX_evaluate_prospect(
     prospect_id: str,
     interpretation_id: str,
 ) -> dict:
@@ -932,7 +932,7 @@ async def geox_evaluate_prospect(
     }
     
     return _create_success_response(
-        tool_name="geox_evaluate_prospect",
+        tool_name="GEOX_evaluate_prospect",
         content=(
             f"🔥 AAA Grade Prospect Evaluation: {prospect_id} — {status}. "
             f"Verdict: {verdict}. Confidence: {confidence:.0%}. "
@@ -969,3 +969,4 @@ if __name__ == "__main__":
         mcp.run(transport="sse", host=args.host, port=args.port)
     else:
         mcp.run(transport="http", host=args.host, port=args.port)
+

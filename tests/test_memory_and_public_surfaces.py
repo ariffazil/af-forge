@@ -5,10 +5,10 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from arifos.geox.geox_hardened import HardenedGeoxAgent
-from arifos.geox.geox_memory import DualMemoryStore, GeoMemoryEntry, GeoMemoryStore
-from arifos.geox.geox_schemas import CoordinatePoint
-from arifos.geox.geox_validator import GeoXValidator
+from arifos.GEOX.GEOX_hardened import HardenedGEOXAgent
+from arifos.GEOX.GEOX_memory import DualMemoryStore, GeoMemoryEntry, GeoMemoryStore
+from arifos.GEOX.GEOX_schemas import CoordinatePoint
+from arifos.GEOX.GEOX_validator import GEOXValidator
 
 
 def test_geo_memory_entry_round_trip_preserves_datetime_fields():
@@ -110,7 +110,7 @@ async def test_qdrant_upsert_falls_back_to_in_memory_on_exception():
 
 @pytest.mark.asyncio
 async def test_dual_memory_store_query_dual_uses_local_fallback_when_no_macrostrat():
-    store = DualMemoryStore(macrostrat_tool=None, cache_dir="/tmp/geox-memory-cache-test")
+    store = DualMemoryStore(macrostrat_tool=None, cache_dir="/tmp/GEOX-memory-cache-test")
     result = await store.query_dual(
         location=CoordinatePoint(latitude=4.5, longitude=103.7),
         query_text="prospect context",
@@ -124,7 +124,7 @@ async def test_dual_memory_store_query_dual_uses_local_fallback_when_no_macrostr
 
 
 def test_public_validator_accepts_non_none_and_rejects_none():
-    validator = GeoXValidator(strict_mode=True)
+    validator = GEOXValidator(strict_mode=True)
 
     supported = validator.validate({"prospect": "Lead A"})
     contradicted = validator.validate(None)
@@ -136,7 +136,7 @@ def test_public_validator_accepts_non_none_and_rejects_none():
 
 @pytest.mark.asyncio
 async def test_hardened_agent_process_and_history():
-    agent = HardenedGeoxAgent(session_id="sess-1")
+    agent = HardenedGEOXAgent(session_id="sess-1")
 
     valid = await agent.process({"prospect": "Lead A"})
     invalid = await agent.process(None)
@@ -144,3 +144,4 @@ async def test_hardened_agent_process_and_history():
     assert valid["verdict"] == "SEAL"
     assert invalid["verdict"] == "VOID"
     assert len(agent.get_history()) == 1
+

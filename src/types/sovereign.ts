@@ -6,7 +6,7 @@
  * Prevents anonymous reasoning and forces epistemic humility.
  */
 
-export type GeoxDimension = 
+export type GEOXDimension = 
   | "Well" | "Earth3D" | "Time4D" | "Physics" 
   | "Map" | "Section" | "Prospect" | "Wealth" | "Abstract";
 
@@ -15,7 +15,7 @@ export type OperationType =
 
 export interface SovereignAgentEnvelope {
   agentId: string;
-  dimension: GeoxDimension;
+  dimension: GEOXDimension;
   operationType: OperationType;
   
   // Explicit declarations to prevent hidden narratives
@@ -56,3 +56,4 @@ export interface ConvergenceResult {
   conflictGraph: string[];
   acRiskMax: number;
 }
+

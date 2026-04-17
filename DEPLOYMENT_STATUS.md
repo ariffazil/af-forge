@@ -8,7 +8,7 @@
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                    GEOX DEPLOYMENT STATUS                                   │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Backend (VPS):         ✅ https://geox.arif-fazil.com/mcp                  │
+│  Backend (VPS):         ✅ https://GEOX.arif-fazil.com/mcp                  │
 │  Health Endpoint:       ✅ /health returns 200 OK                           │
 │  MCP Protocol:          ✅ Responding                                       │
 │  Version:               ✅ v0.5.0                                           │
@@ -25,8 +25,8 @@
 
 | Target | URL | Status | Notes |
 |--------|-----|--------|-------|
-| **VPS Production** | https://geox.arif-fazil.com | 🟡 PARTIAL | Backend ✅, GUI needs rebuild |
-| **Horizon (FastMCP Cloud)** | https://geoxarifOS.fastmcp.app/mcp | 🟡 BUILDING | numpy fix pending push |
+| **VPS Production** | https://GEOX.arif-fazil.com | 🟡 PARTIAL | Backend ✅, GUI needs rebuild |
+| **Horizon (FastMCP Cloud)** | https://GEOXarifOS.fastmcp.app/mcp | 🟡 BUILDING | numpy fix pending push |
 | **Claude Desktop** | Local | ✅ READY | MCP config available |
 | **Copilot** | Microsoft Cloud | ✅ READY | Adapter implemented |
 
@@ -45,12 +45,12 @@
 **Test Commands:**
 ```bash
 # Health check
-curl https://geox.arif-fazil.com/health
+curl https://GEOX.arif-fazil.com/health
 # Output: OK
 
 # Server details
-curl https://geox.arif-fazil.com/health/details
-# Output: {"ok": true, "version": "0.5.0", "service": "geox-earth-witness", ...}
+curl https://GEOX.arif-fazil.com/health/details
+# Output: {"ok": true, "version": "0.5.0", "service": "GEOX-earth-witness", ...}
 ```
 
 ### ⚠️ Frontend GUI (Needs Rebuild)
@@ -72,19 +72,19 @@ curl https://geox.arif-fazil.com/health/details
 ```bash
 # SSH to VPS
 ssh srv1325122.hstgr.cloud
-cd /opt/arifos/geox
+cd /opt/arifos/GEOX
 
 # Pull latest (ensure Malay Basin Pilot commit is present)
 git pull origin main
 
 # Force rebuild with no cache
 docker compose down
-docker compose build --no-cache geox_server
-docker compose up -d geox_server
+docker compose build --no-cache GEOX_server
+docker compose up -d GEOX_server
 
 # Verify
-docker compose logs --tail=50 geox_server
-curl https://geox.arif-fazil.com/health
+docker compose logs --tail=50 GEOX_server
+curl https://GEOX.arif-fazil.com/health
 ```
 
 ### Or Use Deploy Script
@@ -99,23 +99,23 @@ curl https://geox.arif-fazil.com/health
 
 ```bash
 # 1. Health endpoint
-curl https://geox.arif-fazil.com/health
+curl https://GEOX.arif-fazil.com/health
 # Expected: OK
 
 # 2. Pilot tab in HTML
-curl -s https://geox.arif-fazil.com/ | grep -i "pilot"
+curl -s https://GEOX.arif-fazil.com/ | grep -i "pilot"
 # Expected: "Pilot" tab found
 
 # 3. Malay Basin content
-curl -s https://geox.arif-fazil.com/ | grep -i "malay basin"
+curl -s https://GEOX.arif-fazil.com/ | grep -i "malay basin"
 # Expected: Content found
 
 # 4. Pilot tool available
-fastmcp list https://geox.arif-fazil.com/mcp | grep malay
-# Expected: geox_malay_basin_pilot
+fastmcp list https://GEOX.arif-fazil.com/mcp | grep malay
+# Expected: GEOX_malay_basin_pilot
 
 # 5. Test Pilot tool
-fastmcp call https://geox.arif-fazil.com/mcp geox_malay_basin_pilot query_type="stats"
+fastmcp call https://GEOX.arif-fazil.com/mcp GEOX_malay_basin_pilot query_type="stats"
 # Expected: Basin statistics returned
 ```
 
@@ -125,7 +125,7 @@ fastmcp call https://geox.arif-fazil.com/mcp geox_malay_basin_pilot query_type="
 
 | Aspect | Status |
 |--------|--------|
-| **URL** | https://geoxarifOS.fastmcp.app/mcp |
+| **URL** | https://GEOXarifOS.fastmcp.app/mcp |
 | **Build Status** | 🟡 Rebuilding |
 | **Blocker** | numpy dependency (fixed in pyproject.toml) |
 | **Action Required** | Push to main, auto-rebuild |
@@ -186,10 +186,10 @@ git push origin main
 ### If Health Check Fails
 ```bash
 # Check logs
-ssh srv1325122.hstgr.cloud 'cd /opt/arifos/geox && docker compose logs geox_server'
+ssh srv1325122.hstgr.cloud 'cd /opt/arifos/GEOX && docker compose logs GEOX_server'
 
 # Restart
-ssh srv1325122.hstgr.cloud 'cd /opt/arifos/geox && docker compose restart geox_server'
+ssh srv1325122.hstgr.cloud 'cd /opt/arifos/GEOX && docker compose restart GEOX_server'
 ```
 
 ### If GUI Doesn't Update
@@ -203,17 +203,17 @@ docker compose up -d
 ### If MCP Tools Missing
 ```bash
 # Verify tool registration
-fastmcp list https://geox.arif-fazil.com/mcp
+fastmcp list https://GEOX.arif-fazil.com/mcp
 
 # Check server logs for errors
-docker compose logs geox_server | grep -i error
+docker compose logs GEOX_server | grep -i error
 ```
 
 ---
 
 ## Live Demo URL
 
-**Production:** https://geox.arif-fazil.com
+**Production:** https://GEOX.arif-fazil.com
 
 **Features to Demo:**
 1. Health endpoint (`/health`)
@@ -245,3 +245,4 @@ docker compose logs geox_server | grep -i error
 
 *Last verified: 2026-04-09 01:37 UTC*  
 *Constitutional State: DITEMPA BUKAN DIBERI — 999 SEAL*
+

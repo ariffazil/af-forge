@@ -1,5 +1,5 @@
 """
-arifos/geox/geox_hardened.py — Hardened GEOX Pipeline
+arifos/GEOX/GEOX_hardened.py — Hardened GEOX Pipeline
 
 This module integrates GEOX special tools with the arifOS governance layer:
 - Thermodynamic analysis (delta_S)
@@ -16,8 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from arifos.geox.geox_tools import GeoToolResult, ToolRegistry
-from arifos.geox.governance import calculate_indices, get_verdict_advice
+from arifos.GEOX.GEOX_tools import GeoToolResult, ToolRegistry
+from arifos.GEOX.governance import calculate_indices, get_verdict_advice
 
 
 def _candidate_arifos_paths() -> list[Path]:
@@ -55,7 +55,7 @@ def _bootstrap_arifos_path() -> None:
 
 _bootstrap_arifos_path()
 
-logger = logging.getLogger("geox.hardened")
+logger = logging.getLogger("GEOX.hardened")
 
 try:
     from arifosmcp.core.governance import get_governance_kernel
@@ -75,14 +75,14 @@ except ImportError:
         return None
 
 
-class HardenedGeoxAgent:
+class HardenedGEOXAgent:
     """The hardened Geological Intelligence Agent for the arifOS Trinity."""
 
     def __init__(self, session_id: str = "anon_geo_session"):
         self.session_id = session_id
         self.registry = ToolRegistry.default_registry()
         self.kernel = get_governance_kernel(session_id)
-        logger.info(f"HardenedGeoxAgent initialized [ID: {session_id}]")
+        logger.info(f"HardenedGEOXAgent initialized [ID: {session_id}]")
 
     async def execute_tool(
         self,
@@ -137,7 +137,7 @@ class HardenedGeoxAgent:
         # 4. Genius Score Calculation (F8)
         g = indices.get("apex_readiness", genius_score(A=0.9, P=1.0, X=1.0, E=1.0 if ds <= 0 else 0.8))
 
-        # 5. Geox Eureka: Goldilocks & Godellock (The Paradox Eureka)
+        # 5. GEOX Eureka: Goldilocks & Godellock (The Paradox Eureka)
         omega_obj = humility_band(0.9)
         omega = omega_obj.omega_0 if hasattr(omega_obj, "omega_0") else 0.032
 
@@ -162,7 +162,7 @@ class HardenedGeoxAgent:
                 "humility": round(omega, 4) if isinstance(omega, (float, int)) else omega,
                 "indices": indices,
                 "governance_advice": verdict_advice,
-                "geox_eureka": {
+                "GEOX_eureka": {
                     "is_goldilocks": is_goldilocks,
                     "is_godellock": is_godellock,
                     "verdict": "HABITABLE" if is_goldilocks else ("LOCKED" if is_godellock else "UNSTABLE"),
@@ -178,6 +178,7 @@ class HardenedGeoxAgent:
 
         return envelope
 
-def get_hardened_agent(session_id: str) -> HardenedGeoxAgent:
+def get_hardened_agent(session_id: str) -> HardenedGEOXAgent:
     """Factory to get the hardened agent."""
-    return HardenedGeoxAgent(session_id)
+    return HardenedGEOXAgent(session_id)
+

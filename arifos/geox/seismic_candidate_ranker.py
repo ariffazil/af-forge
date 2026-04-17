@@ -31,8 +31,8 @@ from typing import Any
 
 import numpy as np
 
-from arifos.geox.base_tool import _make_provenance
-from arifos.geox.geox_mcp_schemas import (
+from arifos.GEOX.base_tool import _make_provenance
+from arifos.GEOX.GEOX_mcp_schemas import (
     GEOXRankedModelSet,
     GEOXRankedStructuralModel,
     GEOXStructuralCandidateSet,
@@ -241,3 +241,4 @@ async def build_structural_models(
             "verdict_ceiling": "QUALIFY",
         },
     )
+

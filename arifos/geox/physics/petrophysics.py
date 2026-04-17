@@ -20,7 +20,7 @@ from typing import Any, Literal
 
 import numpy as np
 
-from arifos.geox.schemas.petrophysics_schemas import (
+from arifos.GEOX.schemas.petrophysics_schemas import (
     LogQCFlags,
     SwModelAdmissibility,
     PetrophysicsInput,
@@ -326,4 +326,5 @@ def monte_carlo_sw(
         "verdict": "SEAL" if not hold_triggers else "888_HOLD",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
+
 

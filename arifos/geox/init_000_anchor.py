@@ -6,10 +6,10 @@ DITEMPA BUKAN DIBERI — Forged, not given.
 
 This module initializes the GEOX kernel with the constitutional grounding
 required for all Earth physics operations. It must be called before any
-geox.* tool is invoked.
+GEOX.* tool is invoked.
 
 Usage:
-    from geox.init_000_anchor import GEOXAnchor
+    from GEOX.init_000_anchor import GEOXAnchor
     anchor = GEOXAnchor.forge()
     anchor.verify()  # raises if not forged
 """
@@ -208,10 +208,10 @@ class GEOXAnchor:
     def verify(self) -> None:
         """
         Raise AssertionError if anchor is not forged.
-        Call this at the start of every geox.* tool function.
+        Call this at the start of every GEOX.* tool function.
         """
         assert GEOXAnchor._forged, (
-            "GEOXAnchor not forged. Call GEOXAnchor.forge() before using geox.* tools."
+            "GEOXAnchor not forged. Call GEOXAnchor.forge() before using GEOX.* tools."
         )
 
     def check_hold(self, **conditions) -> GEOXHoldStatus:
@@ -469,3 +469,4 @@ __all__ = [
     "bulk_volume_hydrocarbon",
     "vshale_gr",
 ]
+

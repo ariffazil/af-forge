@@ -1,5 +1,5 @@
 """
-arifos/geox/base_tool.py — GEOX Tool Base Classes
+arifos/GEOX/base_tool.py — GEOX Tool Base Classes
 DITEMPA BUKAN DIBERI
 """
 
@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.GEOX_schemas import (
     CoordinatePoint,
     GeoQuantity,
     ProvenanceRecord,
@@ -84,3 +84,4 @@ def _make_quantity(
         uncertainty=uncertainty,
         provenance=provenance,
     )
+

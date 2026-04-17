@@ -2,12 +2,12 @@
 GEOX FastMCP Adapter — Thin transport wrapper for GEOX core tools.
 
 This module provides the FastMCP-specific binding layer. It:
-1. Imports host-agnostic tools from geox.tools.core
+1. Imports host-agnostic tools from GEOX.tools.core
 2. Wraps them with FastMCP decorators
 3. Handles ToolResult conversion
 4. Manages FastMCP server lifecycle
 
-Domain logic lives in geox.tools.core and services/.
+Domain logic lives in GEOX.tools.core and services/.
 This adapter contains NO business logic — only transport concerns.
 
 DITEMPA BUKAN DIBERI
@@ -47,14 +47,14 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
 )
-logger = logging.getLogger("geox.mcp")
+logger = logging.getLogger("GEOX.mcp")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Optional Dependency Detection
 # ═══════════════════════════════════════════════════════════════════════════════
 
 try:
-    from ...geox_memory import GeoMemoryStore
+    from ...GEOX_memory import GeoMemoryStore
     _memory_store: "GeoMemoryStore | None" = GeoMemoryStore()
     _HAS_MEMORY = True
 except Exception as _mem_exc:
@@ -96,18 +96,18 @@ except ImportError:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 from ..core import (
-    geox_calculate_saturation as _core_calculate_saturation,
-    geox_build_structural_candidates as _core_build_structural_candidates,
-    geox_compute_petrophysics as _core_compute_petrophysics,
-    geox_evaluate_prospect as _core_evaluate_prospect,
-    geox_feasibility_check as _core_feasibility_check,
-    geox_health as _core_health,
-    geox_load_seismic_line as _core_load_seismic_line,
-    geox_petrophysical_hold_check as _core_petrophysical_hold_check,
-    geox_query_memory as _core_query_memory,
-    geox_select_sw_model as _core_select_sw_model,
-    geox_validate_cutoffs as _core_validate_cutoffs,
-    geox_verify_geospatial as _core_verify_geospatial,
+    GEOX_calculate_saturation as _core_calculate_saturation,
+    GEOX_build_structural_candidates as _core_build_structural_candidates,
+    GEOX_compute_petrophysics as _core_compute_petrophysics,
+    GEOX_evaluate_prospect as _core_evaluate_prospect,
+    GEOX_feasibility_check as _core_feasibility_check,
+    GEOX_health as _core_health,
+    GEOX_load_seismic_line as _core_load_seismic_line,
+    GEOX_petrophysical_hold_check as _core_petrophysical_hold_check,
+    GEOX_query_memory as _core_query_memory,
+    GEOX_select_sw_model as _core_select_sw_model,
+    GEOX_validate_cutoffs as _core_validate_cutoffs,
+    GEOX_verify_geospatial as _core_verify_geospatial,
 )
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -182,14 +182,14 @@ def _result_to_tool_result(result_obj: Any) -> ToolResult:
     
     # Build meta with app intent if applicable
     meta = {
-        "geox_version": GEOX_VERSION,
+        "GEOX_version": GEOX_VERSION,
         "seal": GEOX_SEAL,
     }
     
     # Check if this result suggests an app intent
     if structured.get("status") == "SEAL" and "views" in structured:
         meta["appIntent"] = {
-            "appId": "geox.seismic-viewer" if "line_id" in structured else "geox.generic",
+            "appId": "GEOX.seismic-viewer" if "line_id" in structured else "GEOX.generic",
             "action": "open",
             "params": structured,
             "preferredMode": "inline",
@@ -205,8 +205,8 @@ def _result_to_tool_result(result_obj: Any) -> ToolResult:
 # MCP Tool Wrappers (Thin Adapters)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@mcp.tool(name="geox_load_seismic_line")
-async def geox_load_seismic_line(
+@mcp.tool(name="GEOX_load_seismic_line")
+async def GEOX_load_seismic_line(
     line_id: str,
     survey_path: str = "default_survey",
     generate_views: bool = True,
@@ -225,8 +225,8 @@ async def geox_load_seismic_line(
     return _tool_result_to_dict(tool_result)
 
 
-@mcp.tool(name="geox_build_structural_candidates")
-async def geox_build_structural_candidates(
+@mcp.tool(name="GEOX_build_structural_candidates")
+async def GEOX_build_structural_candidates(
     line_id: str,
     focus_area: str | None = None,
 ) -> dict:
@@ -240,8 +240,8 @@ async def geox_build_structural_candidates(
     return _tool_result_to_dict(tool_result)
 
 
-@mcp.tool(name="geox_feasibility_check")
-async def geox_feasibility_check(
+@mcp.tool(name="GEOX_feasibility_check")
+async def GEOX_feasibility_check(
     plan_id: str,
     constraints: list[str],
 ) -> dict:
@@ -251,8 +251,8 @@ async def geox_feasibility_check(
     return _tool_result_to_dict(tool_result)
 
 
-@mcp.tool(name="geox_verify_geospatial")
-async def geox_verify_geospatial(
+@mcp.tool(name="GEOX_verify_geospatial")
+async def GEOX_verify_geospatial(
     lat: float,
     lon: float,
     radius_m: float = 1000.0,
@@ -263,8 +263,8 @@ async def geox_verify_geospatial(
     return _tool_result_to_dict(tool_result)
 
 
-@mcp.tool(name="geox_evaluate_prospect")
-async def geox_evaluate_prospect(
+@mcp.tool(name="GEOX_evaluate_prospect")
+async def GEOX_evaluate_prospect(
     prospect_id: str,
     interpretation_id: str,
 ) -> dict:
@@ -274,8 +274,8 @@ async def geox_evaluate_prospect(
     return _tool_result_to_dict(tool_result)
 
 
-@mcp.tool(name="geox_query_memory")
-async def geox_query_memory(
+@mcp.tool(name="GEOX_query_memory")
+async def GEOX_query_memory(
     query: str,
     basin: str | None = None,
     limit: int = 5,
@@ -291,8 +291,8 @@ async def geox_query_memory(
     return _tool_result_to_dict(tool_result)
 
 
-@mcp.tool(name="geox_calculate_saturation")
-async def geox_calculate_saturation(
+@mcp.tool(name="GEOX_calculate_saturation")
+async def GEOX_calculate_saturation(
     model: str,  # Literal["archie", "simandoux", "indonesia"]
     params: dict[str, Any],
     n_samples: int = 1000,
@@ -308,8 +308,8 @@ async def geox_calculate_saturation(
     return _tool_result_to_dict(tool_result)
 
 
-@mcp.tool(name="geox_select_sw_model")
-async def geox_select_sw_model(
+@mcp.tool(name="GEOX_select_sw_model")
+async def GEOX_select_sw_model(
     well_id: str,
     depth_top_m: float,
     depth_base_m: float,
@@ -345,8 +345,8 @@ async def geox_select_sw_model(
     return _tool_result_to_dict(tool_result)
 
 
-@mcp.tool(name="geox_compute_petrophysics")
-async def geox_compute_petrophysics(
+@mcp.tool(name="GEOX_compute_petrophysics")
+async def GEOX_compute_petrophysics(
     well_id: str,
     sw_model: str,
     rw_ohm_m: float,
@@ -381,8 +381,8 @@ async def geox_compute_petrophysics(
     return _tool_result_to_dict(tool_result)
 
 
-@mcp.tool(name="geox_validate_cutoffs")
-async def geox_validate_cutoffs(
+@mcp.tool(name="GEOX_validate_cutoffs")
+async def GEOX_validate_cutoffs(
     well_id: str,
     policy_id: str,
     phi_cutoff: float,
@@ -414,8 +414,8 @@ async def geox_validate_cutoffs(
     return _tool_result_to_dict(tool_result)
 
 
-@mcp.tool(name="geox_petrophysical_hold_check")
-async def geox_petrophysical_hold_check(
+@mcp.tool(name="GEOX_petrophysical_hold_check")
+async def GEOX_petrophysical_hold_check(
     well_id: str,
     sw_value: float,
     phi_value: float,
@@ -449,11 +449,11 @@ async def geox_petrophysical_hold_check(
     return _tool_result_to_dict(tool_result)
 
 
-@mcp.tool(name="geox_health")
-async def geox_health() -> dict:
+@mcp.tool(name="GEOX_health")
+async def GEOX_health() -> dict:
     """Server health check with constitutional floor status."""
     result = await _core_health(
-        geox_version=GEOX_VERSION,
+        GEOX_version=GEOX_VERSION,
         prefab_ui_available=False,  # Would detect from imports
         seismic_engine_available=_HAS_SEISMIC,
         fastmcp_version=".".join(map(str, FASTMCP_VERSION)),
@@ -480,7 +480,7 @@ try:
         """Detailed health endpoint."""
         return JSONResponse({
             "ok": True,
-            "service": "geox-earth-witness",
+            "service": "GEOX-earth-witness",
             "version": GEOX_VERSION,
             "mode": "constitutional-governance",
             "forge": "Forge-3-FastMCP" if IS_FASTMCP_3 else "Forge-2-Horizon",
@@ -508,8 +508,8 @@ def create_server(
     Factory function for creating a configured GEOX MCP server.
 
     Used by FastMCP CLI:
-      fastmcp run arifos.geox.tools.adapters.fastmcp_adapter:create_server
-      fastmcp run arifos.geox.tools.adapters.fastmcp_adapter:create_server --transport http --port 9000
+      fastmcp run arifos.GEOX.tools.adapters.fastmcp_adapter:create_server
+      fastmcp run arifos.GEOX.tools.adapters.fastmcp_adapter:create_server --transport http --port 9000
 
     Returns the configured FastMCP instance. The CLI handles running it.
     """
@@ -527,11 +527,11 @@ def create_server(
     logger.info("Physics Engine: %s", "available" if _HAS_PHYSICS else "unavailable")
     logger.info("Seismic Engine: %s", "available" if _HAS_SEISMIC else "unavailable")
     logger.info("Memory Store: %s", "available" if _HAS_MEMORY else "unavailable")
-    logger.info("Tools (11): geox_load_seismic_line, geox_build_structural_candidates,")
-    logger.info("           geox_feasibility_check, geox_verify_geospatial,")
-    logger.info("           geox_evaluate_prospect, geox_query_memory, geox_health,")
-    logger.info("           geox_select_sw_model, geox_compute_petrophysics,")
-    logger.info("           geox_validate_cutoffs, geox_petrophysical_hold_check")
+    logger.info("Tools (11): GEOX_load_seismic_line, GEOX_build_structural_candidates,")
+    logger.info("           GEOX_feasibility_check, GEOX_verify_geospatial,")
+    logger.info("           GEOX_evaluate_prospect, GEOX_query_memory, GEOX_health,")
+    logger.info("           GEOX_select_sw_model, GEOX_compute_petrophysics,")
+    logger.info("           GEOX_validate_cutoffs, GEOX_petrophysical_hold_check")
     logger.info("=" * 60)
 
     return mcp
@@ -553,8 +553,8 @@ Environment Variables:
   GEOX_PORT=8000               # HTTP port
 
 Examples:
-  python -m arifos.geox.tools.adapters.fastmcp_adapter
-  python -m arifos.geox.tools.adapters.fastmcp_adapter --transport http --port 8100
+  python -m arifos.GEOX.tools.adapters.fastmcp_adapter
+  python -m arifos.GEOX.tools.adapters.fastmcp_adapter --transport http --port 8100
         """
     )
     parser.add_argument(
@@ -599,3 +599,4 @@ Examples:
 
 if __name__ == "__main__":
     main()
+

@@ -14,7 +14,7 @@ class ContinuityRecord(BaseModel):
     This record allows for the full reconstruction of the inference chain,
     ensuring that no 'hallucinated' shortcuts are taken between tools.
     """
-    chain_id: str = Field(default_factory=lambda: f"geox-chain-{uuid.uuid4().hex[:8]}")
+    chain_id: str = Field(default_factory=lambda: f"GEOX-chain-{uuid.uuid4().hex[:8]}")
     previous_tool: str | None = None
     previous_output_id: str | None = None
     artifact_continuity: bool = True  # True if all image paths exist and are readable
@@ -40,3 +40,4 @@ class HardenedToolOutput(BaseModel):
     model_config = {
         "arbitrary_types_allowed": True
     }
+

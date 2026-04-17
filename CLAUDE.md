@@ -26,10 +26,10 @@ Each subproject has its own CLAUDE.md / AGENTS.md — this file covers workspace
 Use the repo-local launcher scripts in `.github/mcp/` for agent MCP wiring:
 
 - `start-arifos-stdio.sh`
-- `start-geox-stdio.sh`
+- `start-GEOX-stdio.sh`
 - `start-playwright.sh`
 
-The shared server names are `arifos-local`, `geox-local`, and `playwright`. Keep `.mcp.json`, `.claude/mcp.json`, `.cursor/mcp.json`, `.opencode.json`, and `.gemini/settings.json` aligned to those names.
+The shared server names are `arifos-local`, `GEOX-local`, and `playwright`. Keep `.mcp.json`, `.claude/mcp.json`, `.cursor/mcp.json`, `.opencode.json`, and `.gemini/settings.json` aligned to those names.
 
 ## Scientific terminology
 
@@ -123,28 +123,28 @@ pip install -e ".[dev]"
 # Tests (must reach 65% coverage)
 pytest tests -q
 pytest tests -k "test_name" -q    # single test
-pytest tests --cov=arifos.geox    # with coverage
+pytest tests --cov=arifos.GEOX    # with coverage
 
 # Lint / format / type check
-ruff check arifos/geox/
-ruff format arifos/geox/
-mypy arifos/geox/
+ruff check arifos/GEOX/
+ruff format arifos/GEOX/
+mypy arifos/GEOX/
 
 # Canonical dimension-native server
-python geox_unified.py --mode bridge
+python GEOX_unified.py --mode bridge
 
 # Compatibility wrapper for stdio-oriented integrations
-python geox_mcp_server.py
+python GEOX_mcp_server.py
 
 # GUI (React 19)
-cd geox-gui
+cd GEOX-gui
 npm run dev          # dev server
 npm run typecheck
 npm run lint
 npm run build
 ```
 
-`geox_unified.py` is the canonical GEOX server. `geox_mcp_server.py` is retained as a compatibility wrapper for older integrations.
+`GEOX_unified.py` is the canonical GEOX server. `GEOX_mcp_server.py` is retained as a compatibility wrapper for older integrations.
 
 Public deployment truth must stay explicit: only the dashboard (`/`), health endpoint (`/health`), and MCP endpoint (`/mcp/`) are live right now; WebMCP discovery and A2A publication are still partial/internal until their public route and contract are verified.
 
@@ -186,7 +186,7 @@ Task state machine: `TASK_CREATED → PLAN_PROPOSED → APPROVAL_REQUIRED → TO
 
 ### GEOX Architecture (Theory → Engine → Tools → Governance)
 
-Every MCP tool is wrapped by `@contrast_governed_tool` which runs the full THEORY → ENGINE → GOVERNANCE pass and returns a verdict (`SEAL ≥ 0.80`, `PARTIAL ≥ 0.50`, `SABAR ≥ 0.25`, `VOID < 0.25`) before any data is written. Verdict constants in `arifos/geox/__init__.py`.
+Every MCP tool is wrapped by `@contrast_governed_tool` which runs the full THEORY → ENGINE → GOVERNANCE pass and returns a verdict (`SEAL ≥ 0.80`, `PARTIAL ≥ 0.50`, `SABAR ≥ 0.25`, `VOID < 0.25`) before any data is written. Verdict constants in `arifos/GEOX/__init__.py`.
 
 **GUI stack:** React 19, TypeScript, Vite, MapLibre GL 4, CesiumJS, Zustand, Radix UI, Tailwind CSS. Governance badges must remain visible at all times — constitutional constraint, not style.
 
@@ -264,7 +264,7 @@ If `docker ps` returns containers, you are already on the VPS — do not ask for
 | `qdrant` | Vector memory |
 | `ollama` | Local LLM inference |
 | `openclaw` | Agent gateway (port 18789) |
-| `geox` | Geospatial MCP co-agent |
+| `GEOX` | Geospatial MCP co-agent |
 | `prometheus` / `grafana` | Metrics |
 | `n8n` | Workflow automation |
 
@@ -297,5 +297,6 @@ These are **unambiguous execution directives** — do not ask for clarification:
 | `yes` / `start` / `Start. ✅` | Proceed with the proposed action |
 | `1 2 3 4 forge` | Execute items 1, 2, 3, 4 in order |
 | `alligned` / `align all` | Sync all agent config files (CLAUDE.md, GEMINI.md, copilot-instructions.md, AGENTS.md, KIMI.md) |
+
 
 

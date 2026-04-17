@@ -13,7 +13,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-from .geox_schemas import ProvenanceRecord
+from .GEOX_schemas import ProvenanceRecord
 
 logger = logging.getLogger(__name__)
 
@@ -88,3 +88,4 @@ class GEOX_INTERPRETATION_SUMMARY(BaseModel):
     human_report: str | None = None # Metric 7
     provenance: ProvenanceRecord
     verdict: Literal["PASS", "QUALIFY", "HOLD", "BLOCK"] = "QUALIFY"
+

@@ -4,8 +4,8 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from arifos.geox.renderers.base import RenderSession
-from arifos.geox.renderers.cigvis_adapter import (
+from arifos.GEOX.renderers.base import RenderSession
+from arifos.GEOX.renderers.cigvis_adapter import (
     CigvisAdapter,
     InteractiveCigvisRenderer,
     StaticCigvisRenderer,
@@ -13,7 +13,7 @@ from arifos.geox.renderers.cigvis_adapter import (
 
 
 def test_compile_scene_returns_empty_when_cigvis_is_unavailable(monkeypatch):
-    monkeypatch.setattr("arifos.geox.renderers.cigvis_adapter.CIGVIS_AVAILABLE", False)
+    monkeypatch.setattr("arifos.GEOX.renderers.cigvis_adapter.CIGVIS_AVAILABLE", False)
     adapter = CigvisAdapter()
 
     scene = adapter.compile_scene({"state_type": "cross_section"})
@@ -40,7 +40,7 @@ def test_render_snapshot_rejects_empty_node_scene():
 def test_render_snapshot_reports_missing_output_file(monkeypatch, tmp_path):
     adapter = CigvisAdapter(output_dir=str(tmp_path))
     monkeypatch.setattr(
-        "arifos.geox.renderers.cigvis_adapter.cigvis.plot3D",
+        "arifos.GEOX.renderers.cigvis_adapter.cigvis.plot3D",
         lambda *args, **kwargs: None,
     )
 
@@ -56,7 +56,7 @@ def test_render_snapshot_adds_headless_hint_for_viewport_errors(monkeypatch):
     def fake_plot3d(*args, **kwargs):
         raise RuntimeError("viewport should be 1D 4-element array-like")
 
-    monkeypatch.setattr("arifos.geox.renderers.cigvis_adapter.cigvis.plot3D", fake_plot3d)
+    monkeypatch.setattr("arifos.GEOX.renderers.cigvis_adapter.cigvis.plot3D", fake_plot3d)
 
     result = adapter.render_snapshot({"nodes": ["node"], "metadata": {}})
 
@@ -101,7 +101,7 @@ def test_allocate_port_raises_when_none_are_available(monkeypatch):
 
 
 def test_static_and_interactive_renderer_fail_cleanly_without_cigvis(monkeypatch):
-    monkeypatch.setattr("arifos.geox.renderers.cigvis_adapter.CIGVIS_AVAILABLE", False)
+    monkeypatch.setattr("arifos.GEOX.renderers.cigvis_adapter.CIGVIS_AVAILABLE", False)
 
     static_renderer = StaticCigvisRenderer(adapter=CigvisAdapter())
     interactive_renderer = InteractiveCigvisRenderer(adapter=CigvisAdapter())
@@ -113,3 +113,4 @@ def test_static_and_interactive_renderer_fail_cleanly_without_cigvis(monkeypatch
     assert interactive_result.success is False
     assert "CIGVis not installed" in static_result.errors[0]
     assert "CIGVis not installed" in interactive_result.errors[0]
+

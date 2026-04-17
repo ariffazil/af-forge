@@ -32,13 +32,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from arifos.geox.renderers.base import (
+from arifos.GEOX.renderers.base import (
     RendererAdapter,
     RenderResult,
     RenderSession,
 )
 
-logger = logging.getLogger("geox.renderers.cigvis")
+logger = logging.getLogger("GEOX.renderers.cigvis")
 
 if "DISPLAY" not in os.environ:
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -130,7 +130,7 @@ class CigvisAdapter(RendererAdapter):
     name = "cigvis"
     supports_interactive = True
 
-    def __init__(self, output_dir: str = "/tmp/geox_renders"):
+    def __init__(self, output_dir: str = "/tmp/GEOX_renders"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self._sessions: dict[str, RenderSession] = {}
@@ -142,7 +142,7 @@ class CigvisAdapter(RendererAdapter):
         Compile canonical state to cigvis-compatible scene.
 
         Args:
-            canonical_state: GeoX state dict
+            canonical_state: GEOX state dict
 
         Returns:
             cigvis-compatible scene dict
@@ -151,7 +151,7 @@ class CigvisAdapter(RendererAdapter):
             logger.warning("CIGVis not available, returning empty scene")
             return {"nodes": [], "camera": None}
 
-        from arifos.geox.renderers.scene_compiler import SceneCompiler
+        from arifos.GEOX.renderers.scene_compiler import SceneCompiler
 
         compiler = SceneCompiler()
         scene = compiler.compile(canonical_state)
@@ -363,7 +363,7 @@ class CigvisAdapter(RendererAdapter):
 
             if output_path is None:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                output_path = str(self.output_dir / f"geox_snapshot_{timestamp}.png")
+                output_path = str(self.output_dir / f"GEOX_snapshot_{timestamp}.png")
 
             cigvis.plot3D(
                 nodes,
@@ -590,3 +590,4 @@ class InteractiveCigvisRenderer:
 
         scene = self.adapter.compile_scene(canonical_state)
         return self.adapter.launch_interactive(scene, port, ttl_seconds)
+

@@ -16,8 +16,8 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from arifos.geox.geox_schemas import CoordinatePoint
-from arifos.geox.tools.seismic_visual_filter import (
+from arifos.GEOX.GEOX_schemas import CoordinatePoint
+from arifos.GEOX.tools.seismic_visual_filter import (
     FilterResult,
     SeismicVisualFilterTool,
     _compute_contrast,
@@ -385,3 +385,4 @@ class TestConstitutionalCompliance:
 
         hypothesis = result.raw_output["hypothesis"]
         assert "EarthModelTool" in hypothesis["requires_confirmation_by"]
+

@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-logger = logging.getLogger("geox.renderers.export")
+logger = logging.getLogger("GEOX.renderers.export")
 
 
 class RenderExporter:
@@ -31,7 +31,7 @@ class RenderExporter:
     - full_artifact: Both PNG + JSON with metadata
     """
 
-    def __init__(self, output_dir: str = "/tmp/geox_exports"):
+    def __init__(self, output_dir: str = "/tmp/GEOX_exports"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -216,3 +216,4 @@ class RenderExporter:
             logger.info(f"Cleaned up {removed} old exports")
 
         return removed
+

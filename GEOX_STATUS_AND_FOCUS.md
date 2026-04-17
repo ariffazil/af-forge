@@ -44,15 +44,15 @@ AC_Risk = 0.252 → QUALIFY
 
 ### 🟡 PRODUCTION-CAPABLE: MCP Server
 **What's Working:**
-- `geox_load_seismic_line` — LIVE
-- `geox_build_structural_candidates` — LIVE
-- `geox_compute_ac_risk` — LIVE
-- `geox_feasibility_check` — LIVE
-- `geox_verify_geospatial` — LIVE
+- `GEOX_load_seismic_line` — LIVE
+- `GEOX_build_structural_candidates` — LIVE
+- `GEOX_compute_ac_risk` — LIVE
+- `GEOX_feasibility_check` — LIVE
+- `GEOX_verify_geospatial` — LIVE
 
 **What's Scaffolded:**
-- `geox_georeference_map` — core works, needs hardening
-- `geox_interpret_single_line` — mock VLM backend
+- `GEOX_georeference_map` — core works, needs hardening
+- `GEOX_interpret_single_line` — mock VLM backend
 
 **Gap Analysis:**
 | Capability | Status | Gap |
@@ -101,7 +101,7 @@ AC_Risk = 0.252 → QUALIFY
 # Target: Centralized registry with metadata
 
 GEOX_TOOL_REGISTRY = {
-    "geox_load_seismic_line": {
+    "GEOX_load_seismic_line": {
         "version": "1.0.0",
         "schema": LoadSeismicLineInput,
         "error_codes": ["FILE_NOT_FOUND", "INVALID_FORMAT", "SCALE_UNKNOWN"],
@@ -124,11 +124,11 @@ GEOX_TOOL_REGISTRY = {
 ```
 User: "I have this seismic section PNG"
   ↓
-Agent: calls geox_load_seismic_line
+Agent: calls GEOX_load_seismic_line
   ↓
 GEOX: returns contrast views + AC_Risk + verdict
   ↓
-Agent: calls geox_build_structural_candidates
+Agent: calls GEOX_build_structural_candidates
   ↓
 GEOX: returns 3 hypotheses + confidence bands
   ↓
@@ -183,11 +183,11 @@ UI Components:
 **Technical Stack:**
 - Vanilla JS (no framework bloat)
 - MCP App SDK (host adapter)
-- Hosted at: `geox.arif-fazil.com/apps/ac-risk-console/`
+- Hosted at: `GEOX.arif-fazil.com/apps/ac-risk-console/`
 
 **Actions:**
 - [ ] Implement HTML/JS UI
-- [ ] Wire to `geox_compute_ac_risk` tool
+- [ ] Wire to `GEOX_compute_ac_risk` tool
 - [ ] Test in Claude Desktop (inline)
 - [ ] Test in goose (inline)
 - [ ] Test external fallback
@@ -210,7 +210,7 @@ Petrel → export horizons/attributes → GEOX → AC_Risk + ToAC audit → Deci
 #### Petrel Bridge
 ```python
 # Accept Petrel exports
-geox_audit_petrel_export(
+GEOX_audit_petrel_export(
     grid_file=".grd",
     horizon_file=".hrz",
     well_tops=".txt"
@@ -220,7 +220,7 @@ geox_audit_petrel_export(
 
 #### DecisionSpace Geo (DSG) Bridge
 ```python
-geox_audit_dsg_interpretation(
+GEOX_audit_dsg_interpretation(
     project_path="...",
     interpretation_id="..."
 )
@@ -228,7 +228,7 @@ geox_audit_dsg_interpretation(
 
 #### PaleoScan Bridge
 ```python
-geox_audit_paleoscan_rgt(
+GEOX_audit_paleoscan_rgt(
     rgt_volume="...",
     horizons="..."
 )
@@ -236,7 +236,7 @@ geox_audit_paleoscan_rgt(
 
 **Actions:**
 - [ ] Document export formats for each tool
-- [ ] Build `geox_audit_legacy_interpretation` tool
+- [ ] Build `GEOX_audit_legacy_interpretation` tool
 - [ ] Create comparison: GEOX risk vs tool-native confidence
 - [ ] Case study: Petrel → GEOX → better decision
 
@@ -295,7 +295,7 @@ ABSOLUTE FOCUS AREAS (in order):
    - Don't replicate their GUIs, augment their decisions
 
 4. WEB ONLY AFTER MCP LOCKED
-   - Keep geox.arif-fazil.com minimal and truthful
+   - Keep GEOX.arif-fazil.com minimal and truthful
    - WebMCP is Phase 3, not Phase 1
 
 HARD CONSTRAINTS:
@@ -314,7 +314,7 @@ n```
 ## 4. Immediate Action Items (Next 2 Weeks)
 
 ### Week 1: MCP Server Hardening
-- [ ] Create unified tool registry (`arifos/geox/tool_registry.py`)
+- [ ] Create unified tool registry (`arifos/GEOX/tool_registry.py`)
 - [ ] Add version to all tool outputs
 - [ ] Standardize error codes
 - [ ] Implement `list_tools` with metadata
@@ -322,9 +322,9 @@ n```
 
 ### Week 2: AC_Risk Console MCP App
 - [ ] Build HTML/JS UI
-- [ ] Wire to `geox_compute_ac_risk`
+- [ ] Wire to `GEOX_compute_ac_risk`
 - [ ] Test inline in Claude
-- [ ] Deploy to `geox.arif-fazil.com/apps/ac-risk-console/`
+- [ ] Deploy to `GEOX.arif-fazil.com/apps/ac-risk-console/`
 - [ ] Create demo video
 
 ---
@@ -362,3 +362,4 @@ n```
 *DITEMPA BUKAN DIBERI*  
 *Focus locked: MCP server + AC_Risk Console.*  
 *Web deferred. Governance prioritized.*
+

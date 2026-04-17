@@ -29,7 +29,7 @@ from typing import Any
 # ═══════════════════════════════════════════════════════════════════════════════
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("geox.unified")
+logger = logging.getLogger("GEOX.unified")
 
 GEOX_VERSION = "2.0.0-UNIFIED-SPEC"
 GEOX_SEAL = "DITEMPA BUKAN DIBERI"
@@ -96,8 +96,8 @@ bootstrap_registries()
 # DASHBOARD / MCP APTS METADATA
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@mcp.resource("geox://registry/apps")
-async def list_geox_apps() -> list[dict]:
+@mcp.resource("GEOX://registry/apps")
+async def list_GEOX_apps() -> list[dict]:
     """Return the list of dashboard-ready GEOX applications from manifests."""
     manifest_dir = "control_plane/fastmcp/manifests"
     apps = []
@@ -111,7 +111,7 @@ async def list_geox_apps() -> list[dict]:
                     logger.error(f"Failed to load manifest {filename}: {e}")
     return apps
 
-@mcp.resource("geox://profile/status")
+@mcp.resource("GEOX://profile/status")
 async def get_profile_status() -> dict:
     return {
         "status": "healthy",
@@ -150,7 +150,7 @@ def build_status_payload() -> dict:
     return {
         "status": "healthy",
         "registry": "unified",
-        "service": "geox-unified-mcp",
+        "service": "GEOX-unified-mcp",
         "version": GEOX_VERSION,
         "profile": GEOX_PROFILE,
         "enabled_dimensions": ENABLED_DIMENSIONS,
@@ -210,3 +210,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

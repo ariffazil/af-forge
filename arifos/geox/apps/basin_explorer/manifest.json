@@ -1,30 +1,30 @@
 {
-  "$schema": "https://geox.arif-fazil.com/schemas/app-manifest/v1.json",
-  "app_id": "geox.basin.explorer",
+  "$schema": "https://GEOX.arif-fazil.com/schemas/app-manifest/v1.json",
+  "app_id": "GEOX.basin.explorer",
   "version": "1.0.0-AAA",
   "domain": "maps",
   "display_name": "Basin Map Explorer",
   "description": "Basin-scale geological mapping with play fairway analysis — AAA Grade",
-  "icon": "https://geox.arif-fazil.com/apps/basin_explorer/icon.svg",
+  "icon": "https://GEOX.arif-fazil.com/apps/basin_explorer/icon.svg",
   "required_tools": [
-    "mcp.geox.query_memory",
-    "mcp.geox.evaluate_prospect",
-    "mcp.geox.verify_geospatial",
-    "mcp.geox.malay_basin_pilot"
+    "mcp.GEOX.query_memory",
+    "mcp.GEOX.evaluate_prospect",
+    "mcp.GEOX.verify_geospatial",
+    "mcp.GEOX.malay_basin_pilot"
   ],
   "optional_tools": [
-    "mcp.geox.query_macrostrat",
-    "mcp.geox.load_seismic_line",
-    "mcp.geox.earth_signals"
+    "mcp.GEOX.query_macrostrat",
+    "mcp.GEOX.load_seismic_line",
+    "mcp.GEOX.earth_signals"
   ],
   "ui_entry": {
-    "resource_uri": "https://geox.arif-fazil.com/apps/basin_explorer/index.html",
+    "resource_uri": "https://GEOX.arif-fazil.com/apps/basin_explorer/index.html",
     "mode": "inline-or-external",
     "capability_required": [
       "webgl",
       "embedded_webview"
     ],
-    "csp_policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; connect-src 'self' https://api.geox.arif-fazil.com https://tile.openstreetmap.org https://*.basemaps.cartocdn.com; img-src 'self' data: https://*.basemaps.cartocdn.com; style-src 'self' 'unsafe-inline' https://unpkg.com;",
+    "csp_policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; connect-src 'self' https://api.GEOX.arif-fazil.com https://tile.openstreetmap.org https://*.basemaps.cartocdn.com; img-src 'self' data: https://*.basemaps.cartocdn.com; style-src 'self' 'unsafe-inline' https://unpkg.com;",
     "sandbox": "allow-scripts allow-same-origin allow-popups",
     "inline_config": {
       "max_width": 1400,
@@ -75,7 +75,7 @@
       "card",
       "text"
     ],
-    "external_url": "https://geox.arif-fazil.com/apps/basin_explorer/?session={session_id}",
+    "external_url": "https://GEOX.arif-fazil.com/apps/basin_explorer/?session={session_id}",
     "card_template": "/apps/basin_explorer/card.html"
   },
   "arifos": {
@@ -96,8 +96,8 @@
   "meta": {
     "author": "GEOX Platform Team",
     "license": "MIT",
-    "repository": "https://github.com/ariffazil/arifos-geox",
-    "homepage": "https://geox.arif-fazil.com/apps/basin_explorer/",
+    "repository": "https://github.com/ariffazil/arifos-GEOX",
+    "homepage": "https://GEOX.arif-fazil.com/apps/basin_explorer/",
     "keywords": [
       "basin",
       "maps",
@@ -109,3 +109,4 @@
     "updated_at": "2026-04-10T00:00:00Z"
   }
 }
+

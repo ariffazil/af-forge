@@ -3,11 +3,11 @@
 
 services:
   # MCP Server (Dimension-Native Architecture v2.0.0)
-  geox:
+  GEOX:
     build:
       context: .
       dockerfile: Dockerfile.unified
-    container_name: geox_unified
+    container_name: GEOX_unified
     ports:
       - "8000:8000"
     environment:
@@ -30,45 +30,45 @@ services:
     labels:
       - "traefik.enable=true"
       # MCP endpoint
-      - "traefik.http.routers.geox-mcp.rule=Host(`geox.arif-fazil.com`) && PathPrefix(`/mcp`)"
-      - "traefik.http.routers.geox-mcp.entrypoints=websecure"
-      - "traefik.http.routers.geox-mcp.tls=true"
-      - "traefik.http.routers.geox-mcp.service=geox-mcp"
-      - "traefik.http.routers.geox-mcp.priority=100"
+      - "traefik.http.routers.GEOX-mcp.rule=Host(`GEOX.arif-fazil.com`) && PathPrefix(`/mcp`)"
+      - "traefik.http.routers.GEOX-mcp.entrypoints=websecure"
+      - "traefik.http.routers.GEOX-mcp.tls=true"
+      - "traefik.http.routers.GEOX-mcp.service=GEOX-mcp"
+      - "traefik.http.routers.GEOX-mcp.priority=100"
       # Health endpoint
-      - "traefik.http.routers.geox-health.rule=Host(`geox.arif-fazil.com`) && PathPrefix(`/health`)"
-      - "traefik.http.routers.geox-health.entrypoints=websecure"
-      - "traefik.http.routers.geox-health.tls=true"
-      - "traefik.http.routers.geox-health.service=geox-mcp"
-      - "traefik.http.routers.geox-health.priority=100"
+      - "traefik.http.routers.GEOX-health.rule=Host(`GEOX.arif-fazil.com`) && PathPrefix(`/health`)"
+      - "traefik.http.routers.GEOX-health.entrypoints=websecure"
+      - "traefik.http.routers.GEOX-health.tls=true"
+      - "traefik.http.routers.GEOX-health.service=GEOX-mcp"
+      - "traefik.http.routers.GEOX-health.priority=100"
       # Service definition
-      - "traefik.http.services.geox-mcp.loadbalancer.server.port=8000"
+      - "traefik.http.services.GEOX-mcp.loadbalancer.server.port=8000"
 
   # GUI (React App with 7-Dimensional Interface)
   gui:
     build:
-      context: ./geox-gui
+      context: ./GEOX-gui
       dockerfile: Dockerfile
-    container_name: geox_gui
+    container_name: GEOX_gui
     expose:
       - "80"
     environment:
-      - VITE_GEOX_API_URL=https://geox.arif-fazil.com
+      - VITE_GEOX_API_URL=https://GEOX.arif-fazil.com
     restart: unless-stopped
     depends_on:
-      - geox
+      - GEOX
     networks:
       - traefik_network
       - arifos_trinity
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.geox-gui.rule=Host(`geox.arif-fazil.com`)"
-      - "traefik.http.routers.geox-gui.entrypoints=websecure"
-      - "traefik.http.routers.geox-gui.tls=true"
-      - "traefik.http.routers.geox-gui.service=geox-gui"
-      - "traefik.http.services.geox-gui.loadbalancer.server.port=80"
+      - "traefik.http.routers.GEOX-gui.rule=Host(`GEOX.arif-fazil.com`)"
+      - "traefik.http.routers.GEOX-gui.entrypoints=websecure"
+      - "traefik.http.routers.GEOX-gui.tls=true"
+      - "traefik.http.routers.GEOX-gui.service=GEOX-gui"
+      - "traefik.http.services.GEOX-gui.loadbalancer.server.port=80"
       # GUI catches all except API paths
-      - "traefik.http.routers.geox-gui.priority=1"
+      - "traefik.http.routers.GEOX-gui.priority=1"
 
 volumes:
   vault_999:
@@ -79,3 +79,4 @@ networks:
     external: true
   arifos_trinity:
     external: true
+

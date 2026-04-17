@@ -137,3 +137,4 @@ class VolumeCompareResponse(BaseModel):
     diverging_areas: list[dict[str, Any]] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+

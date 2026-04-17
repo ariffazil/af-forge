@@ -1,5 +1,5 @@
 """
-HardenedGeoxAgent — Constitutionally Hardened Agent
+HardenedGEOXAgent — Constitutionally Hardened Agent
 DITEMPA BUKAN DIBERI
 
 An agent implementation with hardened constitutional enforcement.
@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .base_tool import GeoToolResult
-from .geox_validator import GeoXValidator
+from .GEOX_validator import GEOXValidator
 
 
 @dataclass
@@ -23,7 +23,7 @@ class HardenedConfig:
     require_provenance: bool = True
 
 
-class HardenedGeoxAgent:
+class HardenedGEOXAgent:
     """
     Constitutionally hardened GEOX agent.
 
@@ -31,11 +31,11 @@ class HardenedGeoxAgent:
     """
 
     def __init__(self, config: HardenedConfig | None = None, session_id: str | None = None):
-        from .geox_tools import ToolRegistry
+        from .GEOX_tools import ToolRegistry
 
         self.config = config or HardenedConfig()
         self.session_id = session_id or "default_session"
-        self.validator = GeoXValidator(strict_mode=self.config.strict_mode)
+        self.validator = GEOXValidator(strict_mode=self.config.strict_mode)
         self.registry = ToolRegistry.default_registry()
         self._history: list[dict[str, Any]] = []
 
@@ -83,4 +83,5 @@ class HardenedGeoxAgent:
         return {"error": f"Tool {tool_name} has no run method"}
 
 
-__all__ = ["HardenedGeoxAgent", "HardenedConfig"]
+__all__ = ["HardenedGEOXAgent", "HardenedConfig"]
+

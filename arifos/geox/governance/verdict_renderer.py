@@ -19,7 +19,7 @@ from typing import Any
 from enum import Enum
 
 
-class GeoxVerdict(Enum):
+class GEOXVerdict(Enum):
     """GEOX verdict types."""
     SEAL = "SEAL"           # All checks passed, proceed
     SABAR = "SABAR"         # Proceed with documented reservations
@@ -36,7 +36,7 @@ class RenderedVerdict:
     
     # Core verdict
     verdict: str
-    verdict_enum: GeoxVerdict
+    verdict_enum: GEOXVerdict
     
     # Justification
     primary_reason: str
@@ -124,31 +124,31 @@ class VerdictRenderer:
     """
     
     VERDICT_DESCRIPTIONS = {
-        GeoxVerdict.SEAL: {
+        GEOXVerdict.SEAL: {
             "description": "All constitutional checks passed. Proceed with confidence.",
             "human_review": False,
         },
-        GeoxVerdict.SABAR: {
+        GEOXVerdict.SABAR: {
             "description": "Proceed with documented reservations. Known limitations exist.",
             "human_review": False,
         },
-        GeoxVerdict.PARTIAL: {
+        GEOXVerdict.PARTIAL: {
             "description": "Partial compliance. Review before relying on results.",
             "human_review": True,
         },
-        GeoxVerdict.REVIEW: {
+        GEOXVerdict.REVIEW: {
             "description": "Explicit human review required before proceeding.",
             "human_review": True,
         },
-        GeoxVerdict.HOLD: {
+        GEOXVerdict.HOLD: {
             "description": "Operation paused. Critical issues must be resolved.",
             "human_review": True,
         },
-        GeoxVerdict.VOID: {
+        GEOXVerdict.VOID: {
             "description": "Operation rejected. Fundamental constitutional violation.",
             "human_review": True,
         },
-        GeoxVerdict.PENDING: {
+        GEOXVerdict.PENDING: {
             "description": "Assessment not yet complete.",
             "human_review": False,
         },
@@ -156,7 +156,7 @@ class VerdictRenderer:
     
     def render(
         self,
-        verdict: str | GeoxVerdict,
+        verdict: str | GEOXVerdict,
         reason: str,
         confidence: float = 0.0,
         risk_level: str = "UNKNOWN",
@@ -185,9 +185,9 @@ class VerdictRenderer:
         """
         if isinstance(verdict, str):
             try:
-                verdict_enum = GeoxVerdict[verdict]
+                verdict_enum = GEOXVerdict[verdict]
             except KeyError:
-                verdict_enum = GeoxVerdict.PENDING
+                verdict_enum = GEOXVerdict.PENDING
                 verdict = "PENDING"
         else:
             verdict_enum = verdict
@@ -226,22 +226,22 @@ class VerdictRenderer:
         
         # Determine verdict
         if total == 0:
-            verdict = GeoxVerdict.PENDING
+            verdict = GEOXVerdict.PENDING
             reason = "No checkpoints evaluated"
         elif passed == total:
-            verdict = GeoxVerdict.SEAL
+            verdict = GEOXVerdict.SEAL
             reason = f"All {total} checkpoints passed"
         elif passed + overridden == total:
-            verdict = GeoxVerdict.SABAR
+            verdict = GEOXVerdict.SABAR
             reason = f"All checkpoints passed ({overridden} via override)"
         elif passed >= total * 0.7:
-            verdict = GeoxVerdict.PARTIAL
+            verdict = GEOXVerdict.PARTIAL
             reason = f"{passed}/{total} checkpoints passed"
         elif passed >= total * 0.4:
-            verdict = GeoxVerdict.REVIEW
+            verdict = GEOXVerdict.REVIEW
             reason = f"Only {passed}/{total} checkpoints passed - review required"
         else:
-            verdict = GeoxVerdict.HOLD
+            verdict = GEOXVerdict.HOLD
             reason = f"Critical failures: only {passed}/{total} checkpoints passed"
         
         # Collect warnings
@@ -254,7 +254,7 @@ class VerdictRenderer:
             verdict=verdict,
             reason=reason,
             confidence=passed / total if total > 0 else 0,
-            risk_level="LOW" if verdict == GeoxVerdict.SEAL else "MEDIUM",
+            risk_level="LOW" if verdict == GEOXVerdict.SEAL else "MEDIUM",
             recommendations=["Review checkpoint details for full context"],
             warnings=warnings,
             source_operation=source_operation,
@@ -271,3 +271,4 @@ def get_verdict_renderer() -> VerdictRenderer:
     if _global_renderer is None:
         _global_renderer = VerdictRenderer()
     return _global_renderer
+

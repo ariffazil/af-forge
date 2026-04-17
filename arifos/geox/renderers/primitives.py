@@ -380,3 +380,4 @@ class NeutralScene:
             + len(self.unit_polygons)
             + len(self.uncertainty_zones)
         )
+

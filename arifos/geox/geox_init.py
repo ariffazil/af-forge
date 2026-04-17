@@ -1,5 +1,5 @@
 """
-arifos/geox/geox_init.py — GEOX Foundation Hardening
+arifos/GEOX/GEOX_init.py — GEOX Foundation Hardening
 
 This module provides the "Ignition State" for GEOX, ensuring:
 - Operational environment verification (F9 Physics9)
@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-logger = logging.getLogger("geox.init")
+logger = logging.getLogger("GEOX.init")
 
 
 def _candidate_arifos_paths() -> list[Path]:
@@ -131,3 +131,4 @@ def verify_and_exit_if_void():
         print(f"CRITICAL: GEOX Foundation Failure - {status['checks']}")
         sys.exit(1)
     return status
+

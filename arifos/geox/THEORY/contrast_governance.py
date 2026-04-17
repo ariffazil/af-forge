@@ -32,7 +32,7 @@ class ContrastVerdict(Enum):
     HOLD = auto()      # Elevated risk, review required
     BLOCK = auto()     # Cannot proceed
 
-    def to_geox_verdict(self) -> str:
+    def to_GEOX_verdict(self) -> str:
         """Convert to standard GEOX verdict string."""
         mapping = {
             ContrastVerdict.SEAL: "SEAL",
@@ -274,3 +274,4 @@ def assess_conflation_risk(
     }
 
     return verdict, triggers, metadata
+

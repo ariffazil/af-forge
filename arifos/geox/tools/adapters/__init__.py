@@ -7,3 +7,4 @@ DITEMPA BUKAN DIBERI
 from .fastmcp_adapter import mcp, main, create_server
 
 __all__ = ["mcp", "main", "create_server"]
+

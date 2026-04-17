@@ -264,3 +264,4 @@ export const WEALTH_TOOLS = [
   WealthEntropyBudgetTool,
   WealthObjectiveComputeTool
 ];
+

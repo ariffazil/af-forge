@@ -26,12 +26,12 @@ Total:                  33 tools
 | **GEOX** (runtime TS) | 11 earth intel tools | **0 runtime tools** | ❌ |
 | **WEALTH** (runtime TS) | 11 capital tools | **0 runtime tools** | ❌ |
 | **arifOS kernel** (Python) | Domain logic | Exists in `arifOS/` sibling | ✅ |
-| **GEOX domain** (Python) | Geospatial contracts | Exists in `geox/` sibling | ✅ |
+| **GEOX domain** (Python) | Geospatial contracts | Exists in `GEOX/` sibling | ✅ |
 | **Runtime Agent** | Executor layer | **7 tools** (parallel universe) | ⚠️ |
 
 **Critical gap:** The "33-tool tri-organ lattice" does NOT exist as a unified system.
 - arifOS Python kernel and TypeScript MCP server are the governance organ (10 tools)
-- GEOX Python (`geox/`) and arifOS Python (`arifOS/`) are sibling domains — not wired into TS runtime
+- GEOX Python (`GEOX/`) and arifOS Python (`arifOS/`) are sibling domains — not wired into TS runtime
 - The 7 runtime agent tools (read_file, write_file, etc.) exist in a completely parallel stack
 
 ---
@@ -85,12 +85,12 @@ These three engine classes are the **intended entry point** for the tri-organ la
 | Semantic Name | File | Category | Pipeline | Status | Synonyms |
 |--------------|------|----------|----------|--------|----------|
 | `GEOXEngine` | `src/engine/GEOXEngine.ts` | CLASS | 333_MIND | **STUB** | earth oracle, physical constraints |
-| *(geox_check_hazard)* | — | TOOL | 333_EXPLORE | **MISSING** | hazard check, physical limit |
-| *(geox_subsurface_model)* | — | TOOL | 333_EXPLORE | **MISSING** | reservoir model, seismic |
-| *(geox_climate_dynamics)* | — | TOOL | 333_EXPLORE | **MISSING** | climate, environmental |
-| *(geox_extract_rate)* | — | TOOL | 777_FORGE | **MISSING** | extraction limits, safe rate |
-| `geox/` (Python sibling) | `/root/geox/` | MODULE | 333_MIND | ✅ EXISTS | geospatial contracts |
-| `geox_check_hazard` (Python) | `geox/mcp/` | TOOL | 333_MIND | ✅ EXISTS | hazard detection |
+| *(GEOX_check_hazard)* | — | TOOL | 333_EXPLORE | **MISSING** | hazard check, physical limit |
+| *(GEOX_subsurface_model)* | — | TOOL | 333_EXPLORE | **MISSING** | reservoir model, seismic |
+| *(GEOX_climate_dynamics)* | — | TOOL | 333_EXPLORE | **MISSING** | climate, environmental |
+| *(GEOX_extract_rate)* | — | TOOL | 777_FORGE | **MISSING** | extraction limits, safe rate |
+| `GEOX/` (Python sibling) | `/root/GEOX/` | MODULE | 333_MIND | ✅ EXISTS | geospatial contracts |
+| `GEOX_check_hazard` (Python) | `GEOX/mcp/` | TOOL | 333_MIND | ✅ EXISTS | hazard detection |
 | `GEOXScenarioContract` | `src/types/arifos.ts:23` | INTERFACE | 333_MIND | ✅ DEFINED | physical scenario schema |
 | `HYPOTHESIS` tag | F8/F2 | EVIDENCE_TAG | 333_MIND | ✅ DEFINED | geo uncertainty tag |
 | `ESTIMATE` tag | F7/F8 | EVIDENCE_TAG | 333_MIND | ✅ DEFINED | bounded confidence tag |
@@ -248,10 +248,10 @@ These three engine classes are the **intended entry point** for the tri-organ la
 
 | Tool | Location | Purpose | Status |
 |------|----------|---------|--------|
-| `geox_check_hazard` | `geox/mcp/` | Physical hazard detection | ✅ EXISTS |
-| `bias_detector` | `geox/core/` | Spatial bias detection | ✅ EXISTS |
-| `ac_risk` | `geox/core/` | Accessibility risk model | ✅ EXISTS |
-| `tool_registry` | `geox/core/` | Tool registration | ✅ EXISTS |
+| `GEOX_check_hazard` | `GEOX/mcp/` | Physical hazard detection | ✅ EXISTS |
+| `bias_detector` | `GEOX/core/` | Spatial bias detection | ✅ EXISTS |
+| `ac_risk` | `GEOX/core/` | Accessibility risk model | ✅ EXISTS |
+| `tool_registry` | `GEOX/core/` | Tool registration | ✅ EXISTS |
 
 ### arifOS Python Kernel (Sibling — not wired to TS runtime)
 
@@ -388,17 +388,17 @@ These three engine classes are the **intended entry point** for the tri-organ la
 
 ### GEOX (Earth Intel) — 11 Tools (0/11 in TS runtime — ALL MISSING)
 
-1. `geox_check_hazard` — physical hazard detection
-2. `geox_subsurface_model` — reservoir/subsurface model
-3. `geox_seismic_interpret` — seismic data interpretation
-4. `geox_climate_bounds` — climate dynamics with uncertainty
-5. `geox_extraction_limits` — maximum safe extraction rate
-6. `geox_uncertainty_tag` — tag output as ESTIMATE/UNKNOWN
-7. `geox_physical_constraint` — return physical constraint envelope
-8. `geox_prospect_score` — geological prospect scoring
-9. `geox_maraoh_impact` — community/dignity impact assessment
-10. `geox_witness_triad` — Tri-Witness physical verification
-11. `geox_ground_truth` — F8 grounding check for physical claims
+1. `GEOX_check_hazard` — physical hazard detection
+2. `GEOX_subsurface_model` — reservoir/subsurface model
+3. `GEOX_seismic_interpret` — seismic data interpretation
+4. `GEOX_climate_bounds` — climate dynamics with uncertainty
+5. `GEOX_extraction_limits` — maximum safe extraction rate
+6. `GEOX_uncertainty_tag` — tag output as ESTIMATE/UNKNOWN
+7. `GEOX_physical_constraint` — return physical constraint envelope
+8. `GEOX_prospect_score` — geological prospect scoring
+9. `GEOX_maraoh_impact` — community/dignity impact assessment
+10. `GEOX_witness_triad` — Tri-Witness physical verification
+11. `GEOX_ground_truth` — F8 grounding check for physical claims
 
 ---
 
@@ -487,7 +487,7 @@ Runtime Agent:          ✅ 7 tools (read_file, write_file, list_files,
 
 Parallel Universe (Python siblings):
                        ✅ arifOS Python kernel (F1-F13 in Python)
-                       ✅ geox Python geospatial tools
+                       ✅ GEOX Python geospatial tools
                        ✅ contracts Python domain tools
                        ❌   Not wired into TypeScript runtime
 
@@ -509,4 +509,5 @@ Without these, the agent can navigate 000→999 for code tasks but cannot perfor
 **SEALED:** `audit_000_999_tri_organ_2026-04-15`
 **PIPELINE:** 000 INIT → 111 SENSE → 222 THINK → 333 MIND → 444 ROUTE → 555 HEART → 666 ALIGN → 777 FORGE → 888 JUDGE → 999 VAULT
 **MOTTO:** *Ditempa Bukan Diberi* — Forged, Not Given
+
 

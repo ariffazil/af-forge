@@ -13,13 +13,13 @@ DITEMPA BUKAN DIBERI
 
 from __future__ import annotations
 from typing import Any
-from ..core import geox_health
+from ..core import GEOX_health
 
 class OpenAIAppAdapter:
     """
     Adapter to bridge GEOX sovereign core to OpenAI Apps runtime.
     """
-    def __init__(self, app_id: str = "geox-subsurface"):
+    def __init__(self, app_id: str = "GEOX-subsurface"):
         self.app_id = app_id
 
     def generate_openai_manifest(self) -> dict[str, Any]:
@@ -30,10 +30,10 @@ class OpenAIAppAdapter:
             "schema_version": "v1",
             "name": "GEOX Subsurface",
             "description": "Governed geological coprocessor for subsurface inverse modelling.",
-            "namespace": "geox",
+            "namespace": "GEOX",
             "tools": [
                 {
-                    "name": "geox_load_seismic_line",
+                    "name": "GEOX_load_seismic_line",
                     "description": "Load and QC seismic cross-sections.",
                     "parameters": {
                         "type": "object",
@@ -55,6 +55,7 @@ class OpenAIAppAdapter:
         Map OpenAI request payload to GEOX core tool call.
         """
         # OpenAI specific request parsing here
-        return {"status": "SUCCESS", "geox_seal": "DITEMPA BUKAN DIBERI"}
+        return {"status": "SUCCESS", "GEOX_seal": "DITEMPA BUKAN DIBERI"}
 
 # Integration logic for starlette/fastapi would go here.
+

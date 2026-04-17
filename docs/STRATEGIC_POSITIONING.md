@@ -49,7 +49,7 @@ We do not fight the "feature war" against SLB. We act as the **High-Clarity Copi
 Agents participating in the GEOX ecosystem must adhere to the following:
 - **Reject the "Petrel Clone" Fallacy:** Do not prioritize UI decoration over physical metabolism.
 - **Prioritize F7 (Humility):** If uncertainty $> 4\%$, trigger an automatic **888_HOLD**.
-- **Govern the Prose:** Do not let LLM fluency invent geology. Truth is streamed only from `geox://canon9/state`.
+- **Govern the Prose:** Do not let LLM fluency invent geology. Truth is streamed only from `GEOX://canon9/state`.
 
 ---
 
@@ -58,3 +58,4 @@ The strategy is locked. The "Heavy Witness" engine is now the established **Sove
 
 **999_SEAL_STRATEGY.**
 **DITEMPA BUKAN DIBERI.**
+

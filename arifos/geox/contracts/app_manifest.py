@@ -215,7 +215,7 @@ class AppMeta(BaseModel):
 # Main Manifest Model
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class GeoXAppManifest(BaseModel):
+class GEOXAppManifest(BaseModel):
     """
     Canonical app manifest for GEOX MCP Apps.
     
@@ -235,8 +235,8 @@ class GeoXAppManifest(BaseModel):
     # Identity
     app_id: str = Field(
         ...,
-        pattern=r"^geox\.[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*$",
-        description="Unique app identifier in geox.{domain}.{name} format"
+        pattern=r"^GEOX\.[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*$",
+        description="Unique app identifier in GEOX.{domain}.{name} format"
     )
     version: str = Field(
         ...,
@@ -276,18 +276,18 @@ class GeoXAppManifest(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "app_id": "geox.seismic.viewer",
+                "app_id": "GEOX.seismic.viewer",
                 "version": "1.0.0",
                 "dimension": "EARTH_3D",
                 "domain": "seismic",
                 "display_name": "Seismic Viewer",
                 "description": "Interactive 2D/3D seismic data visualization",
-                "required_tools": ["mcp.geox.seismic.ingest", "mcp.geox.seismic.detect_reflectors"],
+                "required_tools": ["mcp.GEOX.seismic.ingest", "mcp.GEOX.seismic.detect_reflectors"],
                 "ui_entry": {
-                    "resource_uri": "https://geox.apps/seismic-viewer",
+                    "resource_uri": "https://GEOX.apps/seismic-viewer",
                     "mode": "inline-or-external",
                     "capability_required": ["webgl2"],
-                    "csp_policy": "default-src 'self'; connect-src 'self' https://api.geox.arif-fazil.com"
+                    "csp_policy": "default-src 'self'; connect-src 'self' https://api.GEOX.arif-fazil.com"
                 },
                 "auth": {
                     "mode": "jwt",
@@ -323,17 +323,17 @@ class AppRegistry:
     """
     
     def __init__(self):
-        self._apps: dict[str, GeoXAppManifest] = {}
+        self._apps: dict[str, GEOXAppManifest] = {}
     
-    def register(self, manifest: GeoXAppManifest) -> None:
+    def register(self, manifest: GEOXAppManifest) -> None:
         """Register an app manifest."""
         self._apps[manifest.app_id] = manifest
     
-    def get(self, app_id: str) -> GeoXAppManifest | None:
+    def get(self, app_id: str) -> GEOXAppManifest | None:
         """Get a manifest by app ID."""
         return self._apps.get(app_id)
     
-    def list_apps(self, domain: AppDomain | None = None) -> list[GeoXAppManifest]:
+    def list_apps(self, domain: AppDomain | None = None) -> list[GEOXAppManifest]:
         """List all registered apps, optionally filtered by domain."""
         apps = list(self._apps.values())
         if domain:
@@ -372,3 +372,4 @@ def get_app_registry() -> AppRegistry:
     if _registry is None:
         _registry = AppRegistry()
     return _registry
+

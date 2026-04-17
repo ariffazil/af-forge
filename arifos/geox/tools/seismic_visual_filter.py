@@ -1,5 +1,5 @@
 """
-arifos/geox/tools/seismic_visual_filter.py — Seismic Visual Filter Tool
+arifos/GEOX/tools/seismic_visual_filter.py — Seismic Visual Filter Tool
 DITEMPA BUKAN DIBERI
 
 Plane 2 — Perception Layer: Classical image filtering for seismic data.
@@ -36,15 +36,15 @@ from typing import Any
 
 import numpy as np
 
-from arifos.geox.base_tool import (
+from arifos.GEOX.base_tool import (
     BaseTool,
     GeoToolResult,
     _make_provenance,
     _make_quantity,
 )
-from arifos.geox.geox_schemas import CoordinatePoint
+from arifos.GEOX.GEOX_schemas import CoordinatePoint
 
-logger = logging.getLogger("geox.tools.seismic_visual_filter")
+logger = logging.getLogger("GEOX.tools.seismic_visual_filter")
 
 
 # ---------------------------------------------------------------------------
@@ -760,3 +760,4 @@ class SeismicVisualFilterTool(BaseTool):
             latency_ms=round(latency_ms, 2),
             success=True,
         )
+

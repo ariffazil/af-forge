@@ -39,7 +39,7 @@ git clone https://github.com/vitec-memorix/GeoReferencer.git
 
 #### Day 3-4: Build GCPDetector
 ```python
-# GEOX/arifos/geox/vision/gcp_detector.py
+# GEOX/arifos/GEOX/vision/gcp_detector.py
 class GCPDetector:
     """
     Detect candidate GCPs from map collars using CV + OCR.
@@ -63,7 +63,7 @@ class GCPDetector:
 
 #### Day 5-7: Build GeoreferenceAuditor
 ```python
-# GEOX/arifos/geox/vision/georeference_auditor.py
+# GEOX/arifos/GEOX/vision/georeference_auditor.py
 class GeoreferenceAuditor:
     """
     ToAC governance layer for georeferencing.
@@ -138,7 +138,7 @@ Working digitization pipeline with physics validation
 
 #### Day 4-7: Build Core Pipeline
 ```python
-# GEOX/arifos/geox/vision/analog_digitizer.py
+# GEOX/arifos/GEOX/vision/analog_digitizer.py
 class AnalogDigitizer:
     """
     Digitize scanned logs, charts, core photos with ToAC governance.
@@ -223,7 +223,7 @@ git clone https://github.com/gecos-lab/Seismic-App.git
 
 #### Day 5-10: Build Integration Layer
 ```python
-# GEOX/arifos/geox/vision/backends/
+# GEOX/arifos/GEOX/vision/backends/
 class SeismiqbBackend:
     """Adapter for seismiqb models."""
     
@@ -241,8 +241,8 @@ class SeismicAppBackend:
         # SAM-based segmentation
         # Return mask
 
-class GeoXVLMBackend:
-    """Adapter for GeoX/GeoGround vision towers."""
+class GEOXVLMBackend:
+    """Adapter for GEOX/GeoGround vision towers."""
     
     async def infer(self, image, prompt):
         # Run geo-domain VLM
@@ -282,7 +282,7 @@ class GovernedSeismicVLM:
 result = await governed_vlm.interpret(
     image="seismic_section.png",
     goal="Identify faults and horizons",
-    backends=["seismiqb", "geox_vlm", "sam"],
+    backends=["seismiqb", "GEOX_vlm", "sam"],
 )
 # result.hypotheses  # From multiple backends
 # result.consistency_score  # Cross-view agreement
@@ -302,7 +302,7 @@ Attribute extraction with Nature 2025 risk model
 
 #### Day 1-2: Encode Nature 2025 Findings
 ```python
-# GEOX/arifos/geox/vision/attribute_risk.py
+# GEOX/arifos/GEOX/vision/attribute_risk.py
 ATTRIBUTE_IMAGE_FEASIBILITY = {
     # From Nature 2025 paper
     "coherence": {
@@ -390,7 +390,7 @@ result = await extract_seismic_attribute(
 ## Resource Requirements
 
 ### Compute
-- GPU for seismiqb/GeoX inference (A10G or equivalent)
+- GPU for seismiqb/GEOX inference (A10G or equivalent)
 - Standard CPU for georeferencing/digitization
 
 ### External Dependencies
@@ -403,7 +403,7 @@ rasterio>=1.3.8           # Georeferencing
 pillow>=10.0.0            # Image processing
 
 # Optional DL backends
-torch>=2.0.0              # seismiqb, GeoX
+torch>=2.0.0              # seismiqb, GEOX
 transformers>=4.30.0      # VLM adapters
 segment-anything>=1.0     # SAM integration
 ```
@@ -473,7 +473,7 @@ segment-anything>=1.0     # SAM integration
 
 ```python
 # Complete GEOX Vision stack
-from geox.vision import (
+from GEOX.vision import (
     GeoreferenceAuditor,
     AnalogDigitizer,
     GovernedSeismicVLM,
@@ -498,3 +498,4 @@ for result in [georef, digitized, seismic, attributes]:
 
 *DITEMPA BUKAN DIBERI*  
 *External tools leveraged. ToAC governance applied. Vision forged.*
+

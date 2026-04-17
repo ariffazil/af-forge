@@ -5,15 +5,15 @@ DITEMPA BUKAN DIBERI
 
 """
 GEOX 1D Demo — Joint inversion toy example.
-Run: cd /root/GEOX && python -m arifos.geox.oned.demo
+Run: cd /root/GEOX && python -m arifos.GEOX.oned.demo
 DITEMPA BUKAN DIBERI
 """
 
 import numpy as np
-from arifos.geox.oned.canon9_profile import Canon9Profile, DepthSample
-from arifos.geox.oned.rock_physics import GassmannModel
-from arifos.geox.oned.synthetic import SyntheticSeismic, Wavelet
-from arifos.geox.oned.inversion import JointInversion1D
+from arifos.GEOX.oned.canon9_profile import Canon9Profile, DepthSample
+from arifos.GEOX.oned.rock_physics import GassmannModel
+from arifos.GEOX.oned.synthetic import SyntheticSeismic, Wavelet
+from arifos.GEOX.oned.inversion import JointInversion1D
 
 
 def create_synthetic_well(
@@ -174,3 +174,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

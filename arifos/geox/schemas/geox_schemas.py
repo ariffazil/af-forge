@@ -603,7 +603,7 @@ class AttributeStack(BaseModel):
 # MCP Envelope (Common Output Wrapper)
 # ---------------------------------------------------------------------------
 
-class GeoxUncertainty(BaseModel):
+class GEOXUncertainty(BaseModel):
     """
     Standard uncertainty block for GEOX tools.
     """
@@ -611,27 +611,27 @@ class GeoxUncertainty(BaseModel):
     type: str = Field(..., description="Type of interpretation/analysis domain.")
     notes: list[str] = Field(default_factory=list, description="Specific uncertainty caveats.")
 
-class GeoxGovernance(BaseModel):
+class GEOXGovernance(BaseModel):
     """
     Standard governance/compliance block for GEOX tools.
     """
     floors_ok: list[str] = Field(default_factory=list, description="Verified constitutional floors.")
     warnings: list[str] = Field(default_factory=list, description="Mandatory governance warnings.")
 
-class GeoxMcpEnvelope(BaseModel):
+class GEOXMcpEnvelope(BaseModel):
     """
     Mandatory common output wrapper for all GEOX MCP tools.
     DITEMPA BUKAN DIBERI.
     """
     ok: bool = Field(True, description="Success flag.")
     verdict: Literal["PASS", "FAIL", "PARTIAL", "VOID", "SABAR"] = Field("PASS", description="Tool-level verdict.")
-    source_domain: str = Field("geox-earth-witness", description="Tool execution domain.")
-    uncertainty: GeoxUncertainty = Field(..., description="Mandatory uncertainty reporting.")
+    source_domain: str = Field("GEOX-earth-witness", description="Tool execution domain.")
+    uncertainty: GEOXUncertainty = Field(..., description="Mandatory uncertainty reporting.")
     contrast_metadata: ContrastMetadata | None = Field(None, description="Contrast/display bias tracking (mandatory for image tools).")
-    governance: GeoxGovernance = Field(..., description="Governance and floor verification.")
+    governance: GEOXGovernance = Field(..., description="Governance and floor verification.")
     result: Any = Field(..., description="The actual tool-specific output.")
 
-    model_config = {"json_schema_extra": {"title": "GeoxMcpEnvelope"}}
+    model_config = {"json_schema_extra": {"title": "GEOXMcpEnvelope"}}
 
 
 # ---------------------------------------------------------------------------
@@ -859,8 +859,9 @@ def export_json_schemas() -> dict[str, dict]:
         GeoInsight,
         AttributeVolume,
         AttributeStack,
-        GeoxMcpEnvelope,
+        GEOXMcpEnvelope,
         GeoRequest,
         GeoResponse,
     ]
     return {m.__name__: m.model_json_schema() for m in models}
+

@@ -4,7 +4,7 @@ import subprocess
 import requests
 from datetime import datetime, timezone
 
-SOT_PATH = "/opt/arifos/sites/arif-fazil.com/geox/status.json"
+SOT_PATH = "/opt/arifos/sites/arif-fazil.com/GEOX/status.json"
 SOT_DIR = os.path.dirname(SOT_PATH)
 
 def get_container_status(name):
@@ -31,13 +31,13 @@ status_data = {
             "docker": get_container_status("arifosmcp"),
             "api": get_api_health("https://arifosmcp.arif-fazil.com/health")
         },
-        "geox_eic": {
-            "docker": get_container_status("geox_eic"),
-            "api": get_api_health("https://geox.arif-fazil.com/health")
+        "GEOX_eic": {
+            "docker": get_container_status("GEOX_eic"),
+            "api": get_api_health("https://GEOX.arif-fazil.com/health")
         }
     },
     "integrity": {
-        "skills_linked": os.path.islink("/root/arifOS/geox/skills"),
+        "skills_linked": os.path.islink("/root/arifOS/GEOX/skills"),
         "submodule_sync": True
     }
 }
@@ -47,3 +47,4 @@ with open(SOT_PATH, "w") as f:
     json.dump(status_data, f, indent=2)
 
 print(f"Live SOT updated at {status_data['timestamp']}")
+

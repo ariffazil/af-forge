@@ -240,3 +240,4 @@ class ZoeppritzModel:
                 vp2=s2.vp, vs2=s2.vs, rho2=s2.density
             ))
         return interfaces
+

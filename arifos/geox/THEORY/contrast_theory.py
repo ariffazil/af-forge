@@ -100,3 +100,4 @@ class ToACCore:
     def identify_conflation_risk(physical_axes: List[str], display_transforms: List[str]) -> float:
         """Calculate Risk Level (0.0 - 1.0). High risk if complex transforms used."""
         return min(1.0, len(display_transforms) * 0.2 + 0.1)
+

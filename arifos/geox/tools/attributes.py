@@ -1,5 +1,5 @@
 """
-arifos/geox/tools/attributes.py — Classical Seismic Attribute Engine
+arifos/GEOX/tools/attributes.py — Classical Seismic Attribute Engine
 DITEMPA BUKAN DIBERI
 
 Plane 1/2 Bridge: Computes classical seismic attributes from trace data.
@@ -36,14 +36,14 @@ from typing import Any
 
 import numpy as np
 
-from arifos.geox.base_tool import (
+from arifos.GEOX.base_tool import (
     BaseTool,
     GeoToolResult,
     _make_provenance,
     _make_quantity,
 )
-from arifos.geox.geox_schemas import CoordinatePoint
-from arifos.geox.tools.contrast_metadata import (
+from arifos.GEOX.GEOX_schemas import CoordinatePoint
+from arifos.GEOX.tools.contrast_metadata import (
     ConfidenceClass,
     ContrastMetadata,
     ContrastSourceDomain,
@@ -51,7 +51,7 @@ from arifos.geox.tools.contrast_metadata import (
     VisualTransform,
 )
 
-logger = logging.getLogger("geox.tools.attributes")
+logger = logging.getLogger("GEOX.tools.attributes")
 
 
 # ---------------------------------------------------------------------------
@@ -876,3 +876,4 @@ class SeismicAttributeTool(BaseTool):
             latency_ms=round(latency_ms, 2),
             success=True,
         )
+

@@ -13,4 +13,5 @@ export GEOX_HOST=0.0.0.0
 export GEOX_PORT=8000
 
 # Run with HTTP transport
-exec python geox_unified_mcp_server.py --transport http --host 0.0.0.0 --port 8000
+exec python GEOX_unified_mcp_server.py --transport http --host 0.0.0.0 --port 8000
+

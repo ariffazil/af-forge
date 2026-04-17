@@ -50,7 +50,7 @@ Analog digitization is not a side-task; it is a **primary evidence-capture mode*
 ```json
 {
   "type": "analog_digitization_manifest",
-  "source_uri": "s3://geox-vault/analog/well_A1_scan.jpg",
+  "source_uri": "s3://GEOX-vault/analog/well_A1_scan.jpg",
   "mode": "1d_log",
   "calibration": {
     "engine": "analog-calibrate-1d",
@@ -87,3 +87,4 @@ Analog digitization is not a side-task; it is a **primary evidence-capture mode*
 3.  **The 3D Bridge**: Connect analog-derived outputs as constraints for **GemPy** structural modeling.
 
 *DITEMPA BUKAN DIBERI. SEALED.*
+

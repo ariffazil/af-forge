@@ -1,5 +1,5 @@
 """
-arifos/geox/tools/well_log_tool.py — Electronic Well Log Analysis
+arifos/GEOX/tools/well_log_tool.py — Electronic Well Log Analysis
 DITEMPA BUKAN DIBERI
 
 Full-featured well log analysis tool.
@@ -29,15 +29,15 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, BinaryIO
 
-from arifos.geox.base_tool import (
+from arifos.GEOX.base_tool import (
     BaseTool,
     GeoToolResult,
     _make_provenance,
     _make_quantity,
 )
-from arifos.geox.geox_schemas import CoordinatePoint
+from arifos.GEOX.GEOX_schemas import CoordinatePoint
 
-logger = logging.getLogger("geox.tools.well_log")
+logger = logging.getLogger("GEOX.tools.well_log")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -528,3 +528,4 @@ class WellLogTool(BaseTool):
 
     def health_check(self) -> bool:
         return True
+

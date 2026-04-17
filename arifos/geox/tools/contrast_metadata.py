@@ -1,5 +1,5 @@
 """
-arifos/geox/tools/contrast_metadata.py — Contrast Canon Schema
+arifos/GEOX/tools/contrast_metadata.py — Contrast Canon Schema
 DITEMPA BUKAN DIBERI
 
 Enforces F9 Anti-Hantu: perceptual contrast must never be silently
@@ -461,3 +461,4 @@ def create_meta_attribute_contrast_metadata(
         requires_non_visual_confirmation=True,
         created_by="SeismicAttributeTool",
     )
+

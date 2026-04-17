@@ -54,7 +54,7 @@ This document provides copy-paste config snippets and test procedures for the to
 | Transport (remote) | `SSE` over HTTPS — ChatGPT, Claude.ai web |
 | Auth (remote) | Bearer token via `Authorization` header |
 | Governance parity | F3–F13 + OPS/777 apply identically across all clients |
-| Tool namespaces | `geox_*`, `wealth_*`, `arifos_*` (disciplined, no collision) |
+| Tool namespaces | `GEOX_*`, `wealth_*`, `arifos_*` (disciplined, no collision) |
 | Tool limit strategy | Lean surface — max 40 tools per organ to stay inside IDE limits |
 
 ---
@@ -65,7 +65,7 @@ This document provides copy-paste config snippets and test procedures for the to
 
 ```bash
 # GEOX organ — stdio
-arifos-mcp serve --organ geox --transport stdio
+arifos-mcp serve --organ GEOX --transport stdio
 
 # WEALTH organ — stdio
 arifos-mcp serve --organ wealth --transport stdio
@@ -75,7 +75,7 @@ arifos-mcp serve --organ wealth --transport stdio
 
 | Organ | Remote URL | Auth |
 |-------|-----------|------|
-| GEOX | `https://mcp.arif-fazil.com/geox/mcp` | Bearer token (`AF_GEOX_TOKEN`) |
+| GEOX | `https://mcp.arif-fazil.com/GEOX/mcp` | Bearer token (`AF_GEOX_TOKEN`) |
 | WEALTH | `https://mcp.arif-fazil.com/wealth/mcp` | Bearer token (`AF_WEALTH_TOKEN`) |
 
 ---
@@ -86,18 +86,18 @@ arifos-mcp serve --organ wealth --transport stdio
 
 | Tool | Description | Uncertainty |
 |------|-------------|-------------|
-| `geox_check_hazard` | Physical hazard risk (seismic/volcanic/flood/landslide/subsidence) | ESTIMATE/HYPOTHESIS/UNKNOWN |
-| `geox_subsurface_model` | Porosity, permeability, pressure at depth | ESTIMATE/HYPOTHESIS/UNKNOWN |
-| `geox_seismic_interpret` | Seismic survey interpretation | ESTIMATE/HYPOTHESIS/UNKNOWN |
-| `geox_prospect_score` | Hydrocarbon prospect scoring (OOIP, GIP, chance factor) | ESTIMATE/HYPOTHESIS/UNKNOWN |
-| `geox_physical_constraint` | Pressure/temperature/mud weight safe operating window | ESTIMATE/HYPOTHESIS/UNKNOWN |
-| `geox_uncertainty_tag` | F8 uncertainty classification for any claim | F8 tag |
-| `geox_witness_triad` | Tri-Witness W³ consensus verification | W³ verdict |
-| `geox_ground_truth` | F8 grounding check for physical claims | grounded boolean |
-| `geox_log_interpreter` | Triple-combo wireline log interpreter (GR/RT/RHOB/NPHI) | ESTIMATE/HYPOTHESIS/UNKNOWN |
-| `geox_maraoh_impact` | F6 maruah dignity impact assessment | maruah score |
-| `geox_extraction_limits` | Max safe extraction rate and cumulative limits | rate/depletion |
-| `geox_climate_bounds` | Climate bounds (temperature rise, sea level, carbon budget) | optimistic/pessimistic |
+| `GEOX_check_hazard` | Physical hazard risk (seismic/volcanic/flood/landslide/subsidence) | ESTIMATE/HYPOTHESIS/UNKNOWN |
+| `GEOX_subsurface_model` | Porosity, permeability, pressure at depth | ESTIMATE/HYPOTHESIS/UNKNOWN |
+| `GEOX_seismic_interpret` | Seismic survey interpretation | ESTIMATE/HYPOTHESIS/UNKNOWN |
+| `GEOX_prospect_score` | Hydrocarbon prospect scoring (OOIP, GIP, chance factor) | ESTIMATE/HYPOTHESIS/UNKNOWN |
+| `GEOX_physical_constraint` | Pressure/temperature/mud weight safe operating window | ESTIMATE/HYPOTHESIS/UNKNOWN |
+| `GEOX_uncertainty_tag` | F8 uncertainty classification for any claim | F8 tag |
+| `GEOX_witness_triad` | Tri-Witness W³ consensus verification | W³ verdict |
+| `GEOX_ground_truth` | F8 grounding check for physical claims | grounded boolean |
+| `GEOX_log_interpreter` | Triple-combo wireline log interpreter (GR/RT/RHOB/NPHI) | ESTIMATE/HYPOTHESIS/UNKNOWN |
+| `GEOX_maraoh_impact` | F6 maruah dignity impact assessment | maruah score |
+| `GEOX_extraction_limits` | Max safe extraction rate and cumulative limits | rate/depletion |
+| `GEOX_climate_bounds` | Climate bounds (temperature rise, sea level, carbon budget) | optimistic/pessimistic |
 
 ### WEALTH (Capital Intelligence)
 
@@ -134,9 +134,9 @@ arifos-mcp serve --organ wealth --transport stdio
 ```json
 {
   "mcpServers": {
-    "arifos_geox": {
+    "arifos_GEOX": {
       "command": "node",
-      "args": ["/usr/local/bin/arifos-mcp", "serve", "--organ", "geox", "--transport", "stdio"],
+      "args": ["/usr/local/bin/arifos-mcp", "serve", "--organ", "GEOX", "--transport", "stdio"],
       "env": {
         "AF_FORGE_MODE": "internal_mode"
       }
@@ -161,7 +161,7 @@ arifos-mcp serve --organ wealth --transport stdio
 
 **Test procedure**:
 1. Restart Claude Desktop
-2. Ask: `"Call geox_check_hazard for Jakarta, Indonesia"`
+2. Ask: `"Call GEOX_check_hazard for Jakarta, Indonesia"`
 3. Ask: `"Call wealth_ping to check WEALTH status"`
 4. Ask: `"Call forge_check_governance for 'delete all files'"` → expect `BLOCK`
 
@@ -173,13 +173,13 @@ arifos-mcp serve --organ wealth --transport stdio
 
 | Field | GEOX | WEALTH | arifOS Forge |
 |-------|------|--------|--------------|
-| Name | `arifos_geox` | `arifos_wealth` | `arifos_forge` |
-| URL | `https://mcp.arif-fazil.com/geox/mcp` | `https://mcp.arif-fazil.com/wealth/mcp` | `https://mcp.arif-fazil.com/mcp` |
+| Name | `arifos_GEOX` | `arifos_wealth` | `arifos_forge` |
+| URL | `https://mcp.arif-fazil.com/GEOX/mcp` | `https://mcp.arif-fazil.com/wealth/mcp` | `https://mcp.arif-fazil.com/mcp` |
 | Auth | Bearer token | Bearer token | Bearer token |
 
 **Token setup** (environment variables on your VPS):
 ```bash
-export AF_GEOX_TOKEN="your-geox-token"
+export AF_GEOX_TOKEN="your-GEOX-token"
 export AF_WEALTH_TOKEN="your-wealth-token"
 export AF_FORGE_TOKEN="your-forge-token"
 ```
@@ -187,7 +187,7 @@ export AF_FORGE_TOKEN="your-forge-token"
 **Test procedure**:
 1. Go to Settings → Apps & Connectors → Developer → MCP Servers
 2. Add each server with URL and bearer token
-3. Test with: `"Use arifos_geox to check seismic hazard for Tokyo"`
+3. Test with: `"Use arifos_GEOX to check seismic hazard for Tokyo"`
 4. Test with: `"Use arifos_wealth to evaluate ROI with initial_investment=10000, scenarios=[{probability:0.6,cash_flow:5000},{probability:0.4,cash_flow:-2000}]"`
 5. Test with: `"Use arifos_forge to check governance for 'deploy to production'"` → expect `BLOCK`
 
@@ -200,9 +200,9 @@ export AF_FORGE_TOKEN="your-forge-token"
 ```json
 {
   "mcpServers": {
-    "arifos_geox": {
+    "arifos_GEOX": {
       "command": "arifos-mcp",
-      "args": ["serve", "--organ", "geox", "--transport", "stdio"],
+      "args": ["serve", "--organ", "GEOX", "--transport", "stdio"],
       "env": {
         "AF_FORGE_MODE": "internal_mode"
       }
@@ -229,7 +229,7 @@ export AF_FORGE_TOKEN="your-forge-token"
 1. Open Cursor → Settings → MCP → Add new server
 2. Paste each config block (or use file path `~/.cursor/mcp.json`)
 3. Press "Test connection" on each
-4. In Cursor AI chat: `"@arifos_geox check seismic hazard for Jakarta"`
+4. In Cursor AI chat: `"@arifos_GEOX check seismic hazard for Jakarta"`
 5. In Cursor AI chat: `"@arifos_wealth evaluate ROI for initial_investment=50000"`
 6. In Cursor AI chat: `"@arifos_forge check governance for 'rm -rf /'"` → expect `BLOCK`
 
@@ -242,9 +242,9 @@ export AF_FORGE_TOKEN="your-forge-token"
 ```json
 {
   "mcpServers": {
-    "arifos_geox": {
+    "arifos_GEOX": {
       "command": "arifos-mcp",
-      "args": ["serve", "--organ", "geox", "--transport", "stdio"],
+      "args": ["serve", "--organ", "GEOX", "--transport", "stdio"],
       "env": {
         "AF_FORGE_MODE": "internal_mode"
       }
@@ -270,7 +270,7 @@ export AF_FORGE_TOKEN="your-forge-token"
 **Test procedure**:
 1. Open Windsurf → Cascade settings → MCP servers
 2. Add servers with same config blocks
-3. Test: `"@arifos_geox what are the extraction limits for a sandstone at 2500m depth?"`
+3. Test: `"@arifos_GEOX what are the extraction limits for a sandstone at 2500m depth?"`
 4. Test: `"@arifos_wealth run wealth_evaluate_ROI with initial_investment=75000"`
 5. Test: `"@arifos_forge run forge_health"` → expect floor status
 
@@ -287,9 +287,9 @@ export AF_FORGE_TOKEN="your-forge-token"
 ```json
 {
   "servers": {
-    "arifos_geox": {
+    "arifos_GEOX": {
       "command": "arifos-mcp",
-      "args": ["serve", "--organ", "geox", "--transport", "stdio"],
+      "args": ["serve", "--organ", "GEOX", "--transport", "stdio"],
       "env": {
         "AF_FORGE_MODE": "internal_mode"
       }
@@ -320,7 +320,7 @@ export AF_FORGE_TOKEN="your-forge-token"
 **Test procedure**:
 1. Install Copilot-MCP extension
 2. Add config to `.vscode/mcp.json`
-3. Test: `"Use arifos_geox to interpret triple-combo logs for a sandstone formation"`
+3. Test: `"Use arifos_GEOX to interpret triple-combo logs for a sandstone formation"`
 4. Test: `"Use arifos_wealth to evaluate ROI with scenarios=[{probability:0.7,cash_flow:30000}]"`
 5. Test: `"Use arifos_forge forge_hold to stage a critical investment decision"`
 
@@ -345,7 +345,7 @@ arifos-mcp --help
 
 ```bash
 # Serve GEOX organ (stdio)
-arifos-mcp serve --organ geox --transport stdio
+arifos-mcp serve --organ GEOX --transport stdio
 
 # Serve WEALTH organ (stdio)
 arifos-mcp serve --organ wealth --transport stdio
@@ -354,7 +354,7 @@ arifos-mcp serve --organ wealth --transport stdio
 arifos-mcp serve --organ forge --transport stdio
 
 # Remote HTTPS mode (for ChatGPT and web clients)
-AF_FORGE_MODE=external_safe_mode AF_GEOX_TOKEN=xxx arifos-mcp serve --organ geox --transport sse --port 3001
+AF_FORGE_MODE=external_safe_mode AF_GEOX_TOKEN=xxx arifos-mcp serve --organ GEOX --transport sse --port 3001
 ```
 
 ### Docker (remote hosting)
@@ -367,7 +367,7 @@ docker build -t arifos-mcp .
 docker run -p 3001:3001 \
   -e AF_FORGE_MODE=external_safe_mode \
   -e AF_GEOX_TOKEN=your-token \
-  arifos-mcp serve --organ geox --transport sse --port 3001
+  arifos-mcp serve --organ GEOX --transport sse --port 3001
 
 # Run WEALTH organ
 docker run -p 3002:3002 \
@@ -482,7 +482,7 @@ Sample VAULT999 entry:
 ps aux | grep arifos-mcp
 
 # Test stdio locally
-echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | arifos-mcp serve --organ geox
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | arifos-mcp serve --organ GEOX
 ```
 
 ### Auth failures (remote)
@@ -492,7 +492,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | arifos-mcp s
 echo $AF_GEOX_TOKEN
 
 # Test with verbose curl
-curl -v -H "Authorization: Bearer $AF_GEOX_TOKEN" https://mcp.arif-fazil.com/geox/mcp
+curl -v -H "Authorization: Bearer $AF_GEOX_TOKEN" https://mcp.arif-fazil.com/GEOX/mcp
 ```
 
 ### Tools not appearing in client
@@ -516,10 +516,10 @@ To register arifOS GEOX and WEALTH on Glama's MCP registry:
 
 1. Go to [glama.ai/mcp/servers](https://glama.ai/mcp/servers)
 2. Submit server entry with:
-   - **Name**: `arifos_geox`
+   - **Name**: `arifos_GEOX`
    - **Description**: `Earth intelligence — hazard analysis, subsurface modeling, seismic interpretation, hydrocarbon prospect scoring`
    - **Tags**: `geoscience`, `earth-intelligence`, `constitutional-ai`, `evidence-based`
-   - **URL**: `https://mcp.arif-fazil.com/geox/mcp`
+   - **URL**: `https://mcp.arif-fazil.com/GEOX/mcp`
    - **Transport**: `sse`
 3. Submit separately for:
    - **Name**: `arifos_wealth`
@@ -538,3 +538,4 @@ To register arifOS GEOX and WEALTH on Glama's MCP registry:
 ---
 
 *DITEMPA BUKAN DIBERI — 999 SEAL ALIVE*
+

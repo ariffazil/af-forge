@@ -2,6 +2,7 @@
 GEOX Reporter — re-export from ENGINE package
 DITEMPA BUKAN DIBERI
 """
-from arifos.geox.ENGINE.reporter import GeoXReporter
+from arifos.GEOX.ENGINE.reporter import GEOXReporter
 
-__all__ = ["GeoXReporter"]
+__all__ = ["GEOXReporter"]
+

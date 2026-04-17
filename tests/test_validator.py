@@ -2,7 +2,7 @@
 GEOX Validator Tests
 DITEMPA BUKAN DIBERI
 
-Async pytest tests for GeoXValidator — extract_predictions(), verify_prediction(),
+Async pytest tests for GEOXValidator — extract_predictions(), verify_prediction(),
 validate_batch(), check_floor_compliance(), and the AggregateVerdict logic.
 """
 
@@ -14,21 +14,21 @@ from datetime import datetime, timezone
 import pytest
 import pytest_asyncio
 
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.GEOX_schemas import (
     CoordinatePoint,
     GeoPrediction,
     GeoInsight,
     GeoQuantity,
     ProvenanceRecord,
 )
-from arifos.geox.geox_validator import (
+from arifos.GEOX.GEOX_validator import (
     AggregateVerdict,
-    GeoXValidator,
+    GEOXValidator,
     ValidationResult,
     _parse_range,
 )
-from arifos.geox.examples.mock_tools.mock_earthnet import MockEarthNetTool
-from arifos.geox.examples.mock_tools.mock_vlm import MockSeismicVLMTool
+from arifos.GEOX.examples.mock_tools.mock_earthnet import MockEarthNetTool
+from arifos.GEOX.examples.mock_tools.mock_vlm import MockSeismicVLMTool
 
 
 # ---------------------------------------------------------------------------
@@ -139,13 +139,13 @@ class TestParseRange:
 
 
 # ---------------------------------------------------------------------------
-# GeoXValidator.extract_predictions()
+# GEOXValidator.extract_predictions()
 # ---------------------------------------------------------------------------
 
 class TestExtractPredictions:
 
     def setup_method(self):
-        self.validator = GeoXValidator()
+        self.validator = GEOXValidator()
         self.location = _coord()
 
     def test_net_pay_extraction(self):
@@ -242,13 +242,13 @@ class TestExtractPredictions:
 
 
 # ---------------------------------------------------------------------------
-# GeoXValidator.verify_prediction()
+# GEOXValidator.verify_prediction()
 # ---------------------------------------------------------------------------
 
 class TestVerifyPrediction:
 
     def setup_method(self):
-        self.validator = GeoXValidator()
+        self.validator = GEOXValidator()
         self.mock_earthnet = MockEarthNetTool()
         self.mock_vlm = MockSeismicVLMTool()
 
@@ -332,13 +332,13 @@ class TestVerifyPrediction:
 
 
 # ---------------------------------------------------------------------------
-# GeoXValidator.validate_batch() — SEAL path
+# GEOXValidator.validate_batch() — SEAL path
 # ---------------------------------------------------------------------------
 
 class TestValidateBatch:
 
     def setup_method(self):
-        self.validator = GeoXValidator()
+        self.validator = GEOXValidator()
         self.mock_earthnet = MockEarthNetTool()
         self.mock_vlm = MockSeismicVLMTool()
 
@@ -465,13 +465,13 @@ class TestValidateBatch:
 
 
 # ---------------------------------------------------------------------------
-# GeoXValidator.check_floor_compliance()
+# GEOXValidator.check_floor_compliance()
 # ---------------------------------------------------------------------------
 
 class TestCheckFloorCompliance:
 
     def setup_method(self):
-        self.validator = GeoXValidator()
+        self.validator = GEOXValidator()
 
     def test_f4_clarity_passes_with_units(self):
         """F4: insight text containing a unit should pass."""
@@ -602,3 +602,4 @@ class TestCheckFloorCompliance:
         for key in compliance:
             # All keys should match pattern F<n>_<name>
             assert key.startswith("F"), f"Unexpected compliance key: {key}"
+

@@ -13,7 +13,7 @@ Cigvis is strongest here:
 - synchronized navigation
 """
 
-from arifos.geox.volume_context.schemas import (
+from arifos.GEOX.volume_context.schemas import (
     VolumeContextRequest,
     VolumeContextResponse,
     VolumeContextState,
@@ -25,7 +25,7 @@ from arifos.geox.volume_context.schemas import (
     VolumeCompareRequest,
     VolumeCompareResponse,
 )
-from arifos.geox.volume_context.builders import (
+from arifos.GEOX.volume_context.builders import (
     VolumeSceneBuilder,
     CrossSectionBuilder,
 )
@@ -46,3 +46,4 @@ __all__ = [
     "VolumeSceneBuilder",
     "CrossSectionBuilder",
 ]
+

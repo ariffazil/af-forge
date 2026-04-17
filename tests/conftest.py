@@ -4,7 +4,7 @@ DITEMPA BUKAN DIBERI
 
 Shared fixtures for the GEOX test suite:
   - geo_request   — standard GeoRequest pointing at Blok Selatan, Malay Basin
-  - mock_agent    — GeoXAgent with MockEarthNetTool + MockSeismicVLMTool,
+  - mock_agent    — GEOXAgent with MockEarthNetTool + MockSeismicVLMTool,
                     in-memory GeoMemoryStore, no external APIs
 """
 
@@ -13,13 +13,13 @@ from __future__ import annotations
 import pytest
 import pytest_asyncio
 
-from arifos.geox.geox_schemas import CoordinatePoint, GeoRequest
-from arifos.geox.geox_agent import GeoXAgent, GeoXConfig
-from arifos.geox.geox_validator import GeoXValidator
-from arifos.geox.geox_memory import GeoMemoryStore
-from arifos.geox.geox_tools import ToolRegistry
-from arifos.geox.examples.mock_tools.mock_earthnet import MockEarthNetTool
-from arifos.geox.examples.mock_tools.mock_vlm import MockSeismicVLMTool
+from arifos.GEOX.GEOX_schemas import CoordinatePoint, GeoRequest
+from arifos.GEOX.GEOX_agent import GEOXAgent, GEOXConfig
+from arifos.GEOX.GEOX_validator import GEOXValidator
+from arifos.GEOX.GEOX_memory import GeoMemoryStore
+from arifos.GEOX.GEOX_tools import ToolRegistry
+from arifos.GEOX.examples.mock_tools.mock_earthnet import MockEarthNetTool
+from arifos.GEOX.examples.mock_tools.mock_vlm import MockSeismicVLMTool
 
 
 # ---------------------------------------------------------------------------
@@ -49,16 +49,16 @@ def geo_request() -> GeoRequest:
 
 
 # ---------------------------------------------------------------------------
-# mock_agent — GeoXAgent with mock tools only
+# mock_agent — GEOXAgent with mock tools only
 # ---------------------------------------------------------------------------
 
 @pytest.fixture
-def mock_agent() -> GeoXAgent:
+def mock_agent() -> GEOXAgent:
     """
-    GeoXAgent wired with:
+    GEOXAgent wired with:
       - MockEarthNetTool   (registered as 'EarthModelTool')
       - MockSeismicVLMTool (registered as 'SeismicVLMTool')
-      - GeoXValidator
+      - GEOXValidator
       - In-memory GeoMemoryStore
       - No LLM planner (falls back to heuristic plan)
       - No audit sink
@@ -68,18 +68,18 @@ def mock_agent() -> GeoXAgent:
     registry.register(_EarthModelToolProxy())
     registry.register(_SeismicVLMToolProxy())
 
-    validator = GeoXValidator()
+    validator = GEOXValidator()
     memory = GeoMemoryStore()  # in-memory backend
 
-    config = GeoXConfig(
+    config = GEOXConfig(
         lem_confidence_threshold=0.70,
         max_tool_retries=1,
         allowed_tools=["EarthModelTool", "SeismicVLMTool"],
         provenance_required=True,
-        pipeline_id="geox-test-v0.1",
+        pipeline_id="GEOX-test-v0.1",
     )
 
-    return GeoXAgent(
+    return GEOXAgent(
         config=config,
         tool_registry=registry,
         validator=validator,
@@ -107,3 +107,4 @@ class _SeismicVLMToolProxy(MockSeismicVLMTool):
     @property
     def name(self) -> str:
         return "SeismicVLMTool"
+

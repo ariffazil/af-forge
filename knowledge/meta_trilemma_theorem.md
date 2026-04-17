@@ -53,3 +53,4 @@ Optimization is not free. When a system claims to be Fast, Cheap, and Safe, it i
 > — arifOS Sovereign Kernel
 
 **DITEMPA BUKAN DIBERI**
+

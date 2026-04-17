@@ -18,11 +18,11 @@ import functools
 from collections.abc import Callable
 from typing import Any, TypeVar
 
-from .geox_schemas import (
+from .GEOX_schemas import (
     ContrastMetadata,
-    GeoxGovernance,
-    GeoxMcpEnvelope,
-    GeoxUncertainty,
+    GEOXGovernance,
+    GEOXMcpEnvelope,
+    GEOXUncertainty,
 )
 
 T = TypeVar("T")
@@ -47,11 +47,11 @@ def contrast_governed_tool(
         axes = physical_axes or ["perceptual_lineaments"]
 
         @functools.wraps(func)
-        async def wrapper(*args: Any, **kwargs: Any) -> GeoxMcpEnvelope:
+        async def wrapper(*args: Any, **kwargs: Any) -> GEOXMcpEnvelope:
             result = await func(*args, **kwargs)
 
             # If already wrapped, don't double wrap
-            if isinstance(result, GeoxMcpEnvelope):
+            if isinstance(result, GEOXMcpEnvelope):
                 return result
 
             attr_name = kwargs.get("attribute_name", func.__name__)
@@ -86,23 +86,23 @@ def contrast_governed_tool(
                     "Perceptual contrast may dominate physical signal."
                 )
 
-            gov = GeoxGovernance(
+            gov = GEOXGovernance(
                 floors_ok=floors,
                 warnings=warnings
             )
 
             # 3. Build Uncertainty Block
-            unc = GeoxUncertainty(
+            unc = GEOXUncertainty(
                 level=0.12 if is_meta_attribute else 0.05,
                 type="image_only_structural_interpretation" if "line" in attr_name else "perceptual_lineament",
                 notes=_generate_uncertainty_factors(attr_name)
             )
 
             # 4. Construct Final Envelope
-            return GeoxMcpEnvelope(
+            return GEOXMcpEnvelope(
                 ok=True,
                 verdict="PASS" if not warnings else "PARTIAL",
-                source_domain="geox-earth-witness",
+                source_domain="GEOX-earth-witness",
                 uncertainty=unc,
                 contrast_metadata=contrast_dict,
                 governance=gov,
@@ -240,3 +240,4 @@ def compute_contrast_verdict(
 
 
 contrast_governed = contrast_governed_tool  # Alias for backward compatibility
+

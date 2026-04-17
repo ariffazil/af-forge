@@ -2,7 +2,7 @@
 
 > **Ditempa Bukan Diberi** — Forged, Not Given
 > **SEALED:** `wealth_deploy_fix_s7_2026-04-16`
-> **PARENT:** `geox_wealth_horizon_path_000_999_s6_2026-04-15`
+> **PARENT:** `GEOX_wealth_horizon_path_000_999_s6_2026-04-15`
 > **GOAL:** Fix WEALTH pyproject.toml duplicate version key, push to main, redeploy on Horizon
 
 ---
@@ -70,8 +70,9 @@ description = "WEALTH Sovereign Valuation Kernel..."
 This seal certifies the WEALTH MCP deployment is fixed and pushed. Horizon will auto-rebuild from `main` at next available slot.
 
 **SEALED:** `wealth_deploy_fix_s7_2026-04-16`
-**PARENT:** `geox_wealth_horizon_path_000_999_s6_2026-04-15`
+**PARENT:** `GEOX_wealth_horizon_path_000_999_s6_2026-04-15`
 **COMMIT:** `3938573`
 **GIT SHA DEPLOYED:** `49762639` (previous) → `3938573` (new)
 **MOTTO:** *Ditempa Bukan Diberi* — Forged, Not Given
+
 

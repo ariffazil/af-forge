@@ -17,8 +17,8 @@ This document unifies the architectural goals, research recommendations, and tec
 *Focus: Foundation Hardening & Macrostrat Plumbing*
 
 ### 1. Technical Infrastructure
-- [ ] **Fix Packaging:** Update `pyproject.toml` to match the actual `arifos/geox` directory structure (fix `src/` layout mismatch).
-- [ ] **CLI Implementation:** Create `arifos/geox/cli.py` to satisfy the `geox` entrypoint.
+- [ ] **Fix Packaging:** Update `pyproject.toml` to match the actual `arifos/GEOX` directory structure (fix `src/` layout mismatch).
+- [ ] **CLI Implementation:** Create `arifos/GEOX/cli.py` to satisfy the `GEOX` entrypoint.
 - [ ] **Automated CI:** Setup GitHub Actions for:
     - `ruff check .` (Linting)
     - `mypy src/` (Type Safety)
@@ -26,10 +26,10 @@ This document unifies the architectural goals, research recommendations, and tec
 - [ ] **Clean Installs:** Ensure `pip install -e .` works without `sys.path` manipulation.
 
 ### 2. The Digital Crust (Macrostrat)
-- [ ] **Macrostrat Adapter:** Implement `arifos/geox/geox_macrostrat.py`.
+- [ ] **Macrostrat Adapter:** Implement `arifos/GEOX/GEOX_macrostrat.py`.
     - `macrostrat_context(lat, lon, radius)`: Fetch map polygons and units.
     - `macrostrat_column(lat, lon)`: Fetch synthetic stratigraphic columns.
-- [ ] **F2 Truth Anchor:** Update `GeoXValidator` to use Macrostrat data as the "physical truth" for spatial queries.
+- [ ] **F2 Truth Anchor:** Update `GEOXValidator` to use Macrostrat data as the "physical truth" for spatial queries.
 - [ ] **Mandatory Provenance:** Enforce that any geological claim without a Macrostrat/Sensor citation is flagged as `SABAR` or `VOID`.
 
 ---
@@ -40,7 +40,7 @@ This document unifies the architectural goals, research recommendations, and tec
 *Goal: Move from mocks to real Earth perception.*
 - [ ] **LEM Integration:** Wrap a real Earth Foundation Model (TerraFM or Prithvi-EO-2.0).
 - [ ] **Continuous Memory:** Activate Qdrant backend for continuous vector embeddings.
-- [ ] **Dual-Memory Pattern:** Implement `geox_retrieve_context` merging Discrete (Macrostrat) and Continuous (LEM) memory.
+- [ ] **Dual-Memory Pattern:** Implement `GEOX_retrieve_context` merging Discrete (Macrostrat) and Continuous (LEM) memory.
 - [ ] **Schema-First Synthesis:** Replace regex-based extraction with Pydantic-first JSON generation from the LLM.
 
 ### Phase 3: Geology Adaptation (Months 9–18)
@@ -65,3 +65,4 @@ This document unifies the architectural goals, research recommendations, and tec
 ---
 *Created: March 26, 2026*
 *Status: DRAFT / Forge-Ready*
+

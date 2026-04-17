@@ -44,7 +44,7 @@ This folder enforces F1-F13 floors and the 888_HOLD logic.
 ### 6. Compatibility Zone (`compatibility/`)
 **The Quarantine Area.**
 This folder is the resting place for all legacy aliases, deprecated endpoints, and transitional mappings.
-- **Owns:** Old `geox_` namespaces, deprecated flat return payloads.
+- **Owns:** Old `GEOX_` namespaces, deprecated flat return payloads.
 - **Rule:** *No new features are born here.* This folder exists solely to prevent breaking existing integrations while they migrate to the canonical contracts.
 
 ---
@@ -56,3 +56,4 @@ This folder is the resting place for all legacy aliases, deprecated endpoints, a
 - Any discrepancy between the execution plane and control plane must be resolved in the adapter layers, ensuring the public contract remains immutable.
 
 *DITEMPA BUKAN DIBERI — Forged, Not Given*
+

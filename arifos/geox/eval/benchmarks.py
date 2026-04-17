@@ -1,5 +1,5 @@
 """
-arifos/geox/eval/benchmarks.py — GEOX Evaluation & Benchmarks
+arifos/GEOX/eval/benchmarks.py — GEOX Evaluation & Benchmarks
 FORGE 4: Hardened Evaluation Framework
 
 This module provides benchmarks to validate the GEOX intelligence pipeline,
@@ -15,21 +15,21 @@ from typing import Any
 
 # Standard imports for GEOX
 try:
-    from arifos.geox.geox_agent import GeoXAgent, GeoXConfig
-    from arifos.geox.geox_memory import DualMemoryStore
-    from arifos.geox.geox_schemas import CoordinatePoint, GeoRequest
-    from arifos.geox.geox_tools import ToolRegistry
-    from arifos.geox.geox_validator import GeoXValidator
+    from arifos.GEOX.GEOX_agent import GEOXAgent, GEOXConfig
+    from arifos.GEOX.GEOX_memory import DualMemoryStore
+    from arifos.GEOX.GEOX_schemas import CoordinatePoint, GeoRequest
+    from arifos.GEOX.GEOX_tools import ToolRegistry
+    from arifos.GEOX.GEOX_validator import GEOXValidator
 except ImportError:
     # If not installed as a package, try relative or direct import setup
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
-    from arifos.geox.geox_agent import GeoXAgent, GeoXConfig
-    from arifos.geox.geox_memory import DualMemoryStore
-    from arifos.geox.geox_schemas import CoordinatePoint, GeoRequest
-    from arifos.geox.geox_tools import ToolRegistry
-    from arifos.geox.geox_validator import GeoXValidator
+    from arifos.GEOX.GEOX_agent import GEOXAgent, GEOXConfig
+    from arifos.GEOX.GEOX_memory import DualMemoryStore
+    from arifos.GEOX.GEOX_schemas import CoordinatePoint, GeoRequest
+    from arifos.GEOX.GEOX_tools import ToolRegistry
+    from arifos.GEOX.GEOX_validator import GEOXValidator
 
-logger = logging.getLogger("geox.eval.benchmarks")
+logger = logging.getLogger("GEOX.eval.benchmarks")
 
 class MalayBasinAnalogBenchmark:
     """
@@ -40,10 +40,10 @@ class MalayBasinAnalogBenchmark:
     def __init__(self):
         # We assume the default registry includes all our tools
         self.registry = ToolRegistry.default_registry()
-        self.validator = GeoXValidator()
+        self.validator = GEOXValidator()
         self.memory = DualMemoryStore()
-        self.agent = GeoXAgent(
-            config=GeoXConfig(),
+        self.agent = GEOXAgent(
+            config=GEOXConfig(),
             tool_registry=self.registry,
             validator=self.validator,
             memory_store=self.memory
@@ -122,3 +122,4 @@ async def run_standalone():
 
 if __name__ == "__main__":
     asyncio.run(run_standalone())
+

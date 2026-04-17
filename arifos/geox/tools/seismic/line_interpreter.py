@@ -11,21 +11,21 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from arifos.geox.geox_schemas import GeoxMcpEnvelope, ProvenanceRecord
-from arifos.geox.schemas.seismic_image import (
+from arifos.GEOX.GEOX_schemas import GEOXMcpEnvelope, ProvenanceRecord
+from arifos.GEOX.schemas.seismic_image import (
     GEOX_FEATURE_SET,
     GEOX_INTERPRETATION_SUMMARY,
     GEOX_SEISMIC_IMAGE_INPUT,
 )
-from arifos.geox.tools.seismic_candidate_ranker import rank_candidates
-from arifos.geox.tools.seismic_contrast_views import generate_contrast_views
-from arifos.geox.tools.seismic_feature_extract import extract_lineaments
-from arifos.geox.tools.seismic_image_ingest import ingest_seismic_image
-from arifos.geox.tools.seismic_structure_rules import check_structure_rules
+from arifos.GEOX.tools.seismic_candidate_ranker import rank_candidates
+from arifos.GEOX.tools.seismic_contrast_views import generate_contrast_views
+from arifos.GEOX.tools.seismic_feature_extract import extract_lineaments
+from arifos.GEOX.tools.seismic_image_ingest import ingest_seismic_image
+from arifos.GEOX.tools.seismic_structure_rules import check_structure_rules
 
 logger = logging.getLogger(__name__)
 
-async def geox_interpret_single_line(inputs: dict[str, Any]) -> GeoxMcpEnvelope:
+async def GEOX_interpret_single_line(inputs: dict[str, Any]) -> GEOXMcpEnvelope:
     """
     Run full image-only structural interpretation pipeline (Band A).
     Follows GEOX Agent Success Metrics Blueprint for Minimum Artifact Set.
@@ -70,13 +70,13 @@ async def geox_interpret_single_line(inputs: dict[str, Any]) -> GeoxMcpEnvelope:
         human_report="Structural interpretation complete. Primary inversion fault identified.",
         provenance=ProvenanceRecord(
             source=inputs.get("image_path", "unknown"),
-            method="geox_interpret_single_line_v0.3.1_SEALED"
+            method="GEOX_interpret_single_line_v0.3.1_SEALED"
         ),
         verdict="PASS" if all(c.final_audit_passed for c in final_candidates) else "QUALIFY"
     )
 
     # Final wrap in envelope
-    return GeoxMcpEnvelope(
+    return GEOXMcpEnvelope(
         result=summary,
         uncertainty={"weighted_avg": 0.45, "perception_floor_enforced": True},
         governance={
@@ -84,3 +84,4 @@ async def geox_interpret_single_line(inputs: dict[str, Any]) -> GeoxMcpEnvelope:
             "blueprint_compliant": True
         }
     )
+

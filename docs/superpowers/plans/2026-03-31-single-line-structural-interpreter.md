@@ -16,16 +16,16 @@
 
 | File | Action | Responsibility |
 |---|---|---|
-| `arifos/geox/schemas/geox_output.py` | CREATE | Common `GEOXOutput` envelope — every tool returns this |
-| `arifos/geox/schemas/__init__.py` | CREATE | Package init |
-| `arifos/geox/schemas/structural_interp.py` | CREATE | `SeismicImageInput`, `SeismicView`, `FeatureSet`, `StructuralCandidate`, `InterpretationResult` |
-| `arifos/geox/tools/seismic_image_ingest.py` | CREATE | Stage 1: load + normalize image, return `GEOXOutput` |
-| `arifos/geox/tools/seismic_contrast_views.py` | CREATE | Stage 2: 6 contrast variants wrapping `SeismicVisualFilterTool` |
-| `arifos/geox/tools/seismic_feature_extract.py` | CREATE | Stage 3: lineaments, dip field, discontinuities — image proxies only |
-| `arifos/geox/tools/seismic_structure_rules.py` | CREATE | Stage 5: geological rule engine — score candidates per family |
-| `arifos/geox/tools/seismic_candidate_ranker.py` | CREATE | Stage 4+6: build + rank structural candidates |
-| `arifos/geox/tools/seismic_report_writer.py` | CREATE | Stage 7: governed markdown + JSON report |
-| `tests/tools/test_geox_output.py` | CREATE | Envelope schema tests |
+| `arifos/GEOX/schemas/GEOX_output.py` | CREATE | Common `GEOXOutput` envelope — every tool returns this |
+| `arifos/GEOX/schemas/__init__.py` | CREATE | Package init |
+| `arifos/GEOX/schemas/structural_interp.py` | CREATE | `SeismicImageInput`, `SeismicView`, `FeatureSet`, `StructuralCandidate`, `InterpretationResult` |
+| `arifos/GEOX/tools/seismic_image_ingest.py` | CREATE | Stage 1: load + normalize image, return `GEOXOutput` |
+| `arifos/GEOX/tools/seismic_contrast_views.py` | CREATE | Stage 2: 6 contrast variants wrapping `SeismicVisualFilterTool` |
+| `arifos/GEOX/tools/seismic_feature_extract.py` | CREATE | Stage 3: lineaments, dip field, discontinuities — image proxies only |
+| `arifos/GEOX/tools/seismic_structure_rules.py` | CREATE | Stage 5: geological rule engine — score candidates per family |
+| `arifos/GEOX/tools/seismic_candidate_ranker.py` | CREATE | Stage 4+6: build + rank structural candidates |
+| `arifos/GEOX/tools/seismic_report_writer.py` | CREATE | Stage 7: governed markdown + JSON report |
+| `tests/tools/test_GEOX_output.py` | CREATE | Envelope schema tests |
 | `tests/tools/test_structural_interp_schemas.py` | CREATE | Schema validation tests |
 | `tests/tools/test_seismic_image_ingest.py` | CREATE | Ingest tests |
 | `tests/tools/test_seismic_contrast_views.py` | CREATE | 6-view generation tests |
@@ -66,18 +66,18 @@ def make_synthetic_seismic(h: int = 100, w: int = 200) -> np.ndarray:
 ## Task 1: Common Output Envelope
 
 **Files:**
-- Create: `arifos/geox/schemas/__init__.py`
-- Create: `arifos/geox/schemas/geox_output.py`
+- Create: `arifos/GEOX/schemas/__init__.py`
+- Create: `arifos/GEOX/schemas/GEOX_output.py`
 - Create: `tests/tools/__init__.py`
-- Create: `tests/tools/test_geox_output.py`
+- Create: `tests/tools/test_GEOX_output.py`
 
 - [ ] **Step 1.1: Write failing test**
 
 ```python
-# tests/tools/test_geox_output.py
-from arifos.geox.schemas.geox_output import GEOXOutput, GEOXUncertainty, GEOXContrastMeta, GEOXGovernance
+# tests/tools/test_GEOX_output.py
+from arifos.GEOX.schemas.GEOX_output import GEOXOutput, GEOXUncertainty, GEOXContrastMeta, GEOXGovernance
 
-def test_geox_output_minimal():
+def test_GEOX_output_minimal():
     out = GEOXOutput(
         ok=True,
         verdict="QUALIFY",
@@ -85,11 +85,11 @@ def test_geox_output_minimal():
     )
     assert out.ok is True
     assert out.verdict == "QUALIFY"
-    assert out.source_domain == "geox-earth-witness"
+    assert out.source_domain == "GEOX-earth-witness"
     assert out.result == {}
     assert out.error is None
 
-def test_geox_output_uncertainty_bounds():
+def test_GEOX_output_uncertainty_bounds():
     import pytest
     with pytest.raises(Exception):
         GEOXOutput(
@@ -97,7 +97,7 @@ def test_geox_output_uncertainty_bounds():
             uncertainty=GEOXUncertainty(level=0.02, type="test"),  # below floor 0.03
         )
 
-def test_geox_output_serializes():
+def test_GEOX_output_serializes():
     out = GEOXOutput(
         ok=False,
         verdict="GEOX_BLOCK",
@@ -114,14 +114,14 @@ def test_geox_output_serializes():
 
 ```
 cd C:\ariffazil\GEOX
-python -m pytest tests/tools/test_geox_output.py -v
+python -m pytest tests/tools/test_GEOX_output.py -v
 ```
-Expected: `ModuleNotFoundError: No module named 'arifos.geox.schemas.geox_output'`
+Expected: `ModuleNotFoundError: No module named 'arifos.GEOX.schemas.GEOX_output'`
 
 - [ ] **Step 1.3: Create package files**
 
 ```python
-# arifos/geox/schemas/__init__.py
+# arifos/GEOX/schemas/__init__.py
 """GEOX structural interpretation schemas."""
 ```
 
@@ -129,10 +129,10 @@ Expected: `ModuleNotFoundError: No module named 'arifos.geox.schemas.geox_output
 # tests/tools/__init__.py
 ```
 
-- [ ] **Step 1.4: Write `geox_output.py`**
+- [ ] **Step 1.4: Write `GEOX_output.py`**
 
 ```python
-# arifos/geox/schemas/geox_output.py
+# arifos/GEOX/schemas/GEOX_output.py
 """
 GEOXOutput — Common output envelope for all GEOX Band-A tools.
 DITEMPA BUKAN DIBERI
@@ -172,7 +172,7 @@ class GEOXOutput(BaseModel):
     Fields:
         ok               — False if tool encountered an error
         verdict          — PASS | QUALIFY | HOLD | GEOX_BLOCK
-        source_domain    — Always "geox-earth-witness"
+        source_domain    — Always "GEOX-earth-witness"
         uncertainty      — F7 calibrated uncertainty
         contrast_metadata — Contrast Canon metadata
         governance       — Floor compliance + warnings
@@ -182,7 +182,7 @@ class GEOXOutput(BaseModel):
 
     ok: bool
     verdict: Literal["PASS", "QUALIFY", "HOLD", "GEOX_BLOCK"]
-    source_domain: str = "geox-earth-witness"
+    source_domain: str = "GEOX-earth-witness"
     uncertainty: GEOXUncertainty
     contrast_metadata: GEOXContrastMeta = Field(default_factory=GEOXContrastMeta)
     governance: GEOXGovernance = Field(default_factory=GEOXGovernance)
@@ -193,15 +193,15 @@ class GEOXOutput(BaseModel):
 - [ ] **Step 1.5: Run tests to verify they pass**
 
 ```
-python -m pytest tests/tools/test_geox_output.py -v
+python -m pytest tests/tools/test_GEOX_output.py -v
 ```
 Expected: `3 passed`
 
 - [ ] **Step 1.6: Commit**
 
 ```bash
-git add arifos/geox/schemas/__init__.py arifos/geox/schemas/geox_output.py tests/tools/__init__.py tests/tools/test_geox_output.py
-git commit -m "feat(geox): add GEOXOutput common envelope — Band-A foundation"
+git add arifos/GEOX/schemas/__init__.py arifos/GEOX/schemas/GEOX_output.py tests/tools/__init__.py tests/tools/test_GEOX_output.py
+git commit -m "feat(GEOX): add GEOXOutput common envelope — Band-A foundation"
 ```
 
 ---
@@ -209,7 +209,7 @@ git commit -m "feat(geox): add GEOXOutput common envelope — Band-A foundation"
 ## Task 2: Structural Interpretation Schemas
 
 **Files:**
-- Create: `arifos/geox/schemas/structural_interp.py`
+- Create: `arifos/GEOX/schemas/structural_interp.py`
 - Create: `tests/tools/test_structural_interp_schemas.py`
 
 - [ ] **Step 2.1: Write failing tests**
@@ -217,7 +217,7 @@ git commit -m "feat(geox): add GEOXOutput common envelope — Band-A foundation"
 ```python
 # tests/tools/test_structural_interp_schemas.py
 import pytest
-from arifos.geox.schemas.structural_interp import (
+from arifos.GEOX.schemas.structural_interp import (
     SeismicImageInput, SeismicView, Lineament, Discontinuity, DipVector,
     FeatureSet, StructuralCandidate, InterpretationResult,
 )
@@ -265,12 +265,12 @@ def test_interpretation_result_requires_two_d_limits():
 ```
 python -m pytest tests/tools/test_structural_interp_schemas.py -v
 ```
-Expected: `ModuleNotFoundError: No module named 'arifos.geox.schemas.structural_interp'`
+Expected: `ModuleNotFoundError: No module named 'arifos.GEOX.schemas.structural_interp'`
 
 - [ ] **Step 2.3: Write `structural_interp.py`**
 
 ```python
-# arifos/geox/schemas/structural_interp.py
+# arifos/GEOX/schemas/structural_interp.py
 """
 GEOX Structural Interpretation Schemas — Band-A Raster-only Pipeline.
 DITEMPA BUKAN DIBERI
@@ -395,8 +395,8 @@ Expected: `5 passed`
 - [ ] **Step 2.5: Commit**
 
 ```bash
-git add arifos/geox/schemas/structural_interp.py tests/tools/test_structural_interp_schemas.py
-git commit -m "feat(geox): add structural interpretation schemas (Band-A)"
+git add arifos/GEOX/schemas/structural_interp.py tests/tools/test_structural_interp_schemas.py
+git commit -m "feat(GEOX): add structural interpretation schemas (Band-A)"
 ```
 
 ---
@@ -404,7 +404,7 @@ git commit -m "feat(geox): add structural interpretation schemas (Band-A)"
 ## Task 3: Seismic Image Ingest
 
 **Files:**
-- Create: `arifos/geox/tools/seismic_image_ingest.py`
+- Create: `arifos/GEOX/tools/seismic_image_ingest.py`
 - Create: `tests/tools/test_seismic_image_ingest.py`
 
 - [ ] **Step 3.1: Write failing tests**
@@ -413,8 +413,8 @@ git commit -m "feat(geox): add structural interpretation schemas (Band-A)"
 # tests/tools/test_seismic_image_ingest.py
 import numpy as np
 import pytest
-from arifos.geox.tools.seismic_image_ingest import load_seismic_image, ingest_seismic_image
-from arifos.geox.schemas.geox_output import GEOXOutput
+from arifos.GEOX.tools.seismic_image_ingest import load_seismic_image, ingest_seismic_image
+from arifos.GEOX.schemas.GEOX_output import GEOXOutput
 
 def make_synthetic_seismic(h=100, w=200):
     rng = np.random.default_rng(42)
@@ -446,7 +446,7 @@ def test_load_seismic_image_sets_domain(tmp_path):
     meta, _ = load_seismic_image(str(npy_path), {"line_id": "L002", "domain": "time"})
     assert meta.domain == "time"
 
-def test_ingest_seismic_image_returns_geox_output(tmp_path):
+def test_ingest_seismic_image_returns_GEOX_output(tmp_path):
     arr = make_synthetic_seismic()
     npy_path = tmp_path / "test.npy"
     np.save(str(npy_path), arr)
@@ -464,12 +464,12 @@ def test_ingest_seismic_image_returns_geox_output(tmp_path):
 ```
 python -m pytest tests/tools/test_seismic_image_ingest.py -v
 ```
-Expected: `ModuleNotFoundError: No module named 'arifos.geox.tools.seismic_image_ingest'`
+Expected: `ModuleNotFoundError: No module named 'arifos.GEOX.tools.seismic_image_ingest'`
 
 - [ ] **Step 3.3: Write `seismic_image_ingest.py`**
 
 ```python
-# arifos/geox/tools/seismic_image_ingest.py
+# arifos/GEOX/tools/seismic_image_ingest.py
 """
 GEOX Stage 1 — Seismic Image Ingest (Band-A Raster-only)
 DITEMPA BUKAN DIBERI
@@ -486,10 +486,10 @@ from typing import Any
 
 import numpy as np
 
-from arifos.geox.schemas.geox_output import (
+from arifos.GEOX.schemas.GEOX_output import (
     GEOXOutput, GEOXUncertainty, GEOXContrastMeta, GEOXGovernance,
 )
-from arifos.geox.schemas.structural_interp import SeismicImageInput
+from arifos.GEOX.schemas.structural_interp import SeismicImageInput
 
 
 def load_seismic_image(
@@ -612,8 +612,8 @@ Expected: `3 passed`
 - [ ] **Step 3.5: Commit**
 
 ```bash
-git add arifos/geox/tools/seismic_image_ingest.py tests/tools/test_seismic_image_ingest.py
-git commit -m "feat(geox): Stage 1 seismic image ingest (Band-A)"
+git add arifos/GEOX/tools/seismic_image_ingest.py tests/tools/test_seismic_image_ingest.py
+git commit -m "feat(GEOX): Stage 1 seismic image ingest (Band-A)"
 ```
 
 ---
@@ -621,7 +621,7 @@ git commit -m "feat(geox): Stage 1 seismic image ingest (Band-A)"
 ## Task 4: Contrast Views
 
 **Files:**
-- Create: `arifos/geox/tools/seismic_contrast_views.py`
+- Create: `arifos/GEOX/tools/seismic_contrast_views.py`
 - Create: `tests/tools/test_seismic_contrast_views.py`
 
 - [ ] **Step 4.1: Write failing tests**
@@ -630,9 +630,9 @@ git commit -m "feat(geox): Stage 1 seismic image ingest (Band-A)"
 # tests/tools/test_seismic_contrast_views.py
 import numpy as np
 import pytest
-from arifos.geox.tools.seismic_contrast_views import generate_contrast_views, contrast_views_output
-from arifos.geox.schemas.structural_interp import SeismicView
-from arifos.geox.schemas.geox_output import GEOXOutput
+from arifos.GEOX.tools.seismic_contrast_views import generate_contrast_views, contrast_views_output
+from arifos.GEOX.schemas.structural_interp import SeismicView
+from arifos.GEOX.schemas.GEOX_output import GEOXOutput
 
 def make_synthetic_seismic(h=100, w=200):
     rng = np.random.default_rng(42)
@@ -666,7 +666,7 @@ def test_views_values_in_range():
         assert arr.min() >= 0.0
         assert arr.max() <= 1.0 + 1e-6  # small float tolerance
 
-def test_contrast_views_output_returns_geox_output():
+def test_contrast_views_output_returns_GEOX_output():
     image = make_synthetic_seismic()
     output = contrast_views_output(image, "L001")
     assert isinstance(output, GEOXOutput)
@@ -681,12 +681,12 @@ def test_contrast_views_output_returns_geox_output():
 ```
 python -m pytest tests/tools/test_seismic_contrast_views.py -v
 ```
-Expected: `ModuleNotFoundError: No module named 'arifos.geox.tools.seismic_contrast_views'`
+Expected: `ModuleNotFoundError: No module named 'arifos.GEOX.tools.seismic_contrast_views'`
 
 - [ ] **Step 4.3: Write `seismic_contrast_views.py`**
 
 ```python
-# arifos/geox/tools/seismic_contrast_views.py
+# arifos/GEOX/tools/seismic_contrast_views.py
 """
 GEOX Stage 2 — Contrast View Generation (Band-A Raster-only)
 DITEMPA BUKAN DIBERI
@@ -701,11 +701,11 @@ from __future__ import annotations
 
 import numpy as np
 
-from arifos.geox.schemas.geox_output import (
+from arifos.GEOX.schemas.GEOX_output import (
     GEOXOutput, GEOXUncertainty, GEOXContrastMeta, GEOXGovernance,
 )
-from arifos.geox.schemas.structural_interp import SeismicView
-from arifos.geox.tools.seismic_visual_filter import (
+from arifos.GEOX.schemas.structural_interp import SeismicView
+from arifos.GEOX.tools.seismic_visual_filter import (
     _gaussian_filter,
     _clahe_filter,
     _sobel_filter,
@@ -847,8 +847,8 @@ Expected: `4 passed`
 - [ ] **Step 4.5: Commit**
 
 ```bash
-git add arifos/geox/tools/seismic_contrast_views.py tests/tools/test_seismic_contrast_views.py
-git commit -m "feat(geox): Stage 2 contrast view generation — 6 variants with bias audit"
+git add arifos/GEOX/tools/seismic_contrast_views.py tests/tools/test_seismic_contrast_views.py
+git commit -m "feat(GEOX): Stage 2 contrast view generation — 6 variants with bias audit"
 ```
 
 ---
@@ -856,7 +856,7 @@ git commit -m "feat(geox): Stage 2 contrast view generation — 6 variants with 
 ## Task 5: Feature Extraction
 
 **Files:**
-- Create: `arifos/geox/tools/seismic_feature_extract.py`
+- Create: `arifos/GEOX/tools/seismic_feature_extract.py`
 - Create: `tests/tools/test_seismic_feature_extract.py`
 
 - [ ] **Step 5.1: Write failing tests**
@@ -864,9 +864,9 @@ git commit -m "feat(geox): Stage 2 contrast view generation — 6 variants with 
 ```python
 # tests/tools/test_seismic_feature_extract.py
 import numpy as np
-from arifos.geox.tools.seismic_feature_extract import extract_features, feature_extract_output
-from arifos.geox.schemas.structural_interp import FeatureSet
-from arifos.geox.schemas.geox_output import GEOXOutput
+from arifos.GEOX.tools.seismic_feature_extract import extract_features, feature_extract_output
+from arifos.GEOX.schemas.structural_interp import FeatureSet
+from arifos.GEOX.schemas.GEOX_output import GEOXOutput
 
 def make_synthetic_seismic(h=100, w=200):
     rng = np.random.default_rng(42)
@@ -903,7 +903,7 @@ def test_extract_features_note_contains_proxy():
     fs = extract_features(image, "v1")
     assert "image_derived_proxy" in fs.note
 
-def test_feature_extract_output_returns_geox_output():
+def test_feature_extract_output_returns_GEOX_output():
     image = make_synthetic_seismic()
     output = feature_extract_output(image, "v1")
     assert isinstance(output, GEOXOutput)
@@ -922,7 +922,7 @@ Expected: `ModuleNotFoundError`
 - [ ] **Step 5.3: Write `seismic_feature_extract.py`**
 
 ```python
-# arifos/geox/tools/seismic_feature_extract.py
+# arifos/GEOX/tools/seismic_feature_extract.py
 """
 GEOX Stage 3 — Image Feature Extraction (Band-A Raster-only)
 DITEMPA BUKAN DIBERI
@@ -938,13 +938,13 @@ from __future__ import annotations
 
 import numpy as np
 
-from arifos.geox.schemas.geox_output import (
+from arifos.GEOX.schemas.GEOX_output import (
     GEOXOutput, GEOXUncertainty, GEOXContrastMeta, GEOXGovernance,
 )
-from arifos.geox.schemas.structural_interp import (
+from arifos.GEOX.schemas.structural_interp import (
     FeatureSet, Lineament, Discontinuity, DipVector,
 )
-from arifos.geox.tools.seismic_visual_filter import (
+from arifos.GEOX.tools.seismic_visual_filter import (
     _gaussian_filter, _canny_filter, _convolve2d,
 )
 
@@ -1070,8 +1070,8 @@ Expected: `5 passed`
 - [ ] **Step 5.5: Commit**
 
 ```bash
-git add arifos/geox/tools/seismic_feature_extract.py tests/tools/test_seismic_feature_extract.py
-git commit -m "feat(geox): Stage 3 image feature extraction — lineaments, discontinuities, dip field"
+git add arifos/GEOX/tools/seismic_feature_extract.py tests/tools/test_seismic_feature_extract.py
+git commit -m "feat(GEOX): Stage 3 image feature extraction — lineaments, discontinuities, dip field"
 ```
 
 ---
@@ -1079,7 +1079,7 @@ git commit -m "feat(geox): Stage 3 image feature extraction — lineaments, disc
 ## Task 6: Structure Rules Engine
 
 **Files:**
-- Create: `arifos/geox/tools/seismic_structure_rules.py`
+- Create: `arifos/GEOX/tools/seismic_structure_rules.py`
 - Create: `tests/tools/test_seismic_structure_rules.py`
 
 - [ ] **Step 6.1: Write failing tests**
@@ -1088,10 +1088,10 @@ git commit -m "feat(geox): Stage 3 image feature extraction — lineaments, disc
 # tests/tools/test_seismic_structure_rules.py
 import numpy as np
 import pytest
-from arifos.geox.tools.seismic_structure_rules import (
+from arifos.GEOX.tools.seismic_structure_rules import (
     score_candidate, build_candidate, FAMILY_TEMPLATES, ALL_FAMILIES,
 )
-from arifos.geox.schemas.structural_interp import (
+from arifos.GEOX.schemas.structural_interp import (
     StructuralCandidate, FeatureSet, Lineament, Discontinuity,
 )
 
@@ -1149,7 +1149,7 @@ Expected: `ModuleNotFoundError`
 - [ ] **Step 6.3: Write `seismic_structure_rules.py`**
 
 ```python
-# arifos/geox/tools/seismic_structure_rules.py
+# arifos/GEOX/tools/seismic_structure_rules.py
 """
 GEOX Stage 5 — Geological Rule Engine (Band-A Raster-only)
 DITEMPA BUKAN DIBERI
@@ -1166,7 +1166,7 @@ F9 (no hallucinated geology — rules require evidence, not assumptions).
 """
 from __future__ import annotations
 
-from arifos.geox.schemas.structural_interp import FeatureSet, StructuralCandidate
+from arifos.GEOX.schemas.structural_interp import FeatureSet, StructuralCandidate
 
 FAMILY_TEMPLATES: dict[str, dict] = {
     "normal_fault": {
@@ -1343,8 +1343,8 @@ Expected: `5 passed`
 - [ ] **Step 6.5: Commit**
 
 ```bash
-git add arifos/geox/tools/seismic_structure_rules.py tests/tools/test_seismic_structure_rules.py
-git commit -m "feat(geox): Stage 5 geological rule engine — Bond-aware candidate scoring"
+git add arifos/GEOX/tools/seismic_structure_rules.py tests/tools/test_seismic_structure_rules.py
+git commit -m "feat(GEOX): Stage 5 geological rule engine — Bond-aware candidate scoring"
 ```
 
 ---
@@ -1352,7 +1352,7 @@ git commit -m "feat(geox): Stage 5 geological rule engine — Bond-aware candida
 ## Task 7: Candidate Ranker
 
 **Files:**
-- Create: `arifos/geox/tools/seismic_candidate_ranker.py`
+- Create: `arifos/GEOX/tools/seismic_candidate_ranker.py`
 - Create: `tests/tools/test_seismic_candidate_ranker.py`
 
 - [ ] **Step 7.1: Write failing tests**
@@ -1360,12 +1360,12 @@ git commit -m "feat(geox): Stage 5 geological rule engine — Bond-aware candida
 ```python
 # tests/tools/test_seismic_candidate_ranker.py
 import numpy as np
-from arifos.geox.tools.seismic_candidate_ranker import (
+from arifos.GEOX.tools.seismic_candidate_ranker import (
     build_candidates_from_features, rank_candidates, build_interpretation_result,
 )
-from arifos.geox.tools.seismic_feature_extract import extract_features
-from arifos.geox.schemas.structural_interp import InterpretationResult
-from arifos.geox.tools.seismic_structure_rules import ALL_FAMILIES
+from arifos.GEOX.tools.seismic_feature_extract import extract_features
+from arifos.GEOX.schemas.structural_interp import InterpretationResult
+from arifos.GEOX.tools.seismic_structure_rules import ALL_FAMILIES
 
 def make_synthetic_seismic(h=100, w=200):
     rng = np.random.default_rng(42)
@@ -1429,7 +1429,7 @@ Expected: `ModuleNotFoundError`
 - [ ] **Step 7.3: Write `seismic_candidate_ranker.py`**
 
 ```python
-# arifos/geox/tools/seismic_candidate_ranker.py
+# arifos/GEOX/tools/seismic_candidate_ranker.py
 """
 GEOX Stages 4+6 — Candidate Builder + Ranker (Band-A Raster-only)
 DITEMPA BUKAN DIBERI
@@ -1442,8 +1442,8 @@ warn that multiple hypotheses must be maintained.
 """
 from __future__ import annotations
 
-from arifos.geox.schemas.structural_interp import FeatureSet, StructuralCandidate, InterpretationResult
-from arifos.geox.tools.seismic_structure_rules import (
+from arifos.GEOX.schemas.structural_interp import FeatureSet, StructuralCandidate, InterpretationResult
+from arifos.GEOX.tools.seismic_structure_rules import (
     ALL_FAMILIES, build_candidate, FAMILY_TEMPLATES,
 )
 
@@ -1593,8 +1593,8 @@ Expected: `5 passed`
 - [ ] **Step 7.5: Commit**
 
 ```bash
-git add arifos/geox/tools/seismic_candidate_ranker.py tests/tools/test_seismic_candidate_ranker.py
-git commit -m "feat(geox): Stages 4+6 candidate builder and ranker — Bond-bias composite scoring"
+git add arifos/GEOX/tools/seismic_candidate_ranker.py tests/tools/test_seismic_candidate_ranker.py
+git commit -m "feat(GEOX): Stages 4+6 candidate builder and ranker — Bond-bias composite scoring"
 ```
 
 ---
@@ -1602,7 +1602,7 @@ git commit -m "feat(geox): Stages 4+6 candidate builder and ranker — Bond-bias
 ## Task 8: Report Writer
 
 **Files:**
-- Create: `arifos/geox/tools/seismic_report_writer.py`
+- Create: `arifos/GEOX/tools/seismic_report_writer.py`
 - Create: `tests/tools/test_seismic_report_writer.py`
 
 - [ ] **Step 8.1: Write failing tests**
@@ -1610,12 +1610,12 @@ git commit -m "feat(geox): Stages 4+6 candidate builder and ranker — Bond-bias
 ```python
 # tests/tools/test_seismic_report_writer.py
 import numpy as np
-from arifos.geox.tools.seismic_report_writer import write_markdown_report, write_json_result
-from arifos.geox.tools.seismic_feature_extract import extract_features
-from arifos.geox.tools.seismic_candidate_ranker import (
+from arifos.GEOX.tools.seismic_report_writer import write_markdown_report, write_json_result
+from arifos.GEOX.tools.seismic_feature_extract import extract_features
+from arifos.GEOX.tools.seismic_candidate_ranker import (
     build_candidates_from_features, rank_candidates, build_interpretation_result,
 )
-from arifos.geox.schemas.structural_interp import SeismicImageInput
+from arifos.GEOX.schemas.structural_interp import SeismicImageInput
 
 def make_result():
     rng = np.random.default_rng(42)
@@ -1667,7 +1667,7 @@ Expected: `ModuleNotFoundError`
 - [ ] **Step 8.3: Write `seismic_report_writer.py`**
 
 ```python
-# arifos/geox/tools/seismic_report_writer.py
+# arifos/GEOX/tools/seismic_report_writer.py
 """
 GEOX Stage 7 — Governed Report Writer (Band-A Raster-only)
 DITEMPA BUKAN DIBERI
@@ -1681,7 +1681,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
 
-from arifos.geox.schemas.structural_interp import InterpretationResult, SeismicImageInput
+from arifos.GEOX.schemas.structural_interp import InterpretationResult, SeismicImageInput
 
 
 def write_markdown_report(
@@ -1769,8 +1769,8 @@ Expected: `5 passed`
 - [ ] **Step 8.5: Commit**
 
 ```bash
-git add arifos/geox/tools/seismic_report_writer.py tests/tools/test_seismic_report_writer.py
-git commit -m "feat(geox): Stage 7 report writer — governed markdown + JSON output"
+git add arifos/GEOX/tools/seismic_report_writer.py tests/tools/test_seismic_report_writer.py
+git commit -m "feat(GEOX): Stage 7 report writer — governed markdown + JSON output"
 ```
 
 ---
@@ -1800,14 +1800,14 @@ import json
 import numpy as np
 import pytest
 
-from arifos.geox.tools.seismic_image_ingest import load_seismic_image, ingest_seismic_image
-from arifos.geox.tools.seismic_contrast_views import generate_contrast_views, contrast_views_output
-from arifos.geox.tools.seismic_feature_extract import extract_features
-from arifos.geox.tools.seismic_candidate_ranker import (
+from arifos.GEOX.tools.seismic_image_ingest import load_seismic_image, ingest_seismic_image
+from arifos.GEOX.tools.seismic_contrast_views import generate_contrast_views, contrast_views_output
+from arifos.GEOX.tools.seismic_feature_extract import extract_features
+from arifos.GEOX.tools.seismic_candidate_ranker import (
     build_candidates_from_features, rank_candidates, build_interpretation_result,
 )
-from arifos.geox.tools.seismic_report_writer import write_markdown_report, write_json_result
-from arifos.geox.schemas.structural_interp import SeismicImageInput
+from arifos.GEOX.tools.seismic_report_writer import write_markdown_report, write_json_result
+from arifos.GEOX.schemas.structural_interp import SeismicImageInput
 
 
 def make_bond_synthetic(h=100, w=200) -> np.ndarray:
@@ -1910,7 +1910,7 @@ Expected: All tests pass.
 
 ```bash
 git add tests/test_single_line_integration.py
-git commit -m "test(geox): Bond synthetic integration test — Band-A pipeline end-to-end"
+git commit -m "test(GEOX): Bond synthetic integration test — Band-A pipeline end-to-end"
 ```
 
 ---
@@ -1928,8 +1928,8 @@ Expected: All pass, no failures.
 
 ```bash
 git add docs/superpowers/specs/ docs/superpowers/plans/
-git add arifos/geox/knowledge/seismic_attribute_taxonomy.yaml
-git commit -m "docs(geox): design spec + implementation plan — Band-A single-line interpreter"
+git add arifos/GEOX/knowledge/seismic_attribute_taxonomy.yaml
+git commit -m "docs(GEOX): design spec + implementation plan — Band-A single-line interpreter"
 ```
 
 - [ ] **Step 10.3: Summary of what was built**
@@ -1937,7 +1937,7 @@ git commit -m "docs(geox): design spec + implementation plan — Band-A single-l
 ```
 Band-A Single-Line Structural Interpreter — SEALED
 =====================================================
-New schemas:     geox_output.py, structural_interp.py
+New schemas:     GEOX_output.py, structural_interp.py
 New tools (6):   seismic_image_ingest, seismic_contrast_views,
                  seismic_feature_extract, seismic_structure_rules,
                  seismic_candidate_ranker, seismic_report_writer
@@ -1967,3 +1967,4 @@ DITEMPA BUKAN DIBERI
 
 *Plan saved to `docs/superpowers/plans/2026-03-31-single-line-structural-interpreter.md`*
 *Spec at `docs/superpowers/specs/2026-03-31-single-line-structural-interpreter-design.md`*
+

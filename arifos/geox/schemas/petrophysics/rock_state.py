@@ -14,7 +14,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-from arifos.geox.schemas.geox_schemas import ProvenanceRecord
+from arifos.GEOX.schemas.GEOX_schemas import ProvenanceRecord
 
 
 class MineralVolume(BaseModel):
@@ -274,3 +274,4 @@ class RockFluidState(BaseModel):
             "verdict": self.verdict,
             "model": self.saturation_model_used,
         }
+

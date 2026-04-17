@@ -47,8 +47,8 @@
     "arifos_untracked": 8,
     "arifos_modified": 76,
     "sites_clean": true,
-    "geox_untracked": 9,
-    "geox_modified": 16
+    "GEOX_untracked": 9,
+    "GEOX_modified": 16
   },
   "constitutional_check": {
     "F1_AMANAH": "PASS - All changes reversible via git history",
@@ -60,5 +60,6 @@
   "kernel_version": "2026.04.09",
   "horizon": "II.1"
 }
+
 
 

@@ -11,7 +11,7 @@ from enum import Enum
 from typing import Any
 
 
-class GeoxErrorCode(Enum):
+class GEOXErrorCode(Enum):
     # Standard MCP / JSON-RPC Errors
     INVALID_REQUEST = -32600
     METHOD_NOT_FOUND = -32601
@@ -39,11 +39,11 @@ class GeoxErrorCode(Enum):
     PARAMETER_OUT_OF_RANGE = 3004
 
 
-class GeoxError(Exception):
+class GEOXError(Exception):
     """Base exception for GEOX errors."""
     def __init__(
         self,
-        code: GeoxErrorCode,
+        code: GEOXErrorCode,
         message: str,
         data: dict[str, Any] | None = None
     ):
@@ -59,3 +59,4 @@ class GeoxError(Exception):
             "message": self.message,
             "data": self.data,
         }
+

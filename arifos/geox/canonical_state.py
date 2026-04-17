@@ -7,14 +7,14 @@ LLM handles intent and orchestration; GEOX produces deterministic state.
 Tri-App Architecture: Map + Cross Section + Seismic Section
 
 Canonical state objects:
-- GeoXIntent: Normalized user intent
-- GeoXAssetContext: Target asset and spatial context
-- GeoXDisplayState: Viewer state (viewport, layers, axes, legend)
-- GeoXAnalysisState: Observations, interpretations, uncertainty
-- GeoXAuditState: Hold status, scope flags, traceability
-- GeoXUiState: UI mode, warnings, badges
-- GeoXCrossSectionState: Geologic cross section (INTERPRETED)
-- GeoXSeismicSectionState: Seismic section (OBSERVATIONAL)
+- GEOXIntent: Normalized user intent
+- GEOXAssetContext: Target asset and spatial context
+- GEOXDisplayState: Viewer state (viewport, layers, axes, legend)
+- GEOXAnalysisState: Observations, interpretations, uncertainty
+- GEOXAuditState: Hold status, scope flags, traceability
+- GEOXUiState: UI mode, warnings, badges
+- GEOXCrossSectionState: Geologic cross section (INTERPRETED)
+- GEOXSeismicSectionState: Seismic section (OBSERVATIONAL)
 
 Tool IO contract pattern:
 - Input: typed intent or state delta
@@ -93,7 +93,7 @@ class CrossSectionState(str, Enum):
     HOLD = "hold"
 
 
-class GeoXIntent(BaseModel):
+class GEOXIntent(BaseModel):
     """Normalized user intent object. LLM produces only this; never final geology."""
 
     intent_id: str = Field(default_factory=lambda: str(uuid4()))
@@ -107,7 +107,7 @@ class GeoXIntent(BaseModel):
     requester_id: str = Field(..., description="Requesting user or system ID")
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    model_config = {"json_schema_extra": {"title": "GeoXIntent"}}
+    model_config = {"json_schema_extra": {"title": "GEOXIntent"}}
 
 
 class CoordinateBounds(BaseModel):
@@ -119,7 +119,7 @@ class CoordinateBounds(BaseModel):
     max_lon: float = Field(..., ge=-180, le=180)
 
 
-class GeoXAssetContext(BaseModel):
+class GEOXAssetContext(BaseModel):
     """Asset and spatial context for a geological feature."""
 
     asset_id: str | None = Field(None, description="Unique asset identifier")
@@ -135,7 +135,7 @@ class GeoXAssetContext(BaseModel):
     horizontal_scale: float | None = Field(None)
     vertical_scale: float | None = Field(None)
 
-    model_config = {"json_schema_extra": {"title": "GeoXAssetContext"}}
+    model_config = {"json_schema_extra": {"title": "GEOXAssetContext"}}
 
 
 class Viewport(BaseModel):
@@ -175,11 +175,11 @@ class LayerState(BaseModel):
     thresholds: dict[str, float] = Field(default_factory=dict)
 
 
-class GeoXDisplayState(BaseModel):
+class GEOXDisplayState(BaseModel):
     """Canonical visualization state. GEOX produces this deterministically; UI renders it."""
 
     display_id: str = Field(default_factory=lambda: str(uuid4()))
-    asset_context: GeoXAssetContext | None = None
+    asset_context: GEOXAssetContext | None = None
     viewport: Viewport = Field(default_factory=Viewport)
     x_axis: AxisDefinition | None = None
     y_axis: AxisDefinition | None = None
@@ -190,7 +190,7 @@ class GeoXDisplayState(BaseModel):
     ui_mode: str = Field(default="section")
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    model_config = {"json_schema_extra": {"title": "GeoXDisplayState"}}
+    model_config = {"json_schema_extra": {"title": "GEOXDisplayState"}}
 
 
 class Observation(BaseModel):
@@ -216,11 +216,11 @@ class Interpretation(BaseModel):
     provenance: str = Field(..., description="Source of interpretation")
 
 
-class GeoXAnalysisState(BaseModel):
+class GEOXAnalysisState(BaseModel):
     """Canonical analysis state with observations, interpretations, counter-hypotheses."""
 
     analysis_id: str = Field(default_factory=lambda: str(uuid4()))
-    display_state: GeoXDisplayState | None = None
+    display_state: GEOXDisplayState | None = None
     observations: list[Observation] = Field(default_factory=list)
     interpretations: list[Interpretation] = Field(default_factory=list)
     counter_hypotheses: list[str] = Field(default_factory=list)
@@ -228,7 +228,7 @@ class GeoXAnalysisState(BaseModel):
     roi_results: dict[str, Any] = Field(default_factory=dict)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    model_config = {"json_schema_extra": {"title": "GeoXAnalysisState"}}
+    model_config = {"json_schema_extra": {"title": "GEOXAnalysisState"}}
 
 
 class FloorStatus(BaseModel):
@@ -240,11 +240,11 @@ class FloorStatus(BaseModel):
     confidence: float | None = Field(None, ge=0.0, le=1.0)
 
 
-class GeoXAuditState(BaseModel):
+class GEOXAuditState(BaseModel):
     """Canonical audit state with hold status, scope flags, traceability."""
 
     audit_id: str = Field(default_factory=lambda: str(uuid4()))
-    analysis_state: GeoXAnalysisState | None = None
+    analysis_state: GEOXAnalysisState | None = None
     hold_status: HoldStatus = Field(default=HoldStatus.CLEAR)
     scope_flags: list[str] = Field(default_factory=list)
     floor_compliance: list[FloorStatus] = Field(default_factory=list)
@@ -254,17 +254,17 @@ class GeoXAuditState(BaseModel):
     human_signoff_by: str | None = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    model_config = {"json_schema_extra": {"title": "GeoXAuditState"}}
+    model_config = {"json_schema_extra": {"title": "GEOXAuditState"}}
 
 
-class GeoXUiState(BaseModel):
+class GEOXUiState(BaseModel):
     """Combined UI state for rendering. This is what UI layers consume."""
 
     ui_state_id: str = Field(default_factory=lambda: str(uuid4()))
-    intent: GeoXIntent | None = None
-    display_state: GeoXDisplayState | None = None
-    analysis_state: GeoXAnalysisState | None = None
-    audit_state: GeoXAuditState | None = None
+    intent: GEOXIntent | None = None
+    display_state: GEOXDisplayState | None = None
+    analysis_state: GEOXAnalysisState | None = None
+    audit_state: GEOXAuditState | None = None
     text_summary: str = Field(default="")
     artifact_links: dict[str, str] = Field(default_factory=dict)
     success: bool = True
@@ -272,7 +272,7 @@ class GeoXUiState(BaseModel):
     errors: list[str] = Field(default_factory=list)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    model_config = {"json_schema_extra": {"title": "GeoXUiState"}}
+    model_config = {"json_schema_extra": {"title": "GEOXUiState"}}
 
 
 class ProfilePoint(BaseModel):
@@ -334,7 +334,7 @@ class UncertaintyZone(BaseModel):
     explanation: str = Field(..., description="Why this zone is uncertain")
 
 
-class GeoXCrossSectionState(BaseModel):
+class GEOXCrossSectionState(BaseModel):
     """
     Canonical geologic cross-section state.
 
@@ -372,10 +372,10 @@ class GeoXCrossSectionState(BaseModel):
     sync_cursor_distance_km: float | None = Field(None)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    model_config = {"json_schema_extra": {"title": "GeoXCrossSectionState"}}
+    model_config = {"json_schema_extra": {"title": "GEOXCrossSectionState"}}
 
 
-class GeoXSeismicSectionState(BaseModel):
+class GEOXSeismicSectionState(BaseModel):
     """
     Canonical seismic section state.
 
@@ -385,7 +385,7 @@ class GeoXSeismicSectionState(BaseModel):
 
     section_id: str = Field(default_factory=lambda: str(uuid4()))
     section_name: str = Field(..., description="Seismic line name")
-    asset_context: GeoXAssetContext | None = None
+    asset_context: GEOXAssetContext | None = None
     detected_reflectors: list[dict[str, Any]] = Field(default_factory=list)
     detected_faults: list[dict[str, Any]] = Field(default_factory=list)
     segmented_facies: list[dict[str, Any]] = Field(default_factory=list)
@@ -396,22 +396,22 @@ class GeoXSeismicSectionState(BaseModel):
     well_tie_points: list[dict[str, Any]] = Field(default_factory=list)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    model_config = {"json_schema_extra": {"title": "GeoXSeismicSectionState"}}
+    model_config = {"json_schema_extra": {"title": "GEOXSeismicSectionState"}}
 
 
-class GeoXTriAppState(BaseModel):
+class GEOXTriAppState(BaseModel):
     """Container for all three GEOX app states. Map + Cross Section + Seismic Section."""
 
     active_app: AppMode = Field(default=AppMode.MAP)
-    map_state: GeoXDisplayState | None = None
-    cross_section_state: GeoXCrossSectionState | None = None
-    seismic_section_state: GeoXSeismicSectionState | None = None
+    map_state: GEOXDisplayState | None = None
+    cross_section_state: GEOXCrossSectionState | None = None
+    seismic_section_state: GEOXSeismicSectionState | None = None
     selected_profile_line: str | None = Field(None)
     spatial_bounds: CoordinateBounds | None = Field(None)
     compare_mode_active: bool = False
     compare_cursor_distance_km: float | None = Field(None)
 
-    model_config = {"json_schema_extra": {"title": "GeoXTriAppState"}}
+    model_config = {"json_schema_extra": {"title": "GEOXTriAppState"}}
 
 
 class CrossSectionHoldTriggers(BaseModel):
@@ -470,16 +470,17 @@ def export_canonical_schemas() -> dict[str, Any]:
     from pydantic import BaseModel
 
     models: list[type[BaseModel]] = [
-        GeoXIntent,
-        GeoXAssetContext,
-        GeoXDisplayState,
-        GeoXAnalysisState,
-        GeoXAuditState,
-        GeoXUiState,
-        GeoXCrossSectionState,
-        GeoXSeismicSectionState,
-        GeoXTriAppState,
+        GEOXIntent,
+        GEOXAssetContext,
+        GEOXDisplayState,
+        GEOXAnalysisState,
+        GEOXAuditState,
+        GEOXUiState,
+        GEOXCrossSectionState,
+        GEOXSeismicSectionState,
+        GEOXTriAppState,
         CrossSectionHoldTriggers,
         ToolOutputEnvelope,
     ]
     return {m.__name__: m.model_json_schema() for m in models}
+

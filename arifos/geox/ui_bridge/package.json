@@ -1,5 +1,5 @@
 {
-  "name": "@geox/ui-bridge",
+  "name": "@GEOX/ui-bridge",
   "version": "2026.04.10",
   "description": "GEOX UI Bridge — Host-agnostic communication layer for GEOX MCP Apps",
   "main": "dist/index.js",
@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
-    "geox",
+    "GEOX",
     "mcp",
     "apps",
     "host-agnostic",
@@ -26,8 +26,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ariffazil/arifos-geox.git",
-    "directory": "arifos/geox/ui_bridge"
+    "url": "https://github.com/ariffazil/arifos-GEOX.git",
+    "directory": "arifos/GEOX/ui_bridge"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.0",
@@ -40,3 +40,4 @@
     "node": ">=18.0.0"
   }
 }
+

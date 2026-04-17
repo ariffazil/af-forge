@@ -1,6 +1,6 @@
 """
 ENGINE AC Risk compatibility shim.
-Delegates to the canonical geox.core.ac_risk engine.
+Delegates to the canonical GEOX.core.ac_risk engine.
 DITEMPA BUKAN DIBERI
 """
 
@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from typing import List, Optional, Dict, Any
 
-from geox.core.ac_risk import (
+from GEOX.core.ac_risk import (
     compute_ac_risk as _compute_ac_risk,
     compute_ac_risk_governed as _compute_ac_risk_governed,
     AC_RiskResult,
@@ -95,3 +95,4 @@ __all__ = [
     "TEARFRAME",
     "AntiHantuScreen",
 ]
+

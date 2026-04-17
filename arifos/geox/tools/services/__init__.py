@@ -46,3 +46,4 @@ __all__ = [
     "build_prefab_view",
     "ViewType",
 ]
+

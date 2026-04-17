@@ -257,3 +257,4 @@ class AnomalyDetector:
             "risk_level": risk,
             "alerts": [a.to_dict() for a in alerts],
         }
+

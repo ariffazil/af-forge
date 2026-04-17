@@ -4,13 +4,13 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, List, Optional
 from pydantic import BaseModel, Field, ConfigDict
-from .geox_schemas import CoordinatePoint, ProvenanceRecord
+from .GEOX_schemas import CoordinatePoint, ProvenanceRecord
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 1. GEOX WELL MODEL
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class GeoxWell(BaseModel):
+class GEOXWell(BaseModel):
     """Grounded representation of a borehole / well log."""
     
     well_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -46,14 +46,14 @@ class EvidenceBundle(BaseModel):
 # 3. GEOX PROJECT (The Spine)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class GeoxProject(BaseModel):
+class GEOXProject(BaseModel):
     """The top-level workstation project container for GEOX."""
     
     project_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str = Field(..., description="Human-readable project name.")
     basin: str = Field(..., description="Regional basin context.")
     
-    wells: List[GeoxWell] = Field(default_factory=list)
+    wells: List[GEOXWell] = Field(default_factory=list)
     evidence_bundles: List[EvidenceBundle] = Field(default_factory=list)
     
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -63,7 +63,7 @@ class GeoxProject(BaseModel):
     
     model_config = ConfigDict(extra="allow")
 
-class GeoxSession(BaseModel):
+class GEOXSession(BaseModel):
     """A runtime session for a specific geologist or agent interaction."""
     
     session_id: str = Field(..., description="Canonical arifOS Session ID.")
@@ -73,3 +73,4 @@ class GeoxSession(BaseModel):
     stage: str = "EXPLORATION"
     
     history: List[dict[str, Any]] = Field(default_factory=list)
+

@@ -132,7 +132,7 @@ __all__ = [
 ]
 
 
-def get_geox_info() -> dict:
+def get_GEOX_info() -> dict:
     """Get information about the GEOX installation."""
     return {
         "version": __version__,
@@ -150,3 +150,4 @@ def get_tools():
     from . import TOOLS
 
     return TOOLS
+

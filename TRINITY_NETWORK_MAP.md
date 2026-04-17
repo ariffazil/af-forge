@@ -42,7 +42,7 @@ This map defines the canonical hierarchy and metabolic links between all arifOS 
 ---
 
 ### 🌍 V. The Earth Organ (@GEOX)
-**Path:** `/root/geox` (Staging) | `arifOS/core/organs/_6_geox.py` (Core)  
+**Path:** `/root/GEOX` (Staging) | `arifOS/core/organs/_6_GEOX.py` (Core)  
 **Role:** The Physical Witness (Tier 02).  
 **Logic:** Geospatial Grounding & Feasibility Audit.  
 **Goal:** Coordinate verification (CRS) and subsurface feasibility.  
@@ -61,5 +61,6 @@ This map defines the canonical hierarchy and metabolic links between all arifOS 
 
 ---
 **SEALED v2026.04.17 — 999_ALIVE**
+
 
 

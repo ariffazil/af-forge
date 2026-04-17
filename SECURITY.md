@@ -11,8 +11,8 @@
 This security policy applies to the **GEOX** repository (`ariffazil/GEOX`) — the geospatial and world-model co-agent for arifOS.
 
 In scope:
-- `arifos/geox/` package code
-- `geox_mcp_server.py` MCP server entrypoint
+- `arifos/GEOX/` package code
+- `GEOX_mcp_server.py` MCP server entrypoint
 - `docs/` governance specifications
 - Integration points with arifOS kernel and W@W federation
 
@@ -107,3 +107,4 @@ Responsible disclosure is honoured. Reporters of valid security issues will be a
 ---
 
 *F1-Amanah · arifOS constitutional security · DITEMPA BUKAN DIBERI*
+

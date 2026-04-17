@@ -25,7 +25,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel, Field, field_validator
 
-from arifos.geox.geox_schemas import ProvenanceRecord
+from arifos.GEOX.GEOX_schemas import ProvenanceRecord
 
 
 class ImageSourceType(Enum):
@@ -126,7 +126,7 @@ class GEOXSeismicImageInput(BaseModel):
     model_config = {
         "json_schema_extra": {
             "stage": 1,
-            "pipeline": "geox_interpret_single_line",
+            "pipeline": "GEOX_interpret_single_line",
             "governance": {
                 "F7_uncertainty_base": 0.10,
                 "raster_uncertainty_add": 0.05,
@@ -495,9 +495,10 @@ MCP_SCHEMA_CLASSES = [
 
 def export_mcp_schemas() -> dict[str, dict]:
     """Export all GEOX MCP schemas as JSON schema dicts."""
-    from arifos.geox.geox_schemas import export_json_schemas
+    from arifos.GEOX.GEOX_schemas import export_json_schemas
 
     schemas = export_json_schemas()
     for cls in MCP_SCHEMA_CLASSES:
         schemas[cls.__name__] = cls.model_json_schema()
     return schemas
+

@@ -247,18 +247,18 @@ async def test_wealth() -> None:
 
 # ── Lane: GEOX (delegate) ─────────────────────────────────────────────────────
 
-async def test_geox_delegate() -> None:
+async def test_GEOX_delegate() -> None:
     print("\n━━━ Lane: GEOX (delegate path) ━━━")
     from arifosmcp.runtime.vault_postgres import seal_to_vault
 
-    sid = f"conformance-geox-{uuid.uuid4().hex[:8]}"
+    sid = f"conformance-GEOX-{uuid.uuid4().hex[:8]}"
 
     # R1 — INIT via arifOS (delegates)
     try:
         init_res = await seal_to_vault(
             event_type="GEOX_SESSION_INIT",
             session_id=sid,
-            actor_id="geox-agent",
+            actor_id="GEOX-agent",
             stage="000_INIT",
             verdict="ACTIVE",
             payload={"lane": "GEOX", "test": "conformance"},
@@ -274,7 +274,7 @@ async def test_geox_delegate() -> None:
 
     # harmless action — risk compute (no vault write)
     try:
-        sys.path.insert(0, "/root/geox")
+        sys.path.insert(0, "/root/GEOX")
         log("GEOX", "R2-WORK", True, "GEOX compute layer reachable (delegate)")
     except Exception as e:
         log("GEOX", "R2-WORK", False, str(e))
@@ -284,10 +284,10 @@ async def test_geox_delegate() -> None:
         seal_res = await seal_to_vault(
             event_type="GEOX_PROSPECT_SEAL",
             session_id=sid,
-            actor_id="geox-agent",
+            actor_id="GEOX-agent",
             stage="999_VAULT",
             verdict="SEAL",
-            payload={"summary": "geox conformance smoke test"},
+            payload={"summary": "GEOX conformance smoke test"},
             risk_tier="low",
         )
         log("GEOX", "R2-SEAL", True, f"vault_id={seal_res.db_id}")
@@ -356,7 +356,7 @@ async def main() -> None:
     await test_arifos()
     await test_well()
     await test_wealth()
-    await test_geox_delegate()
+    await test_GEOX_delegate()
     test_afforge_boundary()
     await test_seal_without_init()
 
@@ -379,5 +379,6 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 

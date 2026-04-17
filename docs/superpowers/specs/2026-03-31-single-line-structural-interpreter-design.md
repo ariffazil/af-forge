@@ -25,7 +25,7 @@ Every GEOX tool must return the same JSON envelope shape:
 {
   "ok": true,
   "verdict": "QUALIFY",
-  "source_domain": "geox-earth-witness",
+  "source_domain": "GEOX-earth-witness",
   "uncertainty": { "level": 0.11, "type": "...", "notes": [] },
   "contrast_metadata": { "processing_steps": [], "display_bias_risk": "medium" },
   "governance": { "floors_ok": ["F1","F4","F7"], "warnings": [] },
@@ -50,9 +50,9 @@ Given a single 2D seismic section (image or SEG-Y), produce a governed structura
 | Component | Location | Status |
 |---|---|---|
 | Contrast Canon views (CLAHE, Gaussian, Sobel) | `tools/seismic_visual_filter.py` | ✅ complete |
-| `ContrastMetadata` schema | `geox_schemas.py:167` + `tools/contrast_metadata.py` | ✅ complete |
-| `AttributeStack` + `AttributeVolume` schemas | `geox_schemas.py:500–578` | ✅ complete |
-| `SeismicAttributesTool` (mock compute) | `geox_tools.py:681` + `tools/seismic_attributes_tool.py` | ✅ mock, needs real compute |
+| `ContrastMetadata` schema | `GEOX_schemas.py:167` + `tools/contrast_metadata.py` | ✅ complete |
+| `AttributeStack` + `AttributeVolume` schemas | `GEOX_schemas.py:500–578` | ✅ complete |
+| `SeismicAttributesTool` (mock compute) | `GEOX_tools.py:681` + `tools/seismic_attributes_tool.py` | ✅ mock, needs real compute |
 | Seismic attribute taxonomy | `knowledge/seismic_attribute_taxonomy.yaml` | ✅ complete |
 
 ---
@@ -61,7 +61,7 @@ Given a single 2D seismic section (image or SEG-Y), produce a governed structura
 
 ### 3.1 New Pydantic Schemas
 
-Location: `arifos/geox/schemas/structural_interp.py` (new file)
+Location: `arifos/GEOX/schemas/structural_interp.py` (new file)
 
 ```python
 class SeismicImageInput(BaseModel):
@@ -168,14 +168,14 @@ class InterpretationResult(BaseModel):
 
 | Verb | Chains to |
 |---|---|
-| `geox_load_seismic_image` | `seismic_image_ingest.py` |
-| `geox_generate_contrast_views` | `seismic_contrast_views.py` |
-| `geox_extract_image_features` | `seismic_feature_extract.py` |
-| `geox_build_structural_candidates` | `seismic_structure_rules.py` + `seismic_candidate_ranker.py` |
-| `geox_rank_structural_models` | `seismic_candidate_ranker.py` |
-| `geox_interpret_single_line` | All of the above, chained |
+| `GEOX_load_seismic_image` | `seismic_image_ingest.py` |
+| `GEOX_generate_contrast_views` | `seismic_contrast_views.py` |
+| `GEOX_extract_image_features` | `seismic_feature_extract.py` |
+| `GEOX_build_structural_candidates` | `seismic_structure_rules.py` + `seismic_candidate_ranker.py` |
+| `GEOX_rank_structural_models` | `seismic_candidate_ranker.py` |
+| `GEOX_interpret_single_line` | All of the above, chained |
 
-LLM should call only `geox_interpret_single_line`. GEOX internally chains the rest.
+LLM should call only `GEOX_interpret_single_line`. GEOX internally chains the rest.
 
 ---
 
@@ -241,9 +241,10 @@ This is honest uncertainty, not false precision.
 5. `seismic_structure_rules.py` — rule engine (geological templates)
 6. `seismic_candidate_ranker.py` — scoring + ranking
 7. `seismic_report_writer.py` — structured output
-8. MCP verb wiring (`geox_mcp_server.py`)
+8. MCP verb wiring (`GEOX_mcp_server.py`)
 9. Test: Bond synthetic PNG → full pipeline
 
 ---
 
 *arifOS telemetry v2.1 · @GEOX v0.3.0 · pipeline 222_REFLECT · floors F1 F4 F7 F9 F13 · seal DITEMPA BUKAN DIBERI*
+

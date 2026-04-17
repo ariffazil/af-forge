@@ -1,5 +1,5 @@
 """
-arifos/geox/tools/volumetrics_economics_tool.py — Volumetrics and Economics Tool
+arifos/GEOX/tools/volumetrics_economics_tool.py — Volumetrics and Economics Tool
 DITEMPA BUKAN DIBERI
 
 Phase D — The Void: Volumetric Uncertainty and Economic Modelling.
@@ -22,15 +22,15 @@ from typing import Any
 
 import numpy as np
 
-from arifos.geox.base_tool import (
+from arifos.GEOX.base_tool import (
     BaseTool,
     GeoToolResult,
     _make_provenance,
     _make_quantity,
 )
-from arifos.geox.geox_schemas import CoordinatePoint
+from arifos.GEOX.GEOX_schemas import CoordinatePoint
 
-logger = logging.getLogger("geox.tools.volumetrics_economics")
+logger = logging.getLogger("GEOX.tools.volumetrics_economics")
 
 @dataclass
 class VolumetricInputs:
@@ -218,3 +218,4 @@ class VolumetricsEconomicsTool(BaseTool):
             latency_ms=round(latency_ms, 2),
             success=True,
         )
+

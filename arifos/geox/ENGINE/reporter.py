@@ -21,15 +21,15 @@ import json
 from datetime import datetime, timezone
 from typing import Any
 
-from arifos.geox.geox_schemas import GeoRequest, GeoResponse
+from arifos.GEOX.GEOX_schemas import GeoRequest, GeoResponse
 
 
-class GeoXReporter:
+class GEOXReporter:
     """
     Generates audit and communication reports for GEOX pipeline outputs.
 
     Usage:
-        reporter = GeoXReporter()
+        reporter = GEOXReporter()
         md = reporter.generate_markdown_report(response, request)
         audit = reporter.generate_json_audit(response)
         brief = reporter.generate_human_brief(response)
@@ -292,7 +292,7 @@ class GeoXReporter:
             dict suitable for vault_ledger.store() or JSON serialisation.
         """
         return {
-            "vault_entry_type": "geox_pipeline_response",
+            "vault_entry_type": "GEOX_pipeline_response",
             "version": "2.1",
             "response_id": response.response_id,
             "request_id": response.request_id,
@@ -457,3 +457,4 @@ class GeoXReporter:
             )
 
         return "\n\n".join([para1, para2, para3])
+

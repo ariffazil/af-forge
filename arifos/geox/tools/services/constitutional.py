@@ -293,3 +293,4 @@ def check_sw_model_admissibility(
             )
     
     return results
+

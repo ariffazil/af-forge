@@ -317,14 +317,14 @@ app.get("/contract", (_req: Request, res: Response) => {
       seal_service: true,
       dangerous_tools: process.env.ENABLE_DANGEROUS_TOOLS === "1" || process.env.ENABLE_DANGEROUS_TOOLS === "true",
       background_jobs: process.env.ENABLE_BACKGROUND_JOBS === "1" || process.env.ENABLE_BACKGROUND_JOBS === "true",
-      geox_log_interpreter: true,
+      GEOX_log_interpreter: true,
     },
     endpoints: {
-      geox_log_interpreter: "POST /geox/log_interpreter",
-      geox_contract: "GET /geox/contract",
+      GEOX_log_interpreter: "POST /GEOX/log_interpreter",
+      GEOX_contract: "GET /GEOX/contract",
       a2a: "POST /a2a",
       a2a_agent_card: "GET /.well-known/agent-card.json",
-      python_mcp: "geox-mcp:8765",
+      python_mcp: "GEOX-mcp:8765",
       bridge: "A-FORGE-bridge:7071",
     },
     timestamp: new Date().toISOString(),
@@ -332,19 +332,19 @@ app.get("/contract", (_req: Request, res: Response) => {
 });
 
 /**
- * GET /geox/contract
+ * GET /GEOX/contract
  * GEOX capabilities manifest — exposes A-FORGE GEOX tools to external callers
  * including the GEOX Python MCP and well-desk app.
  */
-app.get("/geox/contract", (_req: Request, res: Response) => {
+app.get("/GEOX/contract", (_req: Request, res: Response) => {
   res.json({
     ok: true,
-    service: "A-FORGE-geox",
+    service: "A-FORGE-GEOX",
     version: "0.1.0",
     namespace: "GEOX",
     tools: [
       {
-        name: "geox_log_interpreter",
+        name: "GEOX_log_interpreter",
         description: "Interpret triple-combo wireline logs (GR, RT, RHOB, NPHI, SP, DT, CAL) → Vsh, PHIE, SW, fluid type, lithology. Anomalous contrast theory.",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
@@ -356,100 +356,100 @@ app.get("/geox/contract", (_req: Request, res: Response) => {
         gates: ["F8_Grounding", "F7_Confidence"],
       },
       {
-        name: "geox_check_hazard",
+        name: "GEOX_check_hazard",
         description: "Assess physical hazard (seismic, volcanic, flood, slope, anthropogenic) at a location",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
         risk_level: "guarded",
       },
       {
-        name: "geox_subsurface_model",
+        name: "GEOX_subsurface_model",
         description: "Generate 3D subsurface geological model with structural framework and property volumes",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
         risk_level: "guarded",
       },
       {
-        name: "geox_seismic_interpret",
+        name: "GEOX_seismic_interpret",
         description: "Structural and stratigraphic interpretation of seismic data",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
         risk_level: "guarded",
       },
       {
-        name: "geox_prospect_score",
+        name: "GEOX_prospect_score",
         description: "Compute composite prospect score (PP, TR, CHARGE) with uncertainty",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
         risk_level: "guarded",
       },
       {
-        name: "geox_physical_constraint",
+        name: "GEOX_physical_constraint",
         description: "Apply physical constraints (pressure, temperature, stress, porosity) to scenario",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
         risk_level: "guarded",
       },
       {
-        name: "geox_uncertainty_tag",
+        name: "GEOX_uncertainty_tag",
         description: "Assign ESTIMATE/HYPOTHESIS/UNKNOWN tag to observation based on evidence quality",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
         risk_level: "guarded",
       },
       {
-        name: "geox_witness_triad",
+        name: "GEOX_witness_triad",
         description: "W³ — Triple-witness check: three independent methods confirm observation",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
         risk_level: "guarded",
       },
       {
-        name: "geox_ground_truth",
+        name: "GEOX_ground_truth",
         description: "Cross-validate observation against ground truth (analog, test, simulation)",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
         risk_level: "guarded",
       },
       {
-        name: "geox_maraoh_impact",
+        name: "GEOX_maraoh_impact",
         description: "Assess community dignity and cultural heritage impact (F6 maruah)",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
         risk_level: "guarded",
       },
       {
-        name: "geox_extraction_limits",
+        name: "GEOX_extraction_limits",
         description: "Compute maximum safe extraction rate and cumulative production limits",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
         risk_level: "guarded",
       },
       {
-        name: "geox_climate_bounds",
+        name: "GEOX_climate_bounds",
         description: "Compute climate envelope (CO2 storage, water production) for operation",
         domain: "geophysics",
         pipeline_stage: "333_MIND",
         risk_level: "guarded",
       },
     ],
-    python_mcp_route: "geox-mcp:8765",
-    bridge_route: "A-FORGE-bridge:7071/geox/*",
-    note: "geox_log_interpreter is executed by A-FORGE TypeScript runtime; Python MCP geox_well_compute_petrophysics is a separate sibling service",
+    python_mcp_route: "GEOX-mcp:8765",
+    bridge_route: "A-FORGE-bridge:7071/GEOX/*",
+    note: "GEOX_log_interpreter is executed by A-FORGE TypeScript runtime; Python MCP GEOX_well_compute_petrophysics is a separate sibling service",
   });
 });
 
 /**
- * POST /geox/log_interpreter
+ * POST /GEOX/log_interpreter
  * Execute GEOXLogInterpreterTool — triple-combo anomalous contrast decoder.
  * Accessible to Python MCP via internal HTTP call.
  */
-app.post("/geox/log_interpreter", async (req: Request, res: Response) => {
+app.post("/GEOX/log_interpreter", async (req: Request, res: Response) => {
   try {
     return await runStage("333_MIND" as MetabolicStage, async () => {
       const { GEOXLogInterpreterTool } = await import("./domains/geophysics/logInterpreter.js");
       const tool = new GEOXLogInterpreterTool();
-      const result = await tool.run(req.body, { sessionId: "geox-bridge", workingDirectory: "/tmp", modeName: "internal_mode" });
+      const result = await tool.run(req.body, { sessionId: "GEOX-bridge", workingDirectory: "/tmp", modeName: "internal_mode" });
       if (!result.ok) {
         res.status(400).json({ ok: false, error: result.output });
         return;
@@ -457,7 +457,7 @@ app.post("/geox/log_interpreter", async (req: Request, res: Response) => {
       res.json({ ok: true, result: JSON.parse(result.output as string) });
     });
   } catch (error) {
-    console.error("[A-FORGE] /geox/log_interpreter error:", error);
+    console.error("[A-FORGE] /GEOX/log_interpreter error:", error);
     res.status(500).json({ ok: false, error: { type: "internal_error", message: String(error) } });
   }
 });
@@ -827,5 +827,6 @@ export async function startServer(): Promise<void> {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   void startServer();
 }
+
 
 

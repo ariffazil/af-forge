@@ -54,7 +54,7 @@ The following apps are declared in the Control Plane (`control_plane/fastmcp/man
 
 1.  **Restructured Repo:** Moved from flat `registries/` to 5-plane architecture.
 2.  **Contract Unification:** Centralized `contracts/enums/statuses.py` as the universal response envelope.
-3.  **Alias Quarantine:** Moved `geox_` prefixed tools to the compatibility layer.
+3.  **Alias Quarantine:** Moved `GEOX_` prefixed tools to the compatibility layer.
 4.  **App Manifests:** Created JSON manifests for all dashboard-ready applications.
 
 ---
@@ -63,4 +63,5 @@ The following apps are declared in the Control Plane (`control_plane/fastmcp/man
 
 - [ ] Update top-level `README.md` to reflect **Multi-Plane Architecture**.
 - [ ] Rebuild Docker images to reflect the new internal folder structure.
-- [ ] Deprecate old `geox_unified*.py` scripts in favor of `control_plane/` and `execution_plane/` entrypoints.
+- [ ] Deprecate old `GEOX_unified*.py` scripts in favor of `control_plane/` and `execution_plane/` entrypoints.
+

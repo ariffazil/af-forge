@@ -186,3 +186,4 @@ class Canon9Profile(BaseModel):
             f"z:[{self.samples[0].depth:.0f},{self.samples[-1].depth:.0f}]m | "
             f"⟨φ⟩={avg_phi:.3f} | ⟨Vp⟩={avg_vp:.0f}m/s | SEALED]"
         )
+

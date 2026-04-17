@@ -20,7 +20,7 @@ The governing document for all GEOX Vision development with:
 - Transform registry reference
 
 ### 2. AC_Risk Calculator
-**File:** `GEOX/arifos/geox/ENGINE/ac_risk.py`
+**File:** `GEOX/arifos/GEOX/ENGINE/ac_risk.py`
 
 Complete implementation of Theory of Anomalous Contrast risk calculation:
 ```python
@@ -39,7 +39,7 @@ AC_Risk = U_phys × D_transform × B_cog
 **Self-test included:** Run `python ac_risk.py` to verify.
 
 ### 3. Vision Governance Module
-**Directory:** `GEOX/arifos/geox/vision/`
+**Directory:** `GEOX/arifos/GEOX/vision/`
 
 #### 3.1 GovernedSeismicVLM
 **File:** `governed_vlm.py`
@@ -163,7 +163,7 @@ AC_Risk < 0.25     → SEAL (auto-proceed)
 
 ### Run AC_Risk Self-Test
 ```bash
-cd GEOX/arifos/geox/ENGINE
+cd GEOX/arifos/GEOX/ENGINE
 python ac_risk.py
 ```
 
@@ -184,7 +184,7 @@ Test 3 (Georeferencing, poor OCR):
 
 ### Run GovernedVLM Self-Test
 ```bash
-cd GEOX/arifos/geox/vision
+cd GEOX/arifos/GEOX/vision
 python governed_vlm.py
 ```
 
@@ -217,11 +217,12 @@ python governed_vlm.py
 ## References
 
 - Charter: `GEOX/GEOX_VISION_DEV_CHARTER.md`
-- AC_Risk: `GEOX/arifos/geox/ENGINE/ac_risk.py`
-- Vision Module: `GEOX/arifos/geox/vision/`
+- AC_Risk: `GEOX/arifos/GEOX/ENGINE/ac_risk.py`
+- Vision Module: `GEOX/arifos/GEOX/vision/`
 - Theory: `GEOX/wiki/10_THEORY/Theory_of_Anomalous_Contrast.md`
 
 ---
 
 *DITEMPA BUKAN DIBERI*  
 *Vision Intelligence: Governed, Not Given*
+

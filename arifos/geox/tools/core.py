@@ -55,7 +55,7 @@ from ..contracts.types import (
 # Seismic Tools
 # ═══════════════════════════════════════════════════════════════════════════════
 
-async def geox_load_seismic_line(
+async def GEOX_load_seismic_line(
     line_id: str,
     survey_path: str = "default_survey",
     generate_views: bool = True,
@@ -103,7 +103,7 @@ async def geox_load_seismic_line(
     )
 
 
-async def geox_build_structural_candidates(
+async def GEOX_build_structural_candidates(
     line_id: str,
     focus_area: str | None = None,
     seismic_engine_available: bool = False,
@@ -144,7 +144,7 @@ async def geox_build_structural_candidates(
 # Evaluation Tools
 # ═══════════════════════════════════════════════════════════════════════════════
 
-async def geox_feasibility_check(
+async def GEOX_feasibility_check(
     plan_id: str,
     constraints: list[str],
 ) -> FeasibilityResult:
@@ -168,7 +168,7 @@ async def geox_feasibility_check(
     )
 
 
-async def geox_verify_geospatial(
+async def GEOX_verify_geospatial(
     lat: float,
     lon: float,
     radius_m: float = 1000.0,
@@ -197,7 +197,7 @@ async def geox_verify_geospatial(
     )
 
 
-async def geox_evaluate_prospect(
+async def GEOX_evaluate_prospect(
     prospect_id: str,
     interpretation_id: str,
 ) -> ProspectEvaluationResult:
@@ -227,7 +227,7 @@ async def geox_evaluate_prospect(
 # Memory Tools
 # ═══════════════════════════════════════════════════════════════════════════════
 
-async def geox_query_memory(
+async def GEOX_query_memory(
     query: str,
     basin: str | None = None,
     limit: int = 5,
@@ -265,7 +265,7 @@ async def geox_query_memory(
 # Petrophysics Tools
 # ═══════════════════════════════════════════════════════════════════════════════
 
-async def geox_calculate_saturation(
+async def GEOX_calculate_saturation(
     model: Literal["archie", "simandoux", "indonesia"],
     params: dict[str, Any],
     n_samples: int = 1000,
@@ -324,7 +324,7 @@ async def geox_calculate_saturation(
     )
 
 
-async def geox_select_sw_model(
+async def GEOX_select_sw_model(
     well_id: str,
     depth_top_m: float,
     depth_base_m: float,
@@ -418,7 +418,7 @@ async def geox_select_sw_model(
     )
 
 
-async def geox_compute_petrophysics(
+async def GEOX_compute_petrophysics(
     well_id: str,
     sw_model: str,
     rw_ohm_m: float,
@@ -539,7 +539,7 @@ async def geox_compute_petrophysics(
     )
 
 
-async def geox_validate_cutoffs(
+async def GEOX_validate_cutoffs(
     well_id: str,
     policy_id: str,
     phi_cutoff: float,
@@ -638,7 +638,7 @@ async def geox_validate_cutoffs(
     )
 
 
-async def geox_petrophysical_hold_check(
+async def GEOX_petrophysical_hold_check(
     well_id: str,
     sw_value: float,
     phi_value: float,
@@ -664,7 +664,7 @@ async def geox_petrophysical_hold_check(
             timestamp=timestamp,
             well_id=well_id,
             hold_id="HOLD-UNAVAILABLE",
-            triggered_by="geox_petrophysical_hold_check",
+            triggered_by="GEOX_petrophysical_hold_check",
             violated_floors=[],
             violations=["Petrophysics schemas not loaded"],
             remediation=["Load petrophysics schemas"],
@@ -696,7 +696,7 @@ async def geox_petrophysical_hold_check(
             timestamp=timestamp,
             well_id=well_id,
             hold_id="",
-            triggered_by="geox_petrophysical_hold_check",
+            triggered_by="GEOX_petrophysical_hold_check",
             violated_floors=[],
             violations=["All constitutional floor checks passed"],
             remediation=[],
@@ -711,7 +711,7 @@ async def geox_petrophysical_hold_check(
         timestamp=timestamp,
         well_id=well_id,
         hold_id=hold_id,
-        triggered_by="geox_petrophysical_hold_check",
+        triggered_by="GEOX_petrophysical_hold_check",
         violated_floors=aggregated.violated_floors,
         violations=aggregated.violations,
         remediation=aggregated.remediation,
@@ -724,8 +724,8 @@ async def geox_petrophysical_hold_check(
 # Health Check
 # ═══════════════════════════════════════════════════════════════════════════════
 
-async def geox_health(
-    geox_version: str = "0.5.0",
+async def GEOX_health(
+    GEOX_version: str = "0.5.0",
     prefab_ui_available: bool = False,
     seismic_engine_available: bool = False,
     fastmcp_version: str = "2.0",
@@ -739,7 +739,7 @@ async def geox_health(
         status="SEAL",
         timestamp=timestamp,
         ok=True,
-        service="geox-earth-witness",
+        service="GEOX-earth-witness",
         fastmcp_version=fastmcp_version,
         prefab_ui=prefab_ui_available,
         seismic_engine=seismic_engine_available,
@@ -748,3 +748,4 @@ async def geox_health(
             "F9_anti_hantu", "F11_authority", "F13_sovereign",
         ],
     )
+

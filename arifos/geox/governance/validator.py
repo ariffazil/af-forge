@@ -26,14 +26,14 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Literal
 
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.GEOX_schemas import (
     CoordinatePoint,
     GeoInsight,
     GeoPrediction,
     GeoQuantity,
     ProvenanceRecord,
 )
-from arifos.geox.geox_tools import BaseTool, GeoToolResult
+from arifos.GEOX.GEOX_tools import BaseTool, GeoToolResult
 
 # ---------------------------------------------------------------------------
 # ValidationResult
@@ -192,11 +192,11 @@ def _parse_range(s: str) -> tuple[float, float]:
 
 
 # ---------------------------------------------------------------------------
-# GeoXValidator
+# GEOXValidator
 # ---------------------------------------------------------------------------
 
 
-class GeoXValidator:
+class GEOXValidator:
     """
     Earth → Language contract validator.
 
@@ -205,7 +205,7 @@ class GeoXValidator:
     between perception/model outputs and final geological conclusions.
 
     Usage:
-        validator = GeoXValidator()
+        validator = GEOXValidator()
         verdict = await validator.validate_batch(insights, tools)
     """
 
@@ -667,3 +667,4 @@ def _quantity_matches_target(qty: GeoQuantity, target: str) -> bool:
         return True
 
     return False
+

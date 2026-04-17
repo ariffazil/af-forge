@@ -17,7 +17,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from arifos.geox.tools.attributes import (
+from arifos.GEOX.tools.attributes import (
     SeismicAttributeTool,
     compute_attributes,
     compute_coherence,
@@ -272,3 +272,4 @@ class TestSeismicAttributeTool:
         })
         assert "governance_summary" in result.raw_output
         assert result.raw_output["contrast_canon_enforced"] is True
+

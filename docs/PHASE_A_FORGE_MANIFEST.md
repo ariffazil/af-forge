@@ -9,7 +9,7 @@
 
 ## What Was Forged
 
-### 1. Petrophysics Schemas (`arifos/geox/schemas/petrophysics/`)
+### 1. Petrophysics Schemas (`arifos/GEOX/schemas/petrophysics/`)
 
 | File | Lines | Purpose |
 |------|-------|---------|
@@ -27,7 +27,7 @@
 
 ---
 
-### 2. MCP Resources (`arifos/geox/resources/`)
+### 2. MCP Resources (`arifos/GEOX/resources/`)
 
 | File | Lines | Purpose |
 |------|-------|---------|
@@ -36,11 +36,11 @@
 
 **URI Schemes Implemented:**
 ```
-geox://well/{well_id}/las/bundle
-geox://well/{well_id}/logs/canonical
-geox://well/{well_id}/interval/{top}-{base}/rock-state
-geox://well/{well_id}/cutoff-policy/{policy_id}
-geox://well/{well_id}/qc/report
+GEOX://well/{well_id}/las/bundle
+GEOX://well/{well_id}/logs/canonical
+GEOX://well/{well_id}/interval/{top}-{base}/rock-state
+GEOX://well/{well_id}/cutoff-policy/{policy_id}
+GEOX://well/{well_id}/qc/report
 ```
 
 **Provenance Badges:**
@@ -51,7 +51,7 @@ geox://well/{well_id}/qc/report
 
 ---
 
-### 3. Petrophysics Tools (`arifos/geox/tools/petrophysics/`)
+### 3. Petrophysics Tools (`arifos/GEOX/tools/petrophysics/`)
 
 | File | Lines | Purpose | Status |
 |------|-------|---------|--------|
@@ -64,18 +64,18 @@ geox://well/{well_id}/qc/report
 | `hold_checker.py` | 75 | 888_HOLD trigger detection stub | 🚧 Phase B |
 
 **Phase A Complete:**
-- `geox_load_well_log_bundle` — Full LAS parsing
-- `geox_qc_logs` — Comprehensive QC analysis
+- `GEOX_load_well_log_bundle` — Full LAS parsing
+- `GEOX_qc_logs` — Comprehensive QC analysis
 
 **Phase B Stubs:**
-- `geox_select_sw_model` — Model selection framework
-- `geox_compute_petrophysics` — Property calculation framework
-- `geox_validate_cutoffs` — Cutoff validation framework
-- `geox_petrophysical_hold_check` — Constitutional validation framework
+- `GEOX_select_sw_model` — Model selection framework
+- `GEOX_compute_petrophysics` — Property calculation framework
+- `GEOX_validate_cutoffs` — Cutoff validation framework
+- `GEOX_petrophysical_hold_check` — Constitutional validation framework
 
 ---
 
-### 4. MCP Server (`arifos/geox/mcp_petrophysics_server.py`)
+### 4. MCP Server (`arifos/GEOX/mcp_petrophysics_server.py`)
 
 | File | Lines | Purpose |
 |------|-------|---------|
@@ -96,20 +96,20 @@ geox://well/{well_id}/qc/report
 │                                                                             │
 │  RESOURCES (Application-Controlled Context)                                  │
 │  ─────────────────────────────────────────                                   │
-│  geox://well/{id}/las/bundle        → RAW data with F4/F9                   │
-│  geox://well/{id}/logs/canonical    → CORRECTED curves                      │
-│  geox://well/{id}/interval/{t}-{b}/rock-state → DERIVED properties          │
-│  geox://well/{id}/cutoff-policy/{id} → POLICY decisions                     │
-│  geox://well/{id}/qc/report          → Quality findings                     │
+│  GEOX://well/{id}/las/bundle        → RAW data with F4/F9                   │
+│  GEOX://well/{id}/logs/canonical    → CORRECTED curves                      │
+│  GEOX://well/{id}/interval/{t}-{b}/rock-state → DERIVED properties          │
+│  GEOX://well/{id}/cutoff-policy/{id} → POLICY decisions                     │
+│  GEOX://well/{id}/qc/report          → Quality findings                     │
 │                                                                             │
 │  TOOLS (Model-Controlled Actions)                                           │
 │  ────────────────────────────────                                           │
-│  geox_load_well_log_bundle      ✅ Phase A (Complete)                       │
-│  geox_qc_logs                   ✅ Phase A (Complete)                       │
-│  geox_select_sw_model           🚧 Phase B (Stub)                           │
-│  geox_compute_petrophysics      🚧 Phase B (Stub)                           │
-│  geox_validate_cutoffs          🚧 Phase B (Stub)                           │
-│  geox_petrophysical_hold_check  🚧 Phase B (Stub)                           │
+│  GEOX_load_well_log_bundle      ✅ Phase A (Complete)                       │
+│  GEOX_qc_logs                   ✅ Phase A (Complete)                       │
+│  GEOX_select_sw_model           🚧 Phase B (Stub)                           │
+│  GEOX_compute_petrophysics      🚧 Phase B (Stub)                           │
+│  GEOX_validate_cutoffs          🚧 Phase B (Stub)                           │
+│  GEOX_petrophysical_hold_check  🚧 Phase B (Stub)                           │
 │                                                                             │
 │  CONSTITUTIONAL FLOORS                                                       │
 │  ─────────────────────                                                       │
@@ -150,16 +150,16 @@ geox://well/{well_id}/qc/report
 
 ```bash
 # Verify schemas
-python -c "from arifos.geox.schemas.petrophysics import RockFluidState; print('✅ Schemas OK')"
+python -c "from arifos.GEOX.schemas.petrophysics import RockFluidState; print('✅ Schemas OK')"
 
 # Verify resources
-python -c "from arifos.geox.resources import WellLogBundleResource; print('✅ Resources OK')"
+python -c "from arifos.GEOX.resources import WellLogBundleResource; print('✅ Resources OK')"
 
 # Verify tools
-python -c "from arifos.geox.tools.petrophysics import LogBundleLoader, QCEngine; print('✅ Tools OK')"
+python -c "from arifos.GEOX.tools.petrophysics import LogBundleLoader, QCEngine; print('✅ Tools OK')"
 
 # Run MCP server
-python arifos/geox/mcp_petrophysics_server.py --transport stdio
+python arifos/GEOX/mcp_petrophysics_server.py --transport stdio
 ```
 
 ---
@@ -178,3 +178,4 @@ The petrophysics bridge is now ready for:
 **DITEMPA BUKAN DIBERI — Forged in Physics, Governed by arifOS.**
 
 ΔΩΨ | GEOX v0.6.0-PHASE-A | 999 SEAL ✅
+

@@ -29,7 +29,7 @@ from typing import Any
 # ═══════════════════════════════════════════════════════════════════════════════
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("geox.sovereign")
+logger = logging.getLogger("GEOX.sovereign")
 
 GEOX_VERSION = "2.0.0-DIMENSION-NATIVE"
 GEOX_SEAL = "DITEMPA BUKAN DIBERI"
@@ -91,11 +91,11 @@ bootstrap_registries()
 # SOVEREIGN HEALTH & STATUS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@mcp.resource("geox://profile/status")
+@mcp.resource("GEOX://profile/status")
 async def get_profile_status() -> dict:
     return {
         "status": "healthy",
-        "service": "geox-dimension-native",
+        "service": "GEOX-dimension-native",
         "profile": "vps",
         "enabled_dimensions": ENABLED_DIMENSIONS,
         "version": GEOX_VERSION,
@@ -106,7 +106,7 @@ async def get_profile_status() -> dict:
 def build_status_payload() -> dict:
     return {
         "status": "healthy",
-        "service": "geox-dimension-native",
+        "service": "GEOX-dimension-native",
         "version": GEOX_VERSION,
         "profile": "vps",
         "enabled_dimensions": ENABLED_DIMENSIONS,
@@ -175,3 +175,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

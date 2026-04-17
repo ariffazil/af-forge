@@ -4,7 +4,7 @@
 ## Canonical tool names and operational meaning
 - `Tier 00 — IDENTITY`: Session bootstrap / Identity binding / Vault (`arifos_init`, `arifos_vault`)
 - `Tier 01 — PERCEPTION`: Environment sensing / Data ingestion (`arifos_sense`, `wealth_ingest_*`)
-- `Tier 02 — PHYSICS`: Earth intelligence / Subsurface engines (`geox_*`)
+- `Tier 02 — PHYSICS`: Earth intelligence / Subsurface engines (`GEOX_*`)
 - `Tier 03 — ECONOMICS`: Capital intelligence / Wealth engines (`wealth_*`)
 - `Tier 04 — RISK`: Ethics / Entropy / Adverse analysis (`arifos_heart`, `wealth_audit_entropy`)
 - `Tier 05 — EXECUTION`: Bounded tool execution (`arifos_forge`)
@@ -45,5 +45,6 @@ Refer to **[CONSTITUTION.md](./CONSTITUTION.md)** for the foundational laws gove
 - **Build:** `npm run build`
 - **Test:** `npm test`
 - **CLI:** `node dist/src/cli.js <command> [options]`
+
 
 

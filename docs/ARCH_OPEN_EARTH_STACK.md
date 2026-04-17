@@ -45,3 +45,4 @@ Unlike global Earth data, subsurface data is split into two governance tiers:
 
 ---
 *Ditempa Bukan Diberi — G = A × P × X × E²*
+

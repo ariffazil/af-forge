@@ -6,7 +6,7 @@ Helper functions for building, verifying, and merging provenance records.
 Supports arifOS F1 (Amanah/Reversibility) and F11 (Authority) compliance.
 
 All functions operate on the ProvenanceRecord Pydantic v2 model from
-geox_schemas. Import this module to construct provenance records
+GEOX_schemas. Import this module to construct provenance records
 without manually populating every field.
 """
 
@@ -17,7 +17,7 @@ import json
 from datetime import datetime, timezone
 from typing import Any, Literal
 
-from arifos.geox.geox_schemas import ProvenanceRecord
+from arifos.GEOX.GEOX_schemas import ProvenanceRecord
 
 # Default floor check template — all True means fully compliant
 _DEFAULT_FLOOR_CHECK: dict[str, bool] = {
@@ -268,3 +268,4 @@ def merge_provenances(records: list[ProvenanceRecord]) -> ProvenanceRecord:
         citation=merged_citation,
         floor_check=merged_floors,
     )
+

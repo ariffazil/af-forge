@@ -10,7 +10,7 @@ Tests the complete MCP server functionality end-to-end:
 5. FastMCP compatibility layer
 
 Usage:
-    python test_e2e_mcp.py [--url https://geoxarifOS.fastmcp.app]
+    python test_e2e_mcp.py [--url https://GEOXarifOS.fastmcp.app]
 
 Exit codes:
     0 - All tests passed
@@ -138,7 +138,7 @@ class GEOXMCPTestSuite:
                         "params": {
                             "protocolVersion": "2024-11-05",
                             "capabilities": {},
-                            "clientInfo": {"name": "geox-e2e-test", "version": "1.0.0"}
+                            "clientInfo": {"name": "GEOX-e2e-test", "version": "1.0.0"}
                         }
                     },
                     timeout=10.0
@@ -197,9 +197,9 @@ class GEOXMCPTestSuite:
                 
                 # Check expected tools
                 expected_tools = [
-                    "geox_verify_geospatial",
-                    "geox_evaluate_prospect",
-                    "geox_health",
+                    "GEOX_verify_geospatial",
+                    "GEOX_evaluate_prospect",
+                    "GEOX_health",
                 ]
                 
                 tool_names = [t.get("name") for t in tools]
@@ -221,7 +221,7 @@ class GEOXMCPTestSuite:
     
     async def test_mcp_call_tool(self) -> bool:
         """Test MCP tool invocation."""
-        test_name = "MCP Call Tool (geox_verify_geospatial)"
+        test_name = "MCP Call Tool (GEOX_verify_geospatial)"
         
         try:
             async with httpx.AsyncClient(headers={"Accept": "application/json"}) as client:
@@ -232,7 +232,7 @@ class GEOXMCPTestSuite:
                         "id": 3,
                         "method": "tools/call",
                         "params": {
-                            "name": "geox_verify_geospatial",
+                            "name": "GEOX_verify_geospatial",
                             "arguments": {
                                 "lat": 4.5,
                                 "lon": 114.2,
@@ -280,7 +280,7 @@ class GEOXMCPTestSuite:
     
     async def test_mcp_call_health_tool(self) -> bool:
         """Test MCP health tool."""
-        test_name = "MCP Call Tool (geox_health)"
+        test_name = "MCP Call Tool (GEOX_health)"
         
         try:
             async with httpx.AsyncClient(headers={"Accept": "application/json"}) as client:
@@ -291,7 +291,7 @@ class GEOXMCPTestSuite:
                         "id": 4,
                         "method": "tools/call",
                         "params": {
-                            "name": "geox_health",
+                            "name": "GEOX_health",
                             "arguments": {}
                         }
                     },
@@ -349,7 +349,7 @@ class GEOXMCPTestSuite:
                         "id": 5,
                         "method": "tools/call",
                         "params": {
-                            "name": "geox_health",
+                            "name": "GEOX_health",
                             "arguments": {}
                         }
                     },

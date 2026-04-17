@@ -6,8 +6,8 @@
 
 export {
   // Event Bus
-  GeoXEventBus,
-  GeoXHostBus,
+  GEOXEventBus,
+  GEOXHostBus,
   createInlineBus,
   createExternalBus,
   createHostBus,
@@ -15,7 +15,7 @@ export {
   // Types
   EventType,
   type EventSource,
-  type GeoXEvent,
+  type GEOXEvent,
   type EventHandler,
   type EventFilter,
   type HostCapabilities,
@@ -32,7 +32,7 @@ export {
 } from './event_bus';
 
 export {
-  GeoXAppRuntime,
+  GEOXAppRuntime,
   type AppConfig,
   type AppState,
 } from './runtime';
@@ -42,3 +42,4 @@ export {
   type HostAdapterConfig,
   type RenderMode,
 } from './host_adapter';
+

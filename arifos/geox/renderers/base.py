@@ -96,8 +96,8 @@ class RendererAdapter(ABC):
         Compile canonical GEOX state into neutral render primitives.
 
         Args:
-            canonical_state: GeoXDisplayState, GeoXCrossSectionState,
-                          GeoXSeismicSectionState, or GeoXTriAppState
+            canonical_state: GEOXDisplayState, GEOXCrossSectionState,
+                          GEOXSeismicSectionState, or GEOXTriAppState
 
         Returns:
             Neutral primitives ready for rendering
@@ -170,3 +170,4 @@ class RendererAdapter(ABC):
     def cleanup_expired_sessions(self) -> int:
         """Remove expired sessions. Returns count of removed sessions."""
         return 0
+

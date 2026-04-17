@@ -26,13 +26,13 @@ GEOX is an **Earth Intelligence** system for subsurface decision-making. It impl
 
 | Tool | Purpose | Constitutional Floors |
 |------|---------|----------------------|
-| `geox_compute_ac_risk` | **THE CORE** — ToAC calculation | F2, F4, F7 |
-| `geox_load_seismic_line` | Seismic loading with scale validation | F4 |
-| `geox_build_structural_candidates` | Multi-model interpretation | F2, F7 |
-| `geox_verify_geospatial` | Coordinate grounding | F4, F11 |
-| `geox_feasibility_check` | Constitutional firewall | F1-F13 |
-| `geox_evaluate_prospect` | Prospect verdict with 888_HOLD | F9, F13 |
-| `geox_earth_signals` | Live Earth observations | F2 |
+| `GEOX_compute_ac_risk` | **THE CORE** — ToAC calculation | F2, F4, F7 |
+| `GEOX_load_seismic_line` | Seismic loading with scale validation | F4 |
+| `GEOX_build_structural_candidates` | Multi-model interpretation | F2, F7 |
+| `GEOX_verify_geospatial` | Coordinate grounding | F4, F11 |
+| `GEOX_feasibility_check` | Constitutional firewall | F1-F13 |
+| `GEOX_evaluate_prospect` | Prospect verdict with 888_HOLD | F9, F13 |
+| `GEOX_earth_signals` | Live Earth observations | F2 |
 
 ---
 
@@ -50,7 +50,7 @@ curl -X POST http://localhost:8000/mcp/v1/messages \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
-    "method": "geox_compute_ac_risk",
+    "method": "GEOX_compute_ac_risk",
     "params": {
       "u_phys": 0.3,
       "transform_stack": ["linear_scaling"]
@@ -100,7 +100,7 @@ Every tool enforces:
 
 ```
 GEOX/
-├── geox/               # Canonical Python package
+├── GEOX/               # Canonical Python package
 │   ├── server.py       # ONE MCP server
 │   ├── core/           # AC_Risk, ToolRegistry
 │   └── apps/           # 4 MCP Apps only
@@ -142,3 +142,4 @@ MIT License — See LICENSE file
 
 *DITEMPA BUKAN DIBERI — Forged, Not Given*
 *Earth Intelligence: Revealed through subtraction*
+

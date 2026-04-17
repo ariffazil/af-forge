@@ -296,3 +296,4 @@ class SeismicSingleLineTool:
             audit_log.append("WARNING: Low confidence. Humility floor triggered.")
 
         return "\n".join(audit_log)
+

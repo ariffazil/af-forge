@@ -2,7 +2,7 @@
 GEOX Schemas — re-export from schemas package
 DITEMPA BUKAN DIBERI
 """
-from arifos.geox.schemas.geox_schemas import (
+from arifos.GEOX.schemas.GEOX_schemas import (
     CoordinatePoint,
     GeoInsight,
     GeoPrediction,
@@ -14,7 +14,8 @@ from arifos.geox.schemas.geox_schemas import (
     AttributeStack,
     ContrastMetadata,
     export_json_schemas,
-    GeoxUncertainty,
-    GeoxGovernance,
-    GeoxMcpEnvelope,
+    GEOXUncertainty,
+    GEOXGovernance,
+    GEOXMcpEnvelope,
 )
+

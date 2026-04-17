@@ -159,7 +159,7 @@ class ContrastSpace:
             "coordinates": feature.coordinates.tolist(),
             "anomalous_score": feature.anomalous_score,
             "is_anomalous": feature.is_anomalous,
-            "verdict": verdict.to_geox_verdict(),
+            "verdict": verdict.to_GEOX_verdict(),
             "triggers": [t.to_dict() for t in metadata.get("triggers", [])],
             "taxonomy": feature.taxonomy.to_dict(),
         }
@@ -199,3 +199,4 @@ class ContrastSpace:
             "features": {fid: f.to_dict() for fid, f in self.features.items()},
             "population_stats": self.get_population_stats(),
         }
+

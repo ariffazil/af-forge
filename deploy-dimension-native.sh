@@ -10,8 +10,8 @@ echo "════════════════════════�
 echo ""
 
 # Configuration
-VPS_HOST="geox.arif-fazil.com"
-DOMAIN="geox.arif-fazil.com"
+VPS_HOST="GEOX.arif-fazil.com"
+DOMAIN="GEOX.arif-fazil.com"
 GEOX_PROFILE="${GEOX_PROFILE:-vps}"
 
 echo "Profile: $GEOX_PROFILE"
@@ -25,7 +25,7 @@ else
 fi
 
 # Check if we're on the VPS or local
-if [ "$(hostname)" = "srv1325122" ] || [ "$(hostname)" = "geox" ]; then
+if [ "$(hostname)" = "srv1325122" ] || [ "$(hostname)" = "GEOX" ]; then
     echo "✓ Running on VPS — local deployment"
     ON_VPS=true
 else
@@ -39,7 +39,7 @@ echo "────────────────────────�
 
 # Check required files exist
 required_files=(
-    "geox_unified.py"
+    "GEOX_unified.py"
     "registries/__init__.py"
     "registries/prospect.py"
     "registries/well.py"
@@ -103,7 +103,7 @@ if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
     curl -s http://localhost:8000/health/details | python3 -m json.tool 2>/dev/null || true
 else
     echo "⚠ Health check failed — checking logs..."
-    "${COMPOSE_CMD[@]}" -f docker-compose.unified.yml logs --tail=50 geox
+    "${COMPOSE_CMD[@]}" -f docker-compose.unified.yml logs --tail=50 GEOX
     exit 1
 fi
 
@@ -152,3 +152,4 @@ echo "  curl https://${DOMAIN}/profile"
 echo "  fastmcp list https://${DOMAIN}/mcp/"
 echo ""
 echo "DITEMPA BUKAN DIBERI — 999 SEAL ALIVE"
+

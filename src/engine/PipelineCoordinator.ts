@@ -84,7 +84,7 @@ export type PipelineSession = {
   sessionId: string;
   kernel: ArifOSKernel;
   routing: RoutingDecision | null;
-  geoxScenarios: GEOXScenarioContract[];
+  GEOXScenarios: GEOXScenarioContract[];
   wealthAllocations: WealthAllocationContract[];
   candidateWavefunction: unknown[];
   triggeredFloors: string[];
@@ -117,7 +117,7 @@ export class PipelineCoordinator {
         sessionId,
         kernel,
         routing: null,
-        geoxScenarios: [],
+        GEOXScenarios: [],
         wealthAllocations: [],
         candidateWavefunction: [],
         triggeredFloors: [],
@@ -145,22 +145,22 @@ export class PipelineCoordinator {
     }
 
     // 333 MIND
-    const { geoxScenarios, wealthAllocations } = await runStage("333_MIND" as MetabolicStage, async () => {
+    const { GEOXScenarios, wealthAllocations } = await runStage("333_MIND" as MetabolicStage, async () => {
       return this.mind(routing);
     });
     if (this.session) {
-      this.session.geoxScenarios = geoxScenarios;
+      this.session.GEOXScenarios = GEOXScenarios;
       this.session.wealthAllocations = wealthAllocations;
     }
 
     // 444 ROUTE
     await runStage("444_ROUTE" as MetabolicStage, async () => {
-      this.route(routing, geoxScenarios, wealthAllocations);
+      this.route(routing, GEOXScenarios, wealthAllocations);
     });
 
     // 555 HEART
     await runStage("555_HEART" as MetabolicStage, async () => {
-      this.heart(geoxScenarios, wealthAllocations);
+      this.heart(GEOXScenarios, wealthAllocations);
     });
 
     // 666 ALIGN
@@ -217,21 +217,21 @@ export class PipelineCoordinator {
 
   // 333 MIND
   private async mind(routing: RoutingDecision): Promise<{
-    geoxScenarios: GEOXScenarioContract[];
+    GEOXScenarios: GEOXScenarioContract[];
     wealthAllocations: WealthAllocationContract[];
   }> {
-    const geox = new GEOXEngine();
+    const GEOX = new GEOXEngine();
     const wealth = new WealthEngine();
 
-    let geoxScenarios: GEOXScenarioContract[] = [];
+    let GEOXScenarios: GEOXScenarioContract[] = [];
     if (routing.primaryOrgan === "GEOX" || routing.secondaryOrgans.includes("GEOX")) {
-      geoxScenarios = await geox.generateScenarios(routing.primaryOrgan === "GEOX" ? "primary" : "secondary");
+      GEOXScenarios = await GEOX.generateScenarios(routing.primaryOrgan === "GEOX" ? "primary" : "secondary");
     }
 
     let wealthAllocations: WealthAllocationContract[] = [];
     if (routing.primaryOrgan === "WEALTH" || routing.secondaryOrgans.includes("WEALTH")) {
       wealthAllocations = await wealth.allocate(
-        geoxScenarios.length > 0 ? geoxScenarios : [
+        GEOXScenarios.length > 0 ? GEOXScenarios : [
           {
             id: "default-scen",
             name: "Default Scenario",
@@ -243,13 +243,13 @@ export class PipelineCoordinator {
         ],
       );
     }
-    return { geoxScenarios, wealthAllocations };
+    return { GEOXScenarios, wealthAllocations };
   }
 
   // 444 ROUTE
   private route(
     routing: RoutingDecision,
-    geoxScenarios: GEOXScenarioContract[],
+    GEOXScenarios: GEOXScenarioContract[],
     wealthAllocations: WealthAllocationContract[],
   ): void {
     if (!this.session) return;
@@ -262,15 +262,15 @@ export class PipelineCoordinator {
       triggers: routing.triggers,
     });
 
-    if (geoxScenarios.length > 0) {
-      this.session.kernel.injectContext("GEOX_Scenarios", geoxScenarios);
+    if (GEOXScenarios.length > 0) {
+      this.session.kernel.injectContext("GEOX_Scenarios", GEOXScenarios);
     }
     if (wealthAllocations.length > 0) {
       this.session.kernel.injectContext("WEALTH_Allocations", wealthAllocations);
     }
 
     this.session.candidateWavefunction = [
-      ...geoxScenarios.map((s) => ({ type: "GEOX" as const, scenario: s })),
+      ...GEOXScenarios.map((s) => ({ type: "GEOX" as const, scenario: s })),
       ...wealthAllocations.map((a) => ({ type: "WEALTH" as const, allocation: a })),
     ];
 
@@ -279,13 +279,13 @@ export class PipelineCoordinator {
 
   // 555 HEART
   private heart(
-    geoxScenarios: GEOXScenarioContract[],
+    GEOXScenarios: GEOXScenarioContract[],
     wealthAllocations: WealthAllocationContract[],
   ): void {
     if (!this.session) return;
     const floors: string[] = [];
 
-    for (const scenario of geoxScenarios) {
+    for (const scenario of GEOXScenarios) {
       if (scenario.physicalConstraints.environmentalImpact > 0.6) {
         floors.push("F6_MARUAH");
       }
@@ -370,10 +370,10 @@ export class PipelineCoordinator {
     }
 
     // GEOX scenarios injection
-    if (this.session?.geoxScenarios.length) {
+    if (this.session?.GEOXScenarios.length) {
       shortTermMemory.append({
         role: "system",
-        content: `[333_MIND] GEOX scenarios: ${this.session.geoxScenarios.map((s) => `${s.id}(${s.tag}[${s.probability}])`).join(", ")}`,
+        content: `[333_MIND] GEOX scenarios: ${this.session.GEOXScenarios.map((s) => `${s.id}(${s.tag}[${s.probability}])`).join(", ")}`,
       });
     }
 

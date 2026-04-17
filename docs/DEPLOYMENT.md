@@ -56,7 +56,7 @@ GEOX deploys as **3 planes**, not one monolith:
 │  │ • History   │ │ • Prospects │ │ • 888_HOLD  │ │ • AC_Risk widget    │   │
 │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────────────┘   │
 │                                                                              │
-│  Access: geox.arif-fazil.com/apps/{app_name}/                               │
+│  Access: GEOX.arif-fazil.com/apps/{app_name}/                               │
 │  Hosting: Same container (simple) or CDN (scale)                            │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -73,8 +73,8 @@ GEOX deploys as **3 planes**, not one monolith:
 version: '3.8'
 
 services:
-  geox:
-    image: geox/eic:latest
+  GEOX:
+    image: GEOX/eic:latest
     ports:
       - "8000:8000"  # MCP Server
     volumes:
@@ -99,8 +99,8 @@ services:
 version: '3.8'
 
 services:
-  geox-mcp:
-    image: geox/eic:latest
+  GEOX-mcp:
+    image: GEOX/eic:latest
     deploy:
       replicas: 2
     ports:
@@ -170,19 +170,19 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy canonical GEOX
-COPY geox/ ./geox/
+COPY GEOX/ ./GEOX/
 COPY data/ ./data/
 
 # Non-root user
-RUN useradd -m -u 1000 geox && chown -R geox:geox /app
-USER geox
+RUN useradd -m -u 1000 GEOX && chown -R GEOX:GEOX /app
+USER GEOX
 
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s \
   CMD curl -f http://localhost:8000/health || exit 1
 
-CMD ["python", "-m", "geox.server", "--transport", "http", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "GEOX.server", "--transport", "http", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ### Environment Variables
@@ -206,10 +206,10 @@ CMD ["python", "-m", "geox.server", "--transport", "http", "--host", "0.0.0.0", 
 MCP Apps served from `/apps/` path on same server:
 
 ```python
-# In geox/server.py
+# In GEOX/server.py
 @mcp.custom_route("/apps/{app_name}/{path:path}", methods=["GET"])
 async def serve_app(request: Request) -> Response:
-    # Serve static files from geox/apps/{app_name}/
+    # Serve static files from GEOX/apps/{app_name}/
     pass
 ```
 
@@ -221,11 +221,11 @@ async def serve_app(request: Request) -> Response:
 MCP Apps hosted separately, referenced by absolute URL:
 
 ```json
-// geox/apps/ac_risk_console/manifest.json
+// GEOX/apps/ac_risk_console/manifest.json
 {
-  "app_id": "geox.ac_risk.console",
+  "app_id": "GEOX.ac_risk.console",
   "ui_entry": {
-    "resource_uri": "https://apps.geox.arif-fazil.com/ac_risk_console/",
+    "resource_uri": "https://apps.GEOX.arif-fazil.com/ac_risk_console/",
     "mode": "inline-or-external"
   }
 }
@@ -258,7 +258,7 @@ MCP Apps hosted separately, referenced by absolute URL:
 # nginx.conf — security headers
 server {
     listen 443 ssl http2;
-    server_name geox.arif-fazil.com;
+    server_name GEOX.arif-fazil.com;
 
     # SSL
     ssl_certificate /etc/nginx/ssl/cert.pem;
@@ -273,7 +273,7 @@ server {
 
     # MCP endpoints
     location / {
-        proxy_pass http://geox-mcp:8000;
+        proxy_pass http://GEOX-mcp:8000;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -289,25 +289,25 @@ server {
 
 ```bash
 # Liveness probe
-curl https://geox.arif-fazil.com/health
+curl https://GEOX.arif-fazil.com/health
 # → OK
 
 # Detailed status
-curl https://geox.arif-fazil.com/health/details | jq .
+curl https://GEOX.arif-fazil.com/health/details | jq .
 # → {"ok": true, "tools": [...], "constitutional_floors": [...]}
 
 # Tool registry
-curl https://geox.arif-fazil.com/tools | jq '.tools[].name'
+curl https://GEOX.arif-fazil.com/tools | jq '.tools[].name'
 ```
 
 ### Backup & Recovery
 
 ```bash
 # Backup audit logs
-docker exec geox-mcp tar czf - /data/999_vault > vault_backup_$(date +%Y%m%d).tar.gz
+docker exec GEOX-mcp tar czf - /data/999_vault > vault_backup_$(date +%Y%m%d).tar.gz
 
 # Backup tool registry state
-curl https://geox.arif-fazil.com/tools > tool_registry_backup.json
+curl https://GEOX.arif-fazil.com/tools > tool_registry_backup.json
 ```
 
 ### Upgrade Procedure
@@ -315,9 +315,9 @@ curl https://geox.arif-fazil.com/tools > tool_registry_backup.json
 ```bash
 # Zero-downtime upgrade (Enterprise)
 docker-compose pull
-docker-compose up -d --no-deps --scale geox-mcp=3 geox-mcp
+docker-compose up -d --no-deps --scale GEOX-mcp=3 GEOX-mcp
 sleep 10
-docker-compose up -d --no-deps --scale geox-mcp=2 geox-mcp
+docker-compose up -d --no-deps --scale GEOX-mcp=2 GEOX-mcp
 
 # Simple upgrade (Research)
 docker-compose pull
@@ -338,7 +338,7 @@ curl http://localhost:8000/health
 curl -I -X OPTIONS http://localhost:8000/mcp/v1/messages
 
 # Check logs
-docker logs geox-mcp --tail 100
+docker logs GEOX-mcp --tail 100
 ```
 
 ### AC_Risk Not Calculating
@@ -349,7 +349,7 @@ curl -X POST http://localhost:8000/mcp/v1/messages \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
-    "method": "geox_compute_ac_risk",
+    "method": "GEOX_compute_ac_risk",
     "params": {"u_phys": 0.5, "transform_stack": ["linear"]},
     "id": 1
   }'
@@ -395,11 +395,11 @@ curl -X POST http://localhost:8000/mcp/v1/messages \
 ## Appendix A: File Structure (Canonical)
 
 ```
-/opt/geox/
+/opt/GEOX/
 ├── docker-compose.yml          # This deployment
 ├── Dockerfile                  # Container build
 ├── nginx.conf                  # Reverse proxy
-├── geox/                       # Python package (read-only)
+├── GEOX/                       # Python package (read-only)
 │   ├── server.py              # MCP entry point
 │   ├── core/                  # AC_Risk, ToolRegistry
 │   └── apps/                  # 4 MCP Apps
@@ -435,3 +435,4 @@ docker-compose up -d
 
 *DITEMPA BUKAN DIBERI — Forged, Not Given*
 *Enterprise Deployment: Sealed*
+

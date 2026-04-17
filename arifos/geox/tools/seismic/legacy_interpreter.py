@@ -36,8 +36,8 @@ from typing import Any, Literal
 
 import numpy as np
 
-from arifos.geox.base_tool import BaseTool, GeoToolResult, _make_provenance
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.base_tool import BaseTool, GeoToolResult, _make_provenance
+from arifos.GEOX.GEOX_schemas import (
     AttributeStack,
     AttributeVolume,
     ContrastMetadata,
@@ -887,3 +887,4 @@ class SingleLineInterpreter(BaseTool):
 def register_single_line_interpreter(registry: Any) -> None:
     """Register the SingleLineInterpreter with a ToolRegistry."""
     registry.register(SingleLineInterpreter())
+

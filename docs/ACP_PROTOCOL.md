@@ -8,7 +8,7 @@
 
 GEOX has transitioned from a monolithic visualization tool to an **MCP-Distributed Intelligence Engine**.
 
-- **Server (Kernel):** The `geox-mcp-server` holds the `EARTH.CANON_9` state and physical laws.
+- **Server (Kernel):** The `GEOX-mcp-server` holds the `EARTH.CANON_9` state and physical laws.
 - **WebMCP (UI):** A transparent glass pane connecting to the server.
 - **Agents (Intelligence):** Specialized actors proposing changes to the state.
 
@@ -21,9 +21,9 @@ Multiple agents connect to the same GEOX MCP Server to synchronize interpretatio
 ### Current Manifest
 | Agent Role | Subscribed Resources | Tools Authorized |
 | :--- | :--- | :--- |
-| **Petrophysicist** | `geox://1d/triple-combo` | `geox_metabolize`, `calculate_stoiip` |
-| **Geophysicist** | `geox://2d/seismic-plane` | `geox_load_seismic_line`, `compute_attributes` |
-| **Basin Interpreter** | `geox://canon9/state` | `geox_query_macrostrat`, `evaluate_prospect` |
+| **Petrophysicist** | `GEOX://1d/triple-combo` | `GEOX_metabolize`, `calculate_stoiip` |
+| **Geophysicist** | `GEOX://2d/seismic-plane` | `GEOX_load_seismic_line`, `compute_attributes` |
+| **Basin Interpreter** | `GEOX://canon9/state` | `GEOX_query_macrostrat`, `evaluate_prospect` |
 
 ### Synchronization Flow
 1. **Subscribe:** Agents query specific domain resources from the server.
@@ -61,3 +61,4 @@ The protocol is now active. All future agents interfacing with GEOX must adhere 
 
 **DITEMPA BUKAN DIBERI.**
 **999_SEAL_ACP.**
+

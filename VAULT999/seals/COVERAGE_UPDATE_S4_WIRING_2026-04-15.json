@@ -83,7 +83,7 @@
 |--------|--------|-------|
 | `GEOXEngine` | STUB — zero imports | Called from `AgentEngine.run()` at 333_MIND |
 | `WealthEngine` | STUB — zero imports | Called from `AgentEngine.run()` at 333_MIND |
-| Routing fields | None | `AgentEngine._routing`, `_geoxScenarios`, `_wealthAllocations` |
+| Routing fields | None | `AgentEngine._routing`, `_GEOXScenarios`, `_wealthAllocations` |
 
 ---
 
@@ -123,7 +123,7 @@
 | `apply_patches` | ApplyPatchesTool | guarded | arifOS |
 | `run_tests` | RunTestsTool | guarded | arifOS |
 | `run_command` | RunCommandTool | dangerous | arifOS |
-| **`geox_check_hazard`** | GEOXCheckHazardTool | guarded | **GEOX** |
+| **`GEOX_check_hazard`** | GEOXCheckHazardTool | guarded | **GEOX** |
 | **`wealth_evaluate_ROI`** | WealthEvaluateROITool | guarded | **WEALTH** |
 
 ### MCP Tools: 10 → **12 tools**
@@ -140,7 +140,7 @@
 | `forge_remember` | 999_VAULT | — |
 | `forge_recall` | 999_VAULT | — |
 | `forge_ticket_status` | 888_JUDGE | — |
-| **`geox_check_hazard`** | 333_MIND | **NEW** |
+| **`GEOX_check_hazard`** | 333_MIND | **NEW** |
 | **`wealth_evaluate_ROI`** | 777_FORGE | **NEW** |
 
 ---
@@ -206,4 +206,5 @@ This seal certifies that the following were completed in Session 4:
 **PREVIOUS:** `audit_000_999_tri_organ_2026-04-15`
 **COVERAGE:** 47% → 67%
 **MOTTO:** *Ditempa Bukan Diberi* — Forged, Not Given
+
 

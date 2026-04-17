@@ -1,10 +1,10 @@
 import asyncio
 from typing import Any
 
-from arifos.geox.geox_hardened import HardenedGeoxAgent
+from arifos.GEOX.GEOX_hardened import HardenedGEOXAgent
 
 async def test_hardened_agent():
-    agent = HardenedGeoxAgent(session_id="ARIF_GEO_FORGE")
+    agent = HardenedGEOXAgent(session_id="ARIF_GEO_FORGE")
     
     # Test a simple tool if any or just check initialization
     # Since I just implemented MacrostratTool, let's try to list tools
@@ -12,7 +12,7 @@ async def test_hardened_agent():
     
     # Try a mock execution (though I don't have a mock tool yet)
     # Let's try to register a simple test tool now
-    from arifos.geox.base_tool import BaseTool, GeoToolResult
+    from arifos.GEOX.base_tool import BaseTool, GeoToolResult
     
     class HelloEarthTool(BaseTool):
         name = "hello_earth"
@@ -35,3 +35,4 @@ async def test_hardened_agent():
 
 if __name__ == "__main__":
     asyncio.run(test_hardened_agent())
+

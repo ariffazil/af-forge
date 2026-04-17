@@ -12,9 +12,9 @@
 
 | Component | Status | Maturity | Evidence |
 |-----------|--------|----------|----------|
-| **1. MCP Server** | ✅ YES | Production | `mcp_server.py`, `geox_mcp_server.py` |
+| **1. MCP Server** | ✅ YES | Production | `mcp_server.py`, `GEOX_mcp_server.py` |
 | **2. MCP Apps** | ✅ YES | Advanced | `prefab_views.py`, 3 app manifests |
-| **3. Traditional Web Apps** | ✅ YES | Production | `volume_app/`, `geox-gui/` |
+| **3. Traditional Web Apps** | ✅ YES | Production | `volume_app/`, `GEOX-gui/` |
 
 **Answer:** GEOX has a **complete 3-layer architecture**, not just 1 or 2.
 
@@ -28,24 +28,24 @@ The foundational MCP layer exposing tools as JSON-RPC endpoints. AI agents call 
 ### Implementation
 ```
 Files:
-├── arifos/geox/mcp_server.py              (FastMCP server)
-├── arifos/geox/geox_mcp_server.py         (Extended server)
-├── arifos/geox/geox_mcp_schemas.py        (Pydantic schemas)
-└── arifos/geox/mcp_petrophysics_server.py (Domain-specific)
+├── arifos/GEOX/mcp_server.py              (FastMCP server)
+├── arifos/GEOX/GEOX_mcp_server.py         (Extended server)
+├── arifos/GEOX/GEOX_mcp_schemas.py        (Pydantic schemas)
+└── arifos/GEOX/mcp_petrophysics_server.py (Domain-specific)
 ```
 
 ### Live Tools
 | Tool | Status | Purpose |
 |------|--------|---------|
-| `geox_load_seismic_line` | ✅ LIVE | Load seismic + contrast views |
-| `geox_build_structural_candidates` | ✅ LIVE | Multi-model interpretation |
-| `geox_interpret_single_line` | 🟡 SCAFFOLD | Full interpreter (mock VLM) |
-| `geox_compute_ac_risk` | ✅ LIVE | AC_Risk calculation |
-| `geox_feasibility_check` | ✅ LIVE | Physical validation |
-| `geox_verify_geospatial` | ✅ LIVE | Coordinate verification |
-| `geox_evaluate_prospect` | ✅ LIVE | Prospect verdict |
-| `geox_georeference_map` | 🟡 SCAFFOLD | Map warping |
-| `geox_digitize_analog` | 🔴 PLANNED | Log digitization |
+| `GEOX_load_seismic_line` | ✅ LIVE | Load seismic + contrast views |
+| `GEOX_build_structural_candidates` | ✅ LIVE | Multi-model interpretation |
+| `GEOX_interpret_single_line` | 🟡 SCAFFOLD | Full interpreter (mock VLM) |
+| `GEOX_compute_ac_risk` | ✅ LIVE | AC_Risk calculation |
+| `GEOX_feasibility_check` | ✅ LIVE | Physical validation |
+| `GEOX_verify_geospatial` | ✅ LIVE | Coordinate verification |
+| `GEOX_evaluate_prospect` | ✅ LIVE | Prospect verdict |
+| `GEOX_georeference_map` | 🟡 SCAFFOLD | Map warping |
+| `GEOX_digitize_analog` | 🔴 PLANNED | Log digitization |
 
 ### Output Format
 ```json
@@ -70,15 +70,15 @@ Interactive applications that render **INSIDE** the AI conversation interface (C
 ### Implementation
 ```
 Files:
-├── arifos/geox/apps/prefab_views.py       (PrefabApp UI builders)
-├── arifos/geox/contracts/app_manifest.py  (Manifest types)
-├── arifos/geox/apps/schemas/
-│   └── geox-app-manifest.json             (JSON Schema)
-├── arifos/geox/apps/basin_explorer/
+├── arifos/GEOX/apps/prefab_views.py       (PrefabApp UI builders)
+├── arifos/GEOX/contracts/app_manifest.py  (Manifest types)
+├── arifos/GEOX/apps/schemas/
+│   └── GEOX-app-manifest.json             (JSON Schema)
+├── arifos/GEOX/apps/basin_explorer/
 │   └── manifest.json                      (App definition)
-├── arifos/geox/apps/seismic_viewer/
+├── arifos/GEOX/apps/seismic_viewer/
 │   └── manifest.json                      (App definition)
-└── arifos/geox/apps/well_context_desk/
+└── arifos/GEOX/apps/well_context_desk/
     └── manifest.json                      (App definition)
 ```
 
@@ -87,18 +87,18 @@ Files:
 #### App 1: Basin Explorer
 ```json
 {
-  "app_id": "geox.basin.explorer",
+  "app_id": "GEOX.basin.explorer",
   "display_name": "Basin Map Explorer",
   "domain": "maps",
   "ui_entry": {
-    "resource_uri": "https://geox.arif-fazil.com/apps/basin_explorer/index.html",
+    "resource_uri": "https://GEOX.arif-fazil.com/apps/basin_explorer/index.html",
     "mode": "inline-or-external",
     "capability_required": ["webgl", "embedded_webview"]
   },
   "required_tools": [
-    "mcp.geox.query_memory",
-    "mcp.geox.evaluate_prospect",
-    "mcp.geox.verify_geospatial"
+    "mcp.GEOX.query_memory",
+    "mcp.GEOX.evaluate_prospect",
+    "mcp.GEOX.verify_geospatial"
   ],
   "arifos": {
     "required_floors": ["F1", "F2", "F4", "F7", "F11"]
@@ -109,18 +109,18 @@ Files:
 #### App 2: Seismic Viewer
 ```json
 {
-  "app_id": "geox.seismic.viewer",
+  "app_id": "GEOX.seismic.viewer",
   "display_name": "Seismic Viewer",
   "domain": "seismic",
   "ui_entry": {
-    "resource_uri": "https://geox.arif-fazil.com/apps/seismic_viewer/index.html",
+    "resource_uri": "https://GEOX.arif-fazil.com/apps/seismic_viewer/index.html",
     "mode": "inline-or-external",
     "capability_required": ["webgl2", "wasm"]
   },
   "required_tools": [
-    "mcp.geox.load_seismic_line",
-    "mcp.geox.build_structural_candidates",
-    "mcp.geox.evaluate_prospect"
+    "mcp.GEOX.load_seismic_line",
+    "mcp.GEOX.build_structural_candidates",
+    "mcp.GEOX.evaluate_prospect"
   ],
   "arifos": {
     "required_floors": ["F1", "F2", "F4", "F7", "F9", "F11"]
@@ -131,18 +131,18 @@ Files:
 #### App 3: Well Context Desk
 ```json
 {
-  "app_id": "geox.well.context-desk",
+  "app_id": "GEOX.well.context-desk",
   "display_name": "Well & Document Context Desk",
   "domain": "wells",
   "ui_entry": {
-    "resource_uri": "https://geox.arif-fazil.com/apps/well_context_desk/index.html",
+    "resource_uri": "https://GEOX.arif-fazil.com/apps/well_context_desk/index.html",
     "mode": "inline-or-external",
     "capability_required": ["embedded_webview"]
   },
   "required_tools": [
-    "mcp.geox.query_memory",
-    "mcp.geox.compute_petrophysics",
-    "mcp.geox.select_sw_model"
+    "mcp.GEOX.query_memory",
+    "mcp.GEOX.compute_petrophysics",
+    "mcp.GEOX.select_sw_model"
   ],
   "arifos": {
     "required_floors": ["F1", "F2", "F4", "F7", "F9", "F11", "F13"]
@@ -156,15 +156,15 @@ The `prefab_views.py` file creates **9 different MCP App views** that render ins
 
 | View | Tool | Purpose |
 |------|------|---------|
-| `seismic_section_view` | `geox_load_seismic_line` | Seismic display with QC badges |
-| `structural_candidates_view` | `geox_build_structural_candidates` | Multi-model table |
-| `feasibility_check_view` | `geox_feasibility_check` | Constitutional check UI |
-| `geospatial_view` | `geox_verify_geospatial` | Coordinate verification |
-| `prospect_verdict_view` | `geox_evaluate_prospect` | Final verdict display |
-| `sw_model_selector_view` | `geox_select_sw_model` | Saturation model UI |
-| `petrophysics_compute_view` | `geox_compute_petrophysics` | Results with uncertainty |
-| `cutoff_validation_view` | `geox_validate_cutoffs` | Net/pay validation |
-| `petrophysical_hold_view` | `geox_petrophysical_hold_check` | 888 HOLD triggers |
+| `seismic_section_view` | `GEOX_load_seismic_line` | Seismic display with QC badges |
+| `structural_candidates_view` | `GEOX_build_structural_candidates` | Multi-model table |
+| `feasibility_check_view` | `GEOX_feasibility_check` | Constitutional check UI |
+| `geospatial_view` | `GEOX_verify_geospatial` | Coordinate verification |
+| `prospect_verdict_view` | `GEOX_evaluate_prospect` | Final verdict display |
+| `sw_model_selector_view` | `GEOX_select_sw_model` | Saturation model UI |
+| `petrophysics_compute_view` | `GEOX_compute_petrophysics` | Results with uncertainty |
+| `cutoff_validation_view` | `GEOX_validate_cutoffs` | Net/pay validation |
+| `petrophysical_hold_view` | `GEOX_petrophysical_hold_check` | 888 HOLD triggers |
 
 ### MCP App Features (Verified)
 
@@ -191,10 +191,10 @@ Standalone web applications accessed via browser, outside the AI conversation co
 ### Implementation
 ```
 Files:
-├── arifos/geox/apps/volume_app/
+├── arifos/GEOX/apps/volume_app/
 │   ├── app.py              (Volume rendering)
 │   └── tools.py            (Tool wrappers)
-└── geox-gui/               (React frontend)
+└── GEOX-gui/               (React frontend)
     ├── src/
     └── docs/
 ```
@@ -205,7 +205,7 @@ Files:
 - **Features:** Slice rendering, horizon/fault overlays, interactive sessions
 - **Access:** External URL, not embedded in AI host
 
-### geox-gui
+### GEOX-gui
 - **Purpose:** Full React-based GUI
 - **Stack:** React + TypeScript + Vite
 - **Status:** Scaffolded, needs completion
@@ -224,7 +224,7 @@ Files:
 ┌─────────────────────────────────▼───────────────────────────────────────────┐
 │  LAYER 3: TRADITIONAL WEB APPS                                              │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │  geox-gui (React)  │  Volume App (Python/cigvis)                     │   │
+│  │  GEOX-gui (React)  │  Volume App (Python/cigvis)                     │   │
 │  │  • Full-featured   │  • 3D visualization                             │   │
 │  │  • Standalone      │  • External access                              │   │
 │  │  • Browser-based   │  • Detailed analysis                            │   │
@@ -246,10 +246,10 @@ Files:
 ┌─────────────────────────────────▼───────────────────────────────────────────┐
 │  LAYER 1: MCP SERVER (JSON Tools)                                           │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │  geox_load_seismic_line()                                           │   │
-│  │  geox_build_structural_candidates()                                 │   │
-│  │  geox_compute_ac_risk()                                             │   │
-│  │  geox_feasibility_check()                                           │   │
+│  │  GEOX_load_seismic_line()                                           │   │
+│  │  GEOX_build_structural_candidates()                                 │   │
+│  │  GEOX_compute_ac_risk()                                             │   │
+│  │  GEOX_feasibility_check()                                           │   │
 │  │  ... (12+ tools)                                                    │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                             │
@@ -269,7 +269,7 @@ Files:
 | **Bidirectional data** | Request/response | Real-time events | Full HTTP |
 | **Sandboxing** | N/A (server) | iframe CSP | Standard web |
 | **Best for** | Automation | Quick review | Deep analysis |
-| **Examples** | `geox_compute_ac_risk` | Basin Explorer | Volume App |
+| **Examples** | `GEOX_compute_ac_risk` | Basin Explorer | Volume App |
 
 ---
 
@@ -302,11 +302,11 @@ Files:
 **Maturity:**
 - MCP Server: Production-ready
 - MCP Apps: Advanced architecture, needs UI completion  
-- Web Apps: Production (Volume App), scaffold (geox-gui)
+- Web Apps: Production (Volume App), scaffold (GEOX-gui)
 
 **Recommendation:**
 1. Complete MCP App UIs for the 3 defined apps
-2. Deploy to `geox.arif-fazil.com/apps/`
+2. Deploy to `GEOX.arif-fazil.com/apps/`
 3. Test host adapter with Claude Desktop
 4. Ship as complete 3-layer platform
 
@@ -314,3 +314,4 @@ Files:
 
 *DITEMPA BUKAN DIBERI*  
 *MCP Apps: Architected. Pending UI completion.*
+

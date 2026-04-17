@@ -24,7 +24,7 @@ from datetime import datetime
 
 from ..THEORY import ContrastTaxonomy
 from ..ENGINE import ContrastSpace, AnomalyDetector
-from .verdict_renderer import VerdictRenderer, GeoxVerdict
+from .verdict_renderer import VerdictRenderer, GEOXVerdict
 
 
 @dataclass
@@ -269,3 +269,4 @@ def generate_conflation_report(
         recommendations=recommendations,
         human_review_required=human_review_required,
     )
+

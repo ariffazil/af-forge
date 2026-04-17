@@ -2,7 +2,7 @@
 /**
  * arifOS MCP CLI
  *
- * Entry point for: arifos-mcp serve --organ geox --transport stdio
+ * Entry point for: arifos-mcp serve --organ GEOX --transport stdio
  *
  * @module mcp/cli
  */
@@ -14,7 +14,7 @@ async function main(): Promise<void> {
   const args = parseServeArgs(process.argv.slice(2));
 
   if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    process.stderr.write(`[arifOS-MCP] Usage: arifos-mcp serve --organ <geox|wealth|forge> --transport <stdio|http> --port <port>\n`);
+    process.stderr.write(`[arifOS-MCP] Usage: arifos-mcp serve --organ <GEOX|wealth|forge> --transport <stdio|http> --port <port>\n`);
     process.exit(0);
     return;
   }
@@ -28,3 +28,4 @@ main().catch((err) => {
   process.stderr.write(`[arifOS-MCP] Fatal: ${err}\n`);
   process.exit(1);
 });
+

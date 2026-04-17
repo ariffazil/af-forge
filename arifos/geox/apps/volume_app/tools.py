@@ -4,21 +4,21 @@ GEOX Volume App Tools — DITEMPA BUKAN DIBERI
 MCP tools for volume context visualization.
 
 Model-visible tools:
-- geox_open_volume_context
-- geox_volume_render_snapshot
-- geox_volume_launch_interactive
+- GEOX_open_volume_context
+- GEOX_volume_render_snapshot
+- GEOX_volume_launch_interactive
 
 Backend tools (hidden from model):
-- geox_renderer_cigvis_build_nodes
-- geox_renderer_cigvis_render_png
-- geox_renderer_cigvis_launch_server
+- GEOX_renderer_cigvis_build_nodes
+- GEOX_renderer_cigvis_render_png
+- GEOX_renderer_cigvis_launch_server
 """
 
 from __future__ import annotations
 
 from typing import Any
 
-from arifos.geox.apps.volume_app.app import VolumeApp
+from arifos.GEOX.apps.volume_app.app import VolumeApp
 
 
 _volume_app_instance: VolumeApp | None = None
@@ -32,7 +32,7 @@ def get_volume_app() -> VolumeApp:
     return _volume_app_instance
 
 
-async def geox_open_volume_context(
+async def GEOX_open_volume_context(
     basin: str,
     survey_name: str | None = None,
     requester_id: str = "unknown",
@@ -61,7 +61,7 @@ async def geox_open_volume_context(
     )
 
 
-async def geox_volume_compile_scene(
+async def GEOX_volume_compile_scene(
     context_id: str,
 ) -> dict[str, Any]:
     """
@@ -77,7 +77,7 @@ async def geox_volume_compile_scene(
     return app.compile_scene(context_id)
 
 
-async def geox_volume_render_snapshot(
+async def GEOX_volume_render_snapshot(
     context_id: str,
     output_path: str | None = None,
     width: int = 1200,
@@ -107,7 +107,7 @@ async def geox_volume_render_snapshot(
     )
 
 
-async def geox_volume_launch_interactive(
+async def GEOX_volume_launch_interactive(
     context_id: str,
     port: int | None = None,
     ttl_seconds: int = 300,
@@ -133,7 +133,7 @@ async def geox_volume_launch_interactive(
     )
 
 
-async def geox_volume_add_horizon(
+async def GEOX_volume_add_horizon(
     context_id: str,
     horizon_id: str,
     name: str,
@@ -166,7 +166,7 @@ async def geox_volume_add_horizon(
     )
 
 
-async def geox_volume_add_wells(
+async def GEOX_volume_add_wells(
     context_id: str,
     wells: list[dict[str, Any]],
 ) -> dict[str, Any]:
@@ -188,7 +188,7 @@ async def geox_volume_add_wells(
 # These are internal implementation details
 
 
-async def _geox_renderer_cigvis_build_nodes(
+async def _GEOX_renderer_cigvis_build_nodes(
     scene: dict[str, Any],
 ) -> dict[str, Any]:
     """
@@ -196,13 +196,13 @@ async def _geox_renderer_cigvis_build_nodes(
 
     NOT exposed to model - implementation detail.
     """
-    from arifos.geox.renderers import CigvisAdapter
+    from arifos.GEOX.renderers import CigvisAdapter
 
     adapter = CigvisAdapter()
     return adapter.compile_scene(scene)
 
 
-async def _geox_renderer_cigvis_render_png(
+async def _GEOX_renderer_cigvis_render_png(
     scene: dict[str, Any],
     output_path: str | None = None,
     width: int = 1200,
@@ -213,7 +213,7 @@ async def _geox_renderer_cigvis_render_png(
 
     NOT exposed to model - implementation detail.
     """
-    from arifos.geox.renderers import CigvisAdapter
+    from arifos.GEOX.renderers import CigvisAdapter
 
     adapter = CigvisAdapter()
     result = adapter.render_snapshot(scene, output_path, width, height)
@@ -224,7 +224,7 @@ async def _geox_renderer_cigvis_render_png(
     }
 
 
-async def _geox_renderer_cigvis_launch_server(
+async def _GEOX_renderer_cigvis_launch_server(
     scene: dict[str, Any],
     port: int | None = None,
     ttl_seconds: int = 300,
@@ -234,7 +234,7 @@ async def _geox_renderer_cigvis_launch_server(
 
     NOT exposed to model - implementation detail.
     """
-    from arifos.geox.renderers import CigvisAdapter
+    from arifos.GEOX.renderers import CigvisAdapter
 
     adapter = CigvisAdapter()
     result = adapter.launch_interactive(scene, port, ttl_seconds)
@@ -244,3 +244,4 @@ async def _geox_renderer_cigvis_launch_server(
         "access_url": result.embedded_url,
         "errors": result.errors,
     }
+

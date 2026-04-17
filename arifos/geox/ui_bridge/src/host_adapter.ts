@@ -11,8 +11,8 @@
  */
 
 import {
-  GeoXEventBus,
-  GeoXHostBus,
+  GEOXEventBus,
+  GEOXHostBus,
   EventType,
   type HostCapabilities,
   type SecurityContext,
@@ -25,7 +25,7 @@ export type RenderMode = 'inline' | 'external' | 'card' | 'text';
 /** Host adapter configuration */
 export interface HostAdapterConfig {
   /** Host type identifier */
-  hostType: 'copilot' | 'claude' | 'openai' | 'geox-custom';
+  hostType: 'copilot' | 'claude' | 'openai' | 'GEOX-custom';
   /** Host version */
   version: string;
   /** Supported render modes */
@@ -80,7 +80,7 @@ export abstract class HostAdapter {
     container: HTMLElement,
     appUrl: string,
     initPayload: AppInitializePayload
-  ): Promise<GeoXHostBus>;
+  ): Promise<GEOXHostBus>;
 
   /**
    * Launch an app in external mode.
@@ -88,7 +88,7 @@ export abstract class HostAdapter {
   abstract launchExternal(
     appUrl: string,
     initPayload: AppInitializePayload
-  ): Promise<GeoXEventBus | null>;
+  ): Promise<GEOXEventBus | null>;
 
   /**
    * Render a card fallback.
@@ -149,7 +149,7 @@ export class GenericHostAdapter extends HostAdapter {
     container: HTMLElement,
     appUrl: string,
     initPayload: AppInitializePayload
-  ): Promise<GeoXHostBus> {
+  ): Promise<GEOXHostBus> {
     // Create iframe
     const iframe = document.createElement('iframe');
     iframe.src = appUrl;
@@ -170,7 +170,7 @@ export class GenericHostAdapter extends HostAdapter {
     });
 
     // Create host bus
-    const bus = new GeoXHostBus(this.config.appOrigin);
+    const bus = new GEOXHostBus(this.config.appOrigin);
     bus.attach(iframe);
 
     // Initialize the app
@@ -182,7 +182,7 @@ export class GenericHostAdapter extends HostAdapter {
   async launchExternal(
     appUrl: string,
     initPayload: AppInitializePayload
-  ): Promise<GeoXEventBus | null> {
+  ): Promise<GEOXEventBus | null> {
     // Open popup
     const features = 'width=1400,height=900,menubar=no,toolbar=no,location=no';
     const popup = window.open(appUrl, '_blank', features);
@@ -193,7 +193,7 @@ export class GenericHostAdapter extends HostAdapter {
     }
 
     // Create event bus
-    const bus = new GeoXEventBus(popup, this.config.appOrigin);
+    const bus = new GEOXEventBus(popup, this.config.appOrigin);
 
     // Wait for popup to load, then initialize
     setTimeout(() => {
@@ -209,12 +209,12 @@ export class GenericHostAdapter extends HostAdapter {
   ): void {
     // Simple card rendering
     const card = document.createElement('div');
-    card.className = 'geox-card';
+    card.className = 'GEOX-card';
     card.innerHTML = `
-      <div class="geox-card-header">
+      <div class="GEOX-card-header">
         <h3>${data.title || 'GEOX Result'}</h3>
       </div>
-      <div class="geox-card-body">
+      <div class="GEOX-card-body">
         <pre>${JSON.stringify(data, null, 2)}</pre>
       </div>
     `;
@@ -240,7 +240,7 @@ export class CopilotHostAdapter extends GenericHostAdapter {
     container: HTMLElement,
     appUrl: string,
     initPayload: AppInitializePayload
-  ): Promise<GeoXHostBus> {
+  ): Promise<GEOXHostBus> {
     // Copilot may have specific iframe requirements
     // For now, use generic implementation
     return super.renderInline(container, appUrl, initPayload);
@@ -265,7 +265,7 @@ export class ClaudeHostAdapter extends GenericHostAdapter {
     container: HTMLElement,
     appUrl: string,
     initPayload: AppInitializePayload
-  ): Promise<GeoXHostBus> {
+  ): Promise<GEOXHostBus> {
     // Claude has rich artifact support
     // Could use custom artifact renderer here
     return super.renderInline(container, appUrl, initPayload);
@@ -290,7 +290,7 @@ export class OpenAIAppsHostAdapter extends GenericHostAdapter {
     container: HTMLElement,
     appUrl: string,
     initPayload: AppInitializePayload
-  ): Promise<GeoXHostBus> {
+  ): Promise<GEOXHostBus> {
     // OpenAI Apps may use widget protocol
     // For now, use generic iframe approach
     return super.renderInline(container, appUrl, initPayload);
@@ -321,3 +321,4 @@ export function createHostAdapter(
       return new GenericHostAdapter(fullConfig);
   }
 }
+

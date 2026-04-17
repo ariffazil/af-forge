@@ -6,7 +6,7 @@ from datetime import datetime
 sys.path.append(os.path.abspath("."))
 
 from services.evidence_store.store import store
-from geox.shared.contracts.schemas import EvidenceObject, EvidenceRef, GeoContext, UnitRef, VerticalDomain, EvidenceKind
+from GEOX.shared.contracts.schemas import EvidenceObject, EvidenceRef, GeoContext, UnitRef, VerticalDomain, EvidenceKind
 
 def seed():
     # 1. Define Common Units
@@ -61,7 +61,7 @@ def seed():
         ref=EvidenceRef(
             id="PROSPECT_ALPHA",
             kind=EvidenceKind.map,
-            sourceUri="geox://prospects/alpha",
+            sourceUri="GEOX://prospects/alpha",
             timestamp=datetime.utcnow()
         ),
         context=ctx,
@@ -73,3 +73,4 @@ def seed():
 
 if __name__ == "__main__":
     seed()
+

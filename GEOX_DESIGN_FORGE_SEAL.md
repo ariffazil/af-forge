@@ -26,12 +26,12 @@ The GEOX Design Forge implementation establishes the canonical 000-999 dimension
 
 ### Color Palette — The Void
 ```css
---geox-void-900: #0A0C0E    /* Deep void background */
---geox-amber-500: #F59E0B   /* Actionable intelligence */
---geox-emerald-500: #10B981 /* Success/999_SEAL */
---geox-crimson-500: #EF4444 /* Alert/888_VOID */
---geox-violet-500: #8B5CF6  /* AI/LLM integration */
---geox-cyan-500: #06B6D4    /* Scientific/technical data */
+--GEOX-void-900: #0A0C0E    /* Deep void background */
+--GEOX-amber-500: #F59E0B   /* Actionable intelligence */
+--GEOX-emerald-500: #10B981 /* Success/999_SEAL */
+--GEOX-crimson-500: #EF4444 /* Alert/888_VOID */
+--GEOX-violet-500: #8B5CF6  /* AI/LLM integration */
+--GEOX-cyan-500: #06B6D4    /* Scientific/technical data */
 ```
 
 ### Typography
@@ -40,9 +40,9 @@ The GEOX Design Forge implementation establishes the canonical 000-999 dimension
 
 ### Glassmorphism
 ```css
---geox-glass-bg: rgba(20, 24, 28, 0.72)
---geox-glass-blur: 16px
---geox-glass-border: rgba(255, 255, 255, 0.06)
+--GEOX-glass-bg: rgba(20, 24, 28, 0.72)
+--GEOX-glass-blur: 16px
+--GEOX-glass-border: rgba(255, 255, 255, 0.06)
 ```
 
 ### Scanline Aesthetic
@@ -172,3 +172,4 @@ The following principles define the GEOX "Heavy Witness" state:
 **Sealed:** 2026-04-11T03:33:49Z
 **Architect:** arifOS / GEOX Earth Intelligence
 **Version:** v2026.04.11-FORGE-999
+

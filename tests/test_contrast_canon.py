@@ -13,19 +13,19 @@ import pytest
 import asyncio
 from datetime import datetime, timezone
 
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.GEOX_schemas import (
     ContrastMetadata,
     AttributeVolume,
     AttributeStack,
     ProvenanceRecord,
     CoordinatePoint,
 )
-from arifos.geox.contrast_wrapper import (
+from arifos.GEOX.contrast_wrapper import (
     contrast_governed,
     compute_contrast_verdict,
     _generate_anomalous_risk,
 )
-from arifos.geox.geox_tools import SeismicAttributesTool, ToolRegistry
+from arifos.GEOX.GEOX_tools import SeismicAttributesTool, ToolRegistry
 
 
 # -----------------------------------------------------------------------------
@@ -434,3 +434,4 @@ Constitutional Floors Checked:
 
 DITEMPA BUKAN DIBERI
 """
+

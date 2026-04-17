@@ -1,5 +1,5 @@
 /**
- * geox_log_interpreter — Triple-Combo Log Interpretation Tool
+ * GEOX_log_interpreter — Triple-Combo Log Interpretation Tool
  *
  * Core implementation of the anomalous contrast decoding protocol.
  * Takes triple-combo log data (GR, RT, RHOB, NPHI, SP, DT, CAL) and
@@ -83,7 +83,7 @@ function stdDev(values: number[]): number {
 }
 
 export class GEOXLogInterpreterTool extends BaseTool {
-  readonly name = "geox_log_interpreter";
+  readonly name = "GEOX_log_interpreter";
   readonly description = "Interpret triple-combo wireline logs (GR, RT, RHOB, NPHI, SP, DT, CAL) to compute Vsh, PHIE, SW, fluid type, and lithology using anomalous contrast theory. All outputs tagged ESTIMATE/HYPOTHESIS/UNKNOWN per F8.";
   readonly riskLevel = "guarded" as const;
 
@@ -249,7 +249,7 @@ export class GEOXLogInterpreterTool extends BaseTool {
     if (compositeAnomaly > 1.5) {
       recommendations.push("STRONG ANOMALY: Proceed to quantitative interpretation — cross-plot confirmation recommended");
     } else if (compositeAnomaly < 0.5) {
-      recommendations.push("WEAK ANOMALY: Use geox_witness_triad for W³ consensus before committing");
+      recommendations.push("WEAK ANOMALY: Use GEOX_witness_triad for W³ consensus before committing");
       recommendations.push("888_HOLD if lithology ambiguous");
     }
 

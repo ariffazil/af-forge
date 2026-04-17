@@ -38,12 +38,12 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.GEOX_schemas import (
     CoordinatePoint,
     GeoQuantity,
     ProvenanceRecord,
 )
-from arifos.geox.geox_tools import BaseTool, GeoToolResult
+from arifos.GEOX.GEOX_tools import BaseTool, GeoToolResult
 
 # ---------------------------------------------------------------------------
 # Perception bridge rule enforcement
@@ -301,3 +301,4 @@ if __name__ == "__main__":
         print(f"\nWarning excerpt: {result.raw_output['perception_bridge_warning'][:100]}...")
 
     asyncio.run(_selftest())
+

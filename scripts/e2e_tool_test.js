@@ -41,18 +41,18 @@ async function testGEOXTools() {
   const mod = await load(BASE, '/GEOXTools.js');
   const GEOX_TOOLS = mod.GEOX_TOOLS;
   const cases = [
-    [0, { location: 'Sumatra', hazard_types: ['seismic'] }, 'geox_check_hazard'],
-    [0, { latitude: 55, longitude: -3, hazard_types: ['flood'] }, 'geox_check_hazard (low-risk)'],
-    [1, { location: 'North Sea', scenario: 'extraction' }, 'geox_subsurface_model'],
-    [2, { line_id: 'MY-2026-SEISMIC-01', horizon: 'TopFrio' }, 'geox_seismic_interpret'],
-    [3, { prospect_id: 'PROSPECT_ALPHA', trap_ma: 50, charge_ma: 60 }, 'geox_prospect_score'],
-    [4, { operation: 'extraction', pressure_bar: 250, temperature_c: 120 }, 'geox_physical_constraint'],
-    [5, {}, 'geox_uncertainty_tag'],
-    [6, { observation: 'GR spike at 2500m', methods: ['wireline', 'core', 'test'] }, 'geox_witness_triad'],
-    [7, { target: 'Porosity > 20%', test_data: { type: 'core', value: 22.5 } }, 'geox_ground_truth'],
-    [8, { location: 'North Sea', operationType: 'extraction', distance_km: 50, population_density: 200 }, 'geox_maraoh_impact'],
-    [9, { location: 'North Sea', max_depth_m: 3500 }, 'geox_extraction_limits'],
-    [10, { operation: 'co2_storage', volume_mt: 1.5 }, 'geox_climate_bounds'],
+    [0, { location: 'Sumatra', hazard_types: ['seismic'] }, 'GEOX_check_hazard'],
+    [0, { latitude: 55, longitude: -3, hazard_types: ['flood'] }, 'GEOX_check_hazard (low-risk)'],
+    [1, { location: 'North Sea', scenario: 'extraction' }, 'GEOX_subsurface_model'],
+    [2, { line_id: 'MY-2026-SEISMIC-01', horizon: 'TopFrio' }, 'GEOX_seismic_interpret'],
+    [3, { prospect_id: 'PROSPECT_ALPHA', trap_ma: 50, charge_ma: 60 }, 'GEOX_prospect_score'],
+    [4, { operation: 'extraction', pressure_bar: 250, temperature_c: 120 }, 'GEOX_physical_constraint'],
+    [5, {}, 'GEOX_uncertainty_tag'],
+    [6, { observation: 'GR spike at 2500m', methods: ['wireline', 'core', 'test'] }, 'GEOX_witness_triad'],
+    [7, { target: 'Porosity > 20%', test_data: { type: 'core', value: 22.5 } }, 'GEOX_ground_truth'],
+    [8, { location: 'North Sea', operationType: 'extraction', distance_km: 50, population_density: 200 }, 'GEOX_maraoh_impact'],
+    [9, { location: 'North Sea', max_depth_m: 3500 }, 'GEOX_extraction_limits'],
+    [10, { operation: 'co2_storage', volume_mt: 1.5 }, 'GEOX_climate_bounds'],
   ];
   for (const [idx, args, label] of cases) {
     const ToolClass = GEOX_TOOLS[idx];
@@ -104,9 +104,9 @@ async function testLogInterpreter() {
   const ms = Date.now() - start;
   if (result.ok) {
     const p = JSON.parse(result.output);
-    console.log(`✅ geox_log_interpreter (${ms}ms) → Vsh:${p.Vsh?.length} PHIE:${p.PHIE?.length} SW:${p.SW?.length} composite:${p.anomalyContrast?.compositeAnomaly} fluidFlags:${p.fluidFlag?.filter(f=>f!=='INDETERMINATE').length}`);
+    console.log(`✅ GEOX_log_interpreter (${ms}ms) → Vsh:${p.Vsh?.length} PHIE:${p.PHIE?.length} SW:${p.SW?.length} composite:${p.anomalyContrast?.compositeAnomaly} fluidFlags:${p.fluidFlag?.filter(f=>f!=='INDETERMINATE').length}`);
   } else {
-    console.log(`❌ geox_log_interpreter (${ms}ms): ${String(result.output ?? '').slice(0,80)}`);
+    console.log(`❌ GEOX_log_interpreter (${ms}ms): ${String(result.output ?? '').slice(0,80)}`);
   }
 }
 
@@ -145,4 +145,5 @@ async function main() {
 }
 
 main().catch(e => { console.error('Error:', e.message); process.exit(1); });
+
 

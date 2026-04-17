@@ -94,7 +94,7 @@ Based on Landauer’s Principle:
 ## 📜 AMENDMENTS
 - **AMENDMENT 001:** Formalized Ωₒᵣₜₕₒ as a normalized correlation inverse (1 - mean|ρ|). Established computable SEAL/HOLD/VOID thresholds for all metabolic metrics.
 - **AMENDMENT 002:** Objective Function Calibration Floor. The Objective Function (OF) must never return < 0.10 when NPV > 0, EMV > 0, Ωₒᵣₜₕₒ ≥ 0.95, and ΔS < 0.20. Under these conditions, an OF < 0.10 triggers `CONSTITUTION_DIAGNOSTIC` mode and an "OF_CALIBRATION_ANOMALY" log, escalating to the Architect.
-- **AMENDMENT 003:** Temporal Anchoring Requirement. Any tool call in Tier 01 that ingests legal, regulatory, or procedural data MUST include the precise procedural stage, exact date of the most recent action, and a call to `geox_time4d_verify_timing` to prevent ΔS inflation from interpretive temporal framing.
+- **AMENDMENT 003:** Temporal Anchoring Requirement. Any tool call in Tier 01 that ingests legal, regulatory, or procedural data MUST include the precise procedural stage, exact date of the most recent action, and a call to `GEOX_time4d_verify_timing` to prevent ΔS inflation from interpretive temporal framing.
 
 ---
 
@@ -103,11 +103,12 @@ Based on Landauer’s Principle:
 ## 🌀 VI. MINIMAL CLOSED-LOOP MISSION (SIMULATION)
 To validate v2.0, every mission must follow the **Metabolic Step-Protocol**:
 1. **T00:** `arifos_init` (Identity Anchor)
-2. **T01:** `geox_fetch_authoritative_state` (Reality Sense)
-3. **T02:** `geox_compute_stoiip` (Physics Engine)
+2. **T01:** `GEOX_fetch_authoritative_state` (Reality Sense)
+3. **T02:** `GEOX_compute_stoiip` (Physics Engine)
 4. **T03:** `wealth_evaluate_ROI` (Economic Engine)
 5. **T04:** `arifos_heart` + `wealth_audit_entropy` (Risk/Entropy Audit)
 6. **GATE:** `arifos_gateway` (Ω Check)
 7. **JUDGE:** `arifos_judge` (Final Verdict)
 8. **T05:** `arifos_forge` (Execution - **SIMULATED ONLY**)
 9. **VAULT:** `arifos_vault` (Record Closure)
+

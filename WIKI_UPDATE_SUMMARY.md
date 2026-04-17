@@ -33,7 +33,7 @@
 | Analog Digitization | WebPlotDigitizer, Geomega | Physics validation + AC_Risk | 5.5 months |
 | Seismic Vision | seismiqb, Seismic-App | Multi-view + AC_Risk | 11 months |
 | Attributes | seismiqb, Nature 2025 | Transform-aware metadata | 2.5 months |
-| VLM Backends | GeoX, GeoGround, GeoPixel | ToAC governance layer | 5.5 months |
+| VLM Backends | GEOX, GeoGround, GeoPixel | ToAC governance layer | 5.5 months |
 
 **Total acceleration: 28 months → 12 weeks**
 
@@ -53,7 +53,7 @@
 ---
 
 ### 4. AC_Risk Calculator
-**File:** `GEOX/arifos/geox/ENGINE/ac_risk.py`  
+**File:** `GEOX/arifos/GEOX/ENGINE/ac_risk.py`  
 **Status:** ✅ TESTED AND WORKING
 
 **Test Results:**
@@ -76,7 +76,7 @@ Test 3 (Georeferencing, poor OCR):
 ---
 
 ### 5. Vision Governance Module
-**Directory:** `GEOX/arifos/geox/vision/`  
+**Directory:** `GEOX/arifos/GEOX/vision/`  
 **Status:** ✅ SCAFFOLD COMPLETE
 
 | Component | Purpose | Lines |
@@ -90,7 +90,7 @@ Test 3 (Georeferencing, poor OCR):
 
 ### 6. Site Specification
 **File:** `GEOX/SITE_GEOK_ARIF_FAZIL_COM.md`  
-**Purpose:** Complete specification for geox.arif-fazil.com
+**Purpose:** Complete specification for GEOX.arif-fazil.com
 
 **Key Clarifications:**
 
@@ -119,13 +119,13 @@ Apps = Human interface (operators)
 5. **AC_Risk Console** — Inspect any workflow's risk components
 
 #### Current MCP Tools (Existing)
-- ✅ `geox_load_seismic_line`
-- ✅ `geox_build_structural_candidates`
-- ✅ `geox_interpret_single_line`
-- ✅ `geox_feasibility_check`
-- ✅ `geox_compute_ac_risk`
-- 🟡 `geox_georeference_map` (scaffold)
-- 🔴 `geox_digitize_analog` (planned)
+- ✅ `GEOX_load_seismic_line`
+- ✅ `GEOX_build_structural_candidates`
+- ✅ `GEOX_interpret_single_line`
+- ✅ `GEOX_feasibility_check`
+- ✅ `GEOX_compute_ac_risk`
+- 🟡 `GEOX_georeference_map` (scaffold)
+- 🔴 `GEOX_digitize_analog` (planned)
 
 #### Current Apps (Existing)
 - ✅ Volume App (3D rendering)
@@ -147,7 +147,7 @@ Apps = Human interface (operators)
 **Example:**
 ```python
 # Agent calls MCP tool
-result = await mcp.geox_interpret_single_line(
+result = await mcp.GEOX_interpret_single_line(
     seismic_data="section.png",
     data_type="raster"
 )
@@ -165,7 +165,7 @@ result = await mcp.geox_interpret_single_line(
 
 **Example:**
 ```
-User opens geox.arif-fazil.com/apps/georeference
+User opens GEOX.arif-fazil.com/apps/georeference
 → Uploads map image
 → Clicks detected GCPs or adds manual ones
 → Reviews residuals
@@ -186,11 +186,11 @@ User opens geox.arif-fazil.com/apps/georeference
 
 ---
 
-## What Should Be on geox.arif-fazil.com
+## What Should Be on GEOX.arif-fazil.com
 
 ### Structure
 ```
-geox.arif-fazil.com
+GEOX.arif-fazil.com
 ├── /              (Hero + capabilities + honest status)
 ├── /apps          (5 operator tools with status badges)
 ├── /mcp           (Tool catalog + schemas + sample workflows)
@@ -220,7 +220,7 @@ GEOX/
 ├── FORGE_HARDENED_VISION.md                (NEW - 12-week roadmap)
 ├── SITE_GEOK_ARIF_FAZIL_COM.md             (NEW - Site specification)
 ├── VISION_INTELLIGENCE_IMPLEMENTATION.md   (NEW - Technical summary)
-└── arifos/geox/
+└── arifos/GEOX/
     ├── ENGINE/
     │   └── ac_risk.py                      (NEW - AC_Risk calculator ✓)
     └── vision/                             (NEW - Governance module)
@@ -246,7 +246,7 @@ git push origin main
 ### Priority 1: Deploy Site (This Week)
 - [ ] Set up Astro/Next.js project
 - [ ] Create homepage with hero + capability grid
-- [ ] Deploy to geox.arif-fazil.com
+- [ ] Deploy to GEOX.arif-fazil.com
 - [ ] Test with mobile
 
 ### Priority 2: MCP Hardening (Next Week)
@@ -275,7 +275,7 @@ git push origin main
 - [x] External integration guide complete
 - [x] Site specification drafted
 - [x] Forge roadmap hardened (12 weeks)
-- [ ] Site deployed to geox.arif-fazil.com
+- [ ] Site deployed to GEOX.arif-fazil.com
 - [ ] MCP documentation live
 - [ ] Apps page with status badges
 - [ ] First external integration (MapWarper)
@@ -309,3 +309,4 @@ git push origin main
 *DITEMPA BUKAN DIBERI*  
 *Wiki updated. Forge hardened. Ready to push.*  
 *Next: Deploy site, forge MCP, build apps.*
+

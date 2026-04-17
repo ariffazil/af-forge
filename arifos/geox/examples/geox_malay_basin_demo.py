@@ -10,7 +10,7 @@ All geological values are entirely fictional but scientifically plausible.
 
 What this demo shows:
   1. Building a GeoRequest for Blok Selatan
-  2. Running GeoXAgent with mock tools (MockEarthNetTool + MockSeismicVLMTool)
+  2. Running GEOXAgent with mock tools (MockEarthNetTool + MockSeismicVLMTool)
   3. Full pipeline execution:
        000 INIT → 111 THINK → 333 EXPLORE → 555 HEART → 777 REASON → 888 AUDIT → 999 SEAL
   4. Printing GeoResponse with verdict and arifOS telemetry
@@ -25,7 +25,7 @@ Prospect details (fictional):
   Target:    Early Miocene sandstone reservoir, ~2500 m depth
 
 Run:
-  python examples/geox_malay_basin_demo.py
+  python examples/GEOX_malay_basin_demo.py
 
 Requirements:
   pydantic>=2.0.0
@@ -51,12 +51,12 @@ if _pkg_root not in sys.path:
 
 from datetime import datetime, timezone
 
-from arifos.geox.geox_agent import GeoXAgent, GeoXConfig
-from arifos.geox.geox_memory import GeoMemoryStore
-from arifos.geox.geox_reporter import GeoXReporter
-from arifos.geox.geox_schemas import CoordinatePoint, GeoRequest
-from arifos.geox.geox_tools import ToolRegistry
-from arifos.geox.geox_validator import GeoXValidator
+from arifos.GEOX.GEOX_agent import GEOXAgent, GEOXConfig
+from arifos.GEOX.GEOX_memory import GeoMemoryStore
+from arifos.GEOX.GEOX_reporter import GEOXReporter
+from arifos.GEOX.GEOX_schemas import CoordinatePoint, GeoRequest
+from arifos.GEOX.GEOX_tools import ToolRegistry
+from arifos.GEOX.GEOX_validator import GEOXValidator
 
 # Import mock tools
 sys.path.insert(0, os.path.join(_demo_dir, "mock_tools"))
@@ -72,7 +72,7 @@ logging.basicConfig(
     format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
     handlers=[logging.StreamHandler(sys.stdout)],
 )
-logger = logging.getLogger("geox.demo")
+logger = logging.getLogger("GEOX.demo")
 
 
 # ---------------------------------------------------------------------------
@@ -105,7 +105,7 @@ def build_mock_registry() -> ToolRegistry:
       - MockSeismicVLMTool (replaces SeismicVLMTool in mock mode)
       - Standard SimulatorTool, GeoRAGTool, EOFoundationModelTool from package
     """
-    from geox.geox_tools import EOFoundationModelTool, GeoRAGTool, SimulatorTool
+    from GEOX.GEOX_tools import EOFoundationModelTool, GeoRAGTool, SimulatorTool
 
     registry = ToolRegistry()
     # Mock tools for LEM and VLM
@@ -119,12 +119,12 @@ def build_mock_registry() -> ToolRegistry:
 
 
 # ---------------------------------------------------------------------------
-# Build GeoXConfig for demo
+# Build GEOXConfig for demo
 # ---------------------------------------------------------------------------
 
-def build_demo_config() -> GeoXConfig:
-    """Build GeoXConfig for the demo, using mock tool names."""
-    return GeoXConfig(
+def build_demo_config() -> GEOXConfig:
+    """Build GEOXConfig for the demo, using mock tool names."""
+    return GEOXConfig(
         lem_confidence_threshold=0.70,  # Slightly relaxed for demo
         max_tool_retries=2,
         allowed_tools=[
@@ -141,7 +141,7 @@ def build_demo_config() -> GeoXConfig:
             "high": "regulator_required",
             "critical": "888_HOLD",
         },
-        pipeline_id="geox-v0.1-malay-basin-demo",
+        pipeline_id="GEOX-v0.1-malay-basin-demo",
     )
 
 
@@ -209,9 +209,9 @@ async def run_demo() -> None:
 
     registry = build_mock_registry()
     config = build_demo_config()
-    validator = GeoXValidator()
+    validator = GEOXValidator()
     memory_store = GeoMemoryStore()
-    reporter = GeoXReporter()
+    reporter = GEOXReporter()
 
     print(f"  Tool registry: {registry.list_tools()}")
     print(f"  Pipeline ID:   {config.pipeline_id}")
@@ -225,7 +225,7 @@ async def run_demo() -> None:
         print(f"    {tool_name}: {status}")
 
     # Build agent (no LLM planner injected → heuristic mode)
-    agent = GeoXAgent(
+    agent = GEOXAgent(
         config=config,
         tool_registry=registry,
         validator=validator,
@@ -233,7 +233,7 @@ async def run_demo() -> None:
         audit_sink=None,    # In production: inject arifOS vault_ledger
         memory_store=memory_store,
     )
-    print("\n  GeoXAgent initialised (heuristic planner mode).")
+    print("\n  GEOXAgent initialised (heuristic planner mode).")
     print("  [arifOS integration: inject llm_planner=agi_mind and audit_sink=vault_ledger]")
 
     # ---- Build Request ----
@@ -349,12 +349,12 @@ async def run_demo() -> None:
   Seal:       {response.arifos_telemetry.get('seal', '?')}
 
   To wire GEOX into arifOS production:
-    1. Run:  uvicorn geox.geox_mcp_server:app --port 8100
+    1. Run:  uvicorn GEOX.GEOX_mcp_server:app --port 8100
     2. Add to arifOS mcp_servers config:
-         - name: geox
-           url: http://geox-server:8100/mcp
-           tools: [geox_evaluate_prospect, geox_query_memory, geox_health]
-    3. Inject llm_planner=agi_mind and audit_sink=vault_ledger into GeoXAgent
+         - name: GEOX
+           url: http://GEOX-server:8100/mcp
+           tools: [GEOX_evaluate_prospect, GEOX_query_memory, GEOX_health]
+    3. Inject llm_planner=agi_mind and audit_sink=vault_ledger into GEOXAgent
 
   DITEMPA BUKAN DIBERI
 """)
@@ -366,3 +366,4 @@ async def run_demo() -> None:
 
 if __name__ == "__main__":
     asyncio.run(run_demo())
+

@@ -237,3 +237,4 @@ Then let GEOX operate strictly within that sandbox.
 ---
 
 *arifOS telemetry v2.1 · pipeline 222 REFLECT → 999 SEAL · floors F1 F4 F7 · confidence CLAIM · P2 1.0 · hold CLEAR · uncertainty 0.06–0.12 · seal DITEMPA BUKAN DIBERI*
+

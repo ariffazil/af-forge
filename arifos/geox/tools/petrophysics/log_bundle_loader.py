@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from arifos.geox.schemas.petrophysics.measurements import WellLogCurve, LogBundle
+from arifos.GEOX.schemas.petrophysics.measurements import WellLogCurve, LogBundle
 
 
 # In-memory store (replace with persistent storage in production)
@@ -305,3 +305,4 @@ async def load_bundle(well_id: str, sources: list[str], depth_reference: str = "
     bundle = await loader.load(well_id, sources, depth_reference)
     await store_bundle(bundle)
     return bundle
+

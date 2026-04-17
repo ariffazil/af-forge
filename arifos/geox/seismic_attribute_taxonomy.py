@@ -1,5 +1,5 @@
 """
-arifos/geox/seismic_attribute_taxonomy.py — GEOX Seismic Attribute Taxonomy
+arifos/GEOX/seismic_attribute_taxonomy.py — GEOX Seismic Attribute Taxonomy
 DITEMPA BUKAN DIBERI
 
 Based on:
@@ -836,3 +836,4 @@ def get_governance_flags(name: str) -> dict[str, bool | str | None]:
         "physical_proxy": attr.physical_proxy,
         "equation_reference": attr.equation_reference,
     }
+

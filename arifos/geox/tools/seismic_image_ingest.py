@@ -53,3 +53,4 @@ async def ingest_seismic_image(inputs: GEOX_SEISMIC_IMAGE_INPUT) -> GEOX_SEISMIC
         "shape": arr.shape,
         "metadata": inputs.model_dump()
     }
+

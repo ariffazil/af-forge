@@ -375,7 +375,7 @@ function getTheme() {
  */
 function setTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('geox-theme', theme);
+  localStorage.setItem('GEOX-theme', theme);
 }
 
 /**
@@ -391,7 +391,7 @@ function toggleTheme() {
  * Initialize theme from localStorage
  */
 function initTheme() {
-  const savedTheme = localStorage.getItem('geox-theme') || 'dark';
+  const savedTheme = localStorage.getItem('GEOX-theme') || 'dark';
   setTheme(savedTheme);
 }
 
@@ -413,3 +413,4 @@ if (typeof module !== 'undefined' && module.exports) {
     refreshScrollAnimations
   };
 }
+

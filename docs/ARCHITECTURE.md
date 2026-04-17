@@ -52,7 +52,7 @@ GEOX operates in **3 planes**:
 
 ## 3. The 7 Tools — Detailed
 
-### 3.1 geox_compute_ac_risk (THE CORE)
+### 3.1 GEOX_compute_ac_risk (THE CORE)
 
 **Purpose:** Calculate Theory of Anomalous Contrast risk score
 
@@ -83,7 +83,7 @@ GEOX operates in **3 planes**:
 
 ---
 
-### 3.2 geox_load_seismic_line
+### 3.2 GEOX_load_seismic_line
 
 **Purpose:** Load seismic with F4 Clarity enforcement
 
@@ -109,7 +109,7 @@ GEOX operates in **3 planes**:
 
 ---
 
-### 3.3 geox_build_structural_candidates
+### 3.3 GEOX_build_structural_candidates
 
 **Purpose:** Generate multiple structural hypotheses
 
@@ -132,7 +132,7 @@ GEOX operates in **3 planes**:
 
 ---
 
-### 3.4 geox_verify_geospatial
+### 3.4 GEOX_verify_geospatial
 
 **Purpose:** Coordinate grounding (F4 + F11)
 
@@ -143,7 +143,7 @@ GEOX operates in **3 planes**:
 
 ---
 
-### 3.5 geox_feasibility_check
+### 3.5 GEOX_feasibility_check
 
 **Purpose:** Constitutional firewall
 
@@ -154,7 +154,7 @@ GEOX operates in **3 planes**:
 
 ---
 
-### 3.6 geox_evaluate_prospect
+### 3.6 GEOX_evaluate_prospect
 
 **Purpose:** Prospect verdict with 888_HOLD
 
@@ -165,7 +165,7 @@ GEOX operates in **3 planes**:
 
 ---
 
-### 3.7 geox_earth_signals
+### 3.7 GEOX_earth_signals
 
 **Purpose:** Live temporal grounding
 
@@ -210,10 +210,10 @@ if ac_risk >= 0.60:
 
 ```json
 {
-  "app_id": "geox.ac_risk.console",
+  "app_id": "GEOX.ac_risk.console",
   "version": "1.0.0-EIC",
   "ui_entry": {
-    "resource_uri": "https://geox.arif-fazil.com/apps/ac_risk_console/",
+    "resource_uri": "https://GEOX.arif-fazil.com/apps/ac_risk_console/",
     "mode": "inline-or-external"
   },
   "arifos": {
@@ -313,14 +313,14 @@ Governed Verdict
 ## 8. Extension Points
 
 **Adding a new tool:**
-1. Add to `geox/core/tool_registry.py`
-2. Implement in `geox/server.py`
+1. Add to `GEOX/core/tool_registry.py`
+2. Implement in `GEOX/server.py`
 3. Define error codes
 4. Add constitutional floor mapping
 5. Update tests
 
 **Adding a new MCP App:**
-1. Create `geox/apps/{app_name}/`
+1. Create `GEOX/apps/{app_name}/`
 2. Build HTML/JS app
 3. Create `manifest.json`
 4. Add to nginx config
@@ -335,18 +335,18 @@ Governed Verdict
 ```python
 def test_f7_humility_ceiling():
     """Confidence must never exceed 15%"""
-    result = geox_build_structural_candidates(line_id="test")
+    result = GEOX_build_structural_candidates(line_id="test")
     for c in result["candidates"]:
         assert c["confidence"] <= 0.15, "F7 Humility violated"
 
 def test_f2_truth_uncertainty():
     """All outputs must include uncertainty"""
-    result = geox_compute_ac_risk(u_phys=0.5, transform_stack=["linear"])
+    result = GEOX_compute_ac_risk(u_phys=0.5, transform_stack=["linear"])
     assert "ac_risk" in result, "F2 Truth: uncertainty missing"
 
 def test_888_hold_trigger():
     """AC_Risk >= 0.60 triggers HOLD"""
-    result = geox_compute_ac_risk(u_phys=0.9, transform_stack=["vlm"])
+    result = GEOX_compute_ac_risk(u_phys=0.9, transform_stack=["vlm"])
     assert result["verdict"] == "VOID", "888_HOLD not triggered"
 ```
 
@@ -366,3 +366,4 @@ def test_888_hold_trigger():
 ---
 
 *DITEMPA BUKAN DIBERI — Forged, Not Given*
+

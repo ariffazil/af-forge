@@ -8,8 +8,8 @@ const hazardTool = new GEOXCheckHazardTool();
 const roiTool = new WealthEvaluateROITool();
 const ctx: ToolExecutionContext = { sessionId: "test", workingDirectory: "/tmp", modeName: "internal_mode" };
 
-test("GEOXCheckHazardTool — name is geox_check_hazard", () => {
-  assert.equal(hazardTool.name, "geox_check_hazard");
+test("GEOXCheckHazardTool — name is GEOX_check_hazard", () => {
+  assert.equal(hazardTool.name, "GEOX_check_hazard");
 });
 
 test("GEOXCheckHazardTool — riskLevel is guarded", () => {

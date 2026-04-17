@@ -440,3 +440,4 @@ if __name__ == "__main__":
     print(f"Test 3 (Georeferencing, poor OCR):")
     print(f"  AC_Risk: {result3.ac_risk:.3f}")
     print(f"  Verdict: {result3.verdict.value}")
+

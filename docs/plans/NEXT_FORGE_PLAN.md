@@ -31,7 +31,7 @@
 
 | Option | Action | Complexity |
 |--------|--------|------------|
-| A | Move code to `src/arifos/geox/` | Low |
+| A | Move code to `src/arifos/GEOX/` | Low |
 | B | Update `pyproject.toml` to use `arifos/` directly | Lower |
 
 **Recommendation: Option B** (minimal change, immediate fix)
@@ -43,7 +43,7 @@ packages = ["arifos"]  # was ["src/arifos"]
 
 [project.scripts]
 # Remove until cli.py exists
-# geox = "arifos.geox.cli:main"
+# GEOX = "arifos.GEOX.cli:main"
 ```
 
 ### 1.2 Add CI/CD Pipeline
@@ -62,7 +62,7 @@ jobs:
         with: { python-version: '3.11' }
       - run: pip install -e ".[dev]"
       - run: ruff check .
-      - run: mypy src/arifos/geox  # or arifos/geox
+      - run: mypy src/arifos/GEOX  # or arifos/GEOX
       - run: pytest tests/ -v --tb=short
 ```
 
@@ -71,8 +71,8 @@ jobs:
 ```bash
 cd C:\ariffazil\GEOX
 pip install -e ".[dev]"
-python -c "from arifos.geox import GeoXAgent, GeoXConfig; print('✓ Import OK')"
-python arifos/geox/examples/geox_malay_basin_demo.py
+python -c "from arifos.GEOX import GEOXAgent, GEOXConfig; print('✓ Import OK')"
+python arifos/GEOX/examples/GEOX_malay_basin_demo.py
 ```
 
 **Success Criteria:** Demo runs without `sys.path` hacks.
@@ -83,7 +83,7 @@ python arifos/geox/examples/geox_malay_basin_demo.py
 
 ### 2.1 Implement MacrostratTool
 
-**New File:** `arifos/geox/tools/macrostrat_tool.py`
+**New File:** `arifos/GEOX/tools/macrostrat_tool.py`
 
 ```python
 """Macrostrat API integration for geological context retrieval."""
@@ -92,8 +92,8 @@ import httpx
 from typing import Any
 from datetime import datetime, timezone
 
-from arifos.geox.geox_tools import BaseTool, GeoToolResult
-from arifos.geox.geox_schemas import GeoQuantity, ProvenanceRecord, CoordinatePoint
+from arifos.GEOX.GEOX_tools import BaseTool, GeoToolResult
+from arifos.GEOX.GEOX_schemas import GeoQuantity, ProvenanceRecord, CoordinatePoint
 
 
 class MacrostratTool(BaseTool):
@@ -226,10 +226,10 @@ class MacrostratTool(BaseTool):
 
 ### 2.2 Add Macrostrat to ToolRegistry
 
-**Modify:** `arifos/geox/geox_tools.py`
+**Modify:** `arifos/GEOX/GEOX_tools.py`
 
 ```python
-from arifos.geox.tools.macrostrat_tool import MacrostratTool
+from arifos.GEOX.tools.macrostrat_tool import MacrostratTool
 
 class ToolRegistry:
     @classmethod
@@ -242,7 +242,7 @@ class ToolRegistry:
 
 ### 2.3 Add Attribution to Reports
 
-**Modify:** `arifos/geox/geox_reporter.py`
+**Modify:** `arifos/GEOX/GEOX_reporter.py`
 
 Add Macrostrat attribution footer:
 
@@ -260,8 +260,8 @@ def _add_macrostrat_attribution(self, report: list[str], metadata: dict):
 
 ```python
 import pytest
-from arifos.geox.tools.macrostrat_tool import MacrostratTool
-from arifos.geox.geox_schemas import CoordinatePoint
+from arifos.GEOX.tools.macrostrat_tool import MacrostratTool
+from arifos.GEOX.GEOX_schemas import CoordinatePoint
 
 @pytest.mark.asyncio
 async def test_macrostrat_tool_malay_basin():
@@ -303,7 +303,7 @@ async def test_macrostrat_tool_malay_basin():
 
 ### 3.2 Implement Embedding Service (LEMBridge)
 
-**New File:** `arifos/geox/tools/lem_bridge.py`
+**New File:** `arifos/GEOX/tools/lem_bridge.py`
 
 ```python
 """Large Earth Model (LEM) bridge for EO foundation model embeddings."""
@@ -312,8 +312,8 @@ from abc import ABC, abstractmethod
 from typing import Any
 import httpx
 
-from arifos.geox.geox_tools import BaseTool, GeoToolResult
-from arifos.geox.geox_schemas import GeoQuantity, ProvenanceRecord
+from arifos.GEOX.GEOX_tools import BaseTool, GeoToolResult
+from arifos.GEOX.GEOX_schemas import GeoQuantity, ProvenanceRecord
 
 
 class LEMBackend(ABC):
@@ -413,7 +413,7 @@ class LEMBridgeTool(BaseTool):
 
 ### 3.3 Vector Memory Store (Qdrant Integration)
 
-**Enhance:** `arifos/geox/geox_memory.py`
+**Enhance:** `arifos/GEOX/GEOX_memory.py`
 
 ```python
 class DualMemoryStore:
@@ -484,7 +484,7 @@ class DualMemoryStore:
 
 ### 4.1 Evaluation Framework
 
-**New File:** `arifos/geox/eval/benchmarks.py`
+**New File:** `arifos/GEOX/eval/benchmarks.py`
 
 ```python
 """Evaluation harness for GEOX against geological benchmarks."""
@@ -508,7 +508,7 @@ class Benchmark(Protocol):
     
     name: str
     
-    async def run(self, agent: GeoXAgent) -> list[EvaluationResult]:
+    async def run(self, agent: GEOXAgent) -> list[EvaluationResult]:
         """Run benchmark and return results."""
         ...
 
@@ -524,7 +524,7 @@ class MalayBasinAnalogBenchmark:
     def __init__(self, test_cases: list[dict]):
         self.test_cases = test_cases
     
-    async def run(self, agent: GeoXAgent) -> list[EvaluationResult]:
+    async def run(self, agent: GEOXAgent) -> list[EvaluationResult]:
         results = []
         
         for case in self.test_cases:
@@ -709,30 +709,30 @@ The 7-stage governed seismic interpretation pipeline is now implemented:
 | 3 | `seismic_feature_extract.py` | ✅ DONE | Lineaments, dip field, coherence, curvature |
 | 4-5 | `seismic_structure_rules.py` | ✅ DONE | Candidate generation + physics rule engine |
 | 6 | `seismic_candidate_ranker.py` | ✅ DONE | Ranked structural models |
-| 7 | `geox_interpret_single_line.py` | ✅ DONE | Full orchestrator + `GEOXInterpretSingleLineTool` |
-| MCP | `geox_mcp_schemas.py` | ✅ DONE | 10 new schemas for pipeline I/O |
+| 7 | `GEOX_interpret_single_line.py` | ✅ DONE | Full orchestrator + `GEOXInterpretSingleLineTool` |
+| MCP | `GEOX_mcp_schemas.py` | ✅ DONE | 10 new schemas for pipeline I/O |
 
 ### 6.2 seisinterpy Integration Strategy
 
 **Primary anchor repo:** https://github.com/yohanesnuwara/seisinterpy
 
 **Strategy (DITEMPA BUKAN DIBERI — forge, don't fork):**
-1. Do NOT fork seisinterpy. Build `geox_*` wrappers that enforce contrast_metadata and floor checks.
+1. Do NOT fork seisinterpy. Build `GEOX_*` wrappers that enforce contrast_metadata and floor checks.
 2. Use seisinterpy for: SEG-Y reading, classical attribute computation, horizon extraction, AVO.
 3. Keep all Contrast Canon, governance (`@contrast_governed_tool`), anomalous_risk, and GEOX_BLOCK logic inside GEOX — never upstream.
 
 **seisinterpy wrappers to build:**
 
 ```python
-# arifos/geox/tools/seisinterpy_adapter.py (future)
+# arifos/GEOX/tools/seisinterpy_adapter.py (future)
 """
 Wrapper around seisinterpy SEG-Y and attribute functions.
 Adds contrast_metadata, provenance, and uncertainty to all outputs.
 DITEMPA BUKAN DIBERI — forged, not hallucinated.
 """
 
-from arifos.geox.contrast_wrapper import contrast_governed_tool
-from arifos.geox.tools.contrast_metadata import create_filter_contrast_metadata
+from arifos.GEOX.contrast_wrapper import contrast_governed_tool
+from arifos.GEOX.tools.contrast_metadata import create_filter_contrast_metadata
 
 @contrast_governed_tool("compute_seismic_attributes")
 def compute_seismic_attributes(segy_data, attribute_list):
@@ -746,30 +746,30 @@ def compute_seismic_attributes(segy_data, attribute_list):
 
 | Tool | Stage | Verdict Ceiling | Seisinterpy Equivalent |
 |------|-------|-----------------|----------------------|
-| `geox_load_seismic_image` | 1 | QUALIFY/HOLD | `segy2cube`, `readsegy` |
-| `geox_generate_contrast_views` | 2 | QUALIFY | — (GEOX native) |
-| `geox_extract_image_features` | 3 | QUALIFY | seisinterpy attributes |
-| `geox_build_structural_candidates` | 4-5 | QUALIFY | seisinterpy horizon extraction |
-| `geox_rank_structural_models` | 6 | QUALIFY | — (GEOX rule engine) |
-| `geox_interpret_single_line` | 7 | QUALIFY (never SEAL) | full pipeline |
+| `GEOX_load_seismic_image` | 1 | QUALIFY/HOLD | `segy2cube`, `readsegy` |
+| `GEOX_generate_contrast_views` | 2 | QUALIFY | — (GEOX native) |
+| `GEOX_extract_image_features` | 3 | QUALIFY | seisinterpy attributes |
+| `GEOX_build_structural_candidates` | 4-5 | QUALIFY | seisinterpy horizon extraction |
+| `GEOX_rank_structural_models` | 6 | QUALIFY | — (GEOX rule engine) |
+| `GEOX_interpret_single_line` | 7 | QUALIFY (never SEAL) | full pipeline |
 
 ### 6.4 Updated File Map
 
 ```
-arifos/geox/
-├── geox_mcp_schemas.py         # 10 new MCP schemas (NEW)
+arifos/GEOX/
+├── GEOX_mcp_schemas.py         # 10 new MCP schemas (NEW)
 ├── seismic_image_ingest.py      # Stage 1 (NEW)
 ├── seismic_contrast_views.py   # Stage 2 (NEW)
 ├── seismic_feature_extract.py  # Stage 3 (NEW)
 ├── seismic_structure_rules.py  # Stages 4-5 (NEW)
 ├── seismic_candidate_ranker.py  # Stage 6 (NEW)
-├── geox_interpret_single_line.py # Stage 7 + tool (NEW)
+├── GEOX_interpret_single_line.py # Stage 7 + tool (NEW)
 ├── tools/
 │   ├── seismic_attributes_2d.py     # 2D attribute tool (existing)
 │   ├── seismic_attribute_taxonomy.py # taxonomy (existing)
 │   ├── contrast_metadata.py          # rich Pydantic schemas (existing)
 │   └── single_line_interpreter.py    # Bond et al. interpreter (existing)
-└── geox_mcp_server.py          # MCP server skeleton (pre-existing)
+└── GEOX_mcp_server.py          # MCP server skeleton (pre-existing)
 ```
 
 ### 6.5 SeisBench Secondary Integration
@@ -783,7 +783,7 @@ For waveform/event context:
 
 Wrapper approach:
 ```python
-# arifos/geox/tools/seisbench_adapter.py (future)
+# arifos/GEOX/tools/seisbench_adapter.py (future)
 """
  SeisBench wrapper with GEOX governance.
  PhaseNet/EQTransformer picks + contrast_metadata + floor checks.
@@ -825,7 +825,7 @@ These are automatic `GEOX_BLOCK` regardless of confidence:
 
 - [ ] Build seisinterpy adapter (`tools/seisinterpy_adapter.py`)
 - [ ] Build SeisBench adapter (`tools/seisbench_adapter.py`) 
-- [ ] Create `geox_mcp_server.py` (register all 6 MCP verbs)
+- [ ] Create `GEOX_mcp_server.py` (register all 6 MCP verbs)
 - [ ] Write `docs/single_line_structural_workflow.md`
 - [ ] Write `docs/contrast_canon.md`
 - [ ] Register `GEOXInterpretSingleLineTool` in `ToolRegistry`
@@ -848,5 +848,6 @@ These are automatic `GEOX_BLOCK` regardless of confidence:
 **Verdict:** SEAL — Pipeline complete. Seisinterpy integration is next forge priority.
 
 **DITEMPA BUKAN DIBERI** — GEOX is now a functional governed seismic coprocessor.
+
 
 

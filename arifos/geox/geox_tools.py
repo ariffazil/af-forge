@@ -30,26 +30,26 @@ import random
 import time
 from typing import Any
 
-from arifos.geox.base_tool import (
+from arifos.GEOX.base_tool import (
     BaseTool,
     GeoToolResult,
     _make_provenance,
     _make_quantity,
 )
-from arifos.geox.geox_schemas import (
+from arifos.GEOX.GEOX_schemas import (
     AttributeStack,
     AttributeVolume,
     ContrastMetadata,
     CoordinatePoint,
     GeoQuantity,
 )
-from arifos.geox.tools.lem_bridge import LEMBridgeTool
-from arifos.geox.tools.macrostrat_tool import MacrostratTool
-from arifos.geox.tools.earth_realtime_tool import EarthRealtimeTool
-from arifos.geox.tools.seismic_visual_filter import SeismicVisualFilterTool
-from arifos.geox.tools.seismic import SeismicSingleLineTool
-from arifos.geox.tools.single_line_interpreter import SingleLineInterpreter
-from arifos.geox.tools.well_log_tool import WellLogTool
+from arifos.GEOX.tools.lem_bridge import LEMBridgeTool
+from arifos.GEOX.tools.macrostrat_tool import MacrostratTool
+from arifos.GEOX.tools.earth_realtime_tool import EarthRealtimeTool
+from arifos.GEOX.tools.seismic_visual_filter import SeismicVisualFilterTool
+from arifos.GEOX.tools.seismic import SeismicSingleLineTool
+from arifos.GEOX.tools.single_line_interpreter import SingleLineInterpreter
+from arifos.GEOX.tools.well_log_tool import WellLogTool
 
 # ---------------------------------------------------------------------------
 # EarthModelTool
@@ -1142,3 +1142,4 @@ class ToolRegistry:
         registry.register(WellLogTool(), name="WellLogTool")
         registry.register(WellLogTool(), name="PetroPhysicsTool")  # alias for MCP compat
         return registry
+

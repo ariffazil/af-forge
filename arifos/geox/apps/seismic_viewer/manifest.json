@@ -1,29 +1,29 @@
 {
-  "$schema": "https://geox.arif-fazil.com/schemas/app-manifest/v1.json",
-  "app_id": "geox.seismic.viewer",
+  "$schema": "https://GEOX.arif-fazil.com/schemas/app-manifest/v1.json",
+  "app_id": "GEOX.seismic.viewer",
   "version": "1.0.0",
   "domain": "seismic",
   "display_name": "Seismic Viewer",
   "description": "Interactive 2D/3D seismic data visualization with interpretation tools",
-  "icon": "https://geox.arif-fazil.com/apps/seismic-viewer/icon.svg",
+  "icon": "https://GEOX.arif-fazil.com/apps/seismic-viewer/icon.svg",
   "required_tools": [
-    "mcp.geox.load_seismic_line",
-    "mcp.geox.build_structural_candidates",
-    "mcp.geox.evaluate_prospect"
+    "mcp.GEOX.load_seismic_line",
+    "mcp.GEOX.build_structural_candidates",
+    "mcp.GEOX.evaluate_prospect"
   ],
   "optional_tools": [
-    "mcp.geox.verify_geospatial",
-    "mcp.geox.query_macrostrat",
-    "mcp.geox.query_memory"
+    "mcp.GEOX.verify_geospatial",
+    "mcp.GEOX.query_macrostrat",
+    "mcp.GEOX.query_memory"
   ],
   "ui_entry": {
-    "resource_uri": "https://geox.arif-fazil.com/apps/seismic_viewer/index.html",
+    "resource_uri": "https://GEOX.arif-fazil.com/apps/seismic_viewer/index.html",
     "mode": "inline-or-external",
     "capability_required": [
       "webgl2",
       "wasm"
     ],
-    "csp_policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; connect-src 'self' https://api.geox.arif-fazil.com wss://realtime.geox.arif-fazil.com; img-src 'self' blob: data:; worker-src 'self' blob:;",
+    "csp_policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; connect-src 'self' https://api.GEOX.arif-fazil.com wss://realtime.GEOX.arif-fazil.com; img-src 'self' blob: data:; worker-src 'self' blob:;",
     "sandbox": "allow-scripts allow-same-origin allow-downloads",
     "inline_config": {
       "max_width": 1400,
@@ -71,7 +71,7 @@
       "card",
       "text"
     ],
-    "external_url": "https://geox.shell/apps/seismic-viewer?session={session_id}",
+    "external_url": "https://GEOX.shell/apps/seismic-viewer?session={session_id}",
     "card_template": "/apps/seismic-viewer/card.html"
   },
   "arifos": {
@@ -93,8 +93,8 @@
   "meta": {
     "author": "GEOX Platform Team",
     "license": "MIT",
-    "repository": "https://github.com/ariffazil/arifos-geox",
-    "homepage": "https://geox.arif-fazil.com/apps/seismic-viewer",
+    "repository": "https://github.com/ariffazil/arifos-GEOX",
+    "homepage": "https://GEOX.arif-fazil.com/apps/seismic-viewer",
     "keywords": [
       "seismic",
       "visualization",
@@ -105,3 +105,4 @@
     "updated_at": "2026-04-09T00:00:00Z"
   }
 }
+

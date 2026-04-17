@@ -66,3 +66,4 @@ The third phase should integrate GemPy-backed structural modeling and a browser 
 ## Architectural Position
 
 The key distinction is that commercial geological platforms derive value not only from polished rendering but also from data conditioning and interpretation machinery hidden behind the interface. GEOX should therefore treat visualization as the user-facing shell for a governed evidence graph, where humans and AI agents inspect and act on the same normalized geological state through MCP-compatible manifests. [github](https://github.com/PangJiutian/Seisvis)
+

@@ -8,12 +8,12 @@ Evaluates and selects appropriate saturation models based on rock properties.
 from dataclasses import dataclass, field
 from typing import Any
 
-from arifos.geox.physics.saturation_models import (
+from arifos.GEOX.physics.saturation_models import (
     ArchieModel,
     SimandouxModel,
     select_model_for_rock,
 )
-from arifos.geox.tools.petrophysics.property_calculator import load_rock_state
+from arifos.GEOX.tools.petrophysics.property_calculator import load_rock_state
 
 
 @dataclass
@@ -222,7 +222,7 @@ async def select_model(
     Convenience function to select model for an interval.
     
     Args:
-        interval_uri: geox://well/{id}/interval/{top}-{base}/rock-state
+        interval_uri: GEOX://well/{id}/interval/{top}-{base}/rock-state
         candidates: List of candidate model names
     
     Returns:
@@ -230,7 +230,7 @@ async def select_model(
     """
     # Parse interval URI
     try:
-        parts = interval_uri.replace("geox://well/", "").split("/")
+        parts = interval_uri.replace("GEOX://well/", "").split("/")
         well_id = parts[0]
         interval_part = parts[2] if len(parts) > 2 else "0-0"
         top_str, base_str = interval_part.split("-")
@@ -255,3 +255,4 @@ async def select_model(
     # Run selector
     selector = SaturationModelSelector()
     return await selector.evaluate(state, candidates)
+

@@ -1,5 +1,5 @@
 """
-arifos/geox/tools/seismic_attributes_tool.py — Seismic Attributes Tool
+arifos/GEOX/tools/seismic_attributes_tool.py — Seismic Attributes Tool
 DITEMPA BUKAN DIBERI
 
 Plane 2 — Perception Layer: Classical + Meta-Intelligence seismic attributes.
@@ -23,20 +23,20 @@ from typing import Any
 
 import numpy as np
 
-from arifos.geox.base_tool import (
+from arifos.GEOX.base_tool import (
     BaseTool,
     GeoToolResult,
     _make_provenance,
     _make_quantity,
 )
-from arifos.geox.geox_schemas import CoordinatePoint
-from arifos.geox.tools.contrast_metadata import (
+from arifos.GEOX.GEOX_schemas import CoordinatePoint
+from arifos.GEOX.tools.contrast_metadata import (
     ContrastMetadata,
     create_filter_contrast_metadata,
     create_meta_attribute_contrast_metadata,
 )
 
-logger = logging.getLogger("geox.tools.seismic_attributes")
+logger = logging.getLogger("GEOX.tools.seismic_attributes")
 
 
 class AttributeType(str, Enum):
@@ -385,3 +385,4 @@ class SeismicAttributesTool(BaseTool):
             latency_ms=round(latency_ms, 2),
             success=True,
         )
+

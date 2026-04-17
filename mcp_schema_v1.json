@@ -55,7 +55,7 @@
     },
     {
       "id": "T02_32",
-      "name": "geox_well_compute_petrophysics",
+      "name": "GEOX_well_compute_petrophysics",
       "tier": 2,
       "cognitive_layer": "PHYSICS",
       "required_predecessors": ["T01_23"]
@@ -103,3 +103,4 @@
     ]
   }
 }
+
