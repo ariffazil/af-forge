@@ -32,6 +32,7 @@ services:
       - REDIS_URL=redis://redis:6379
       - QDRANT_URL=http://qdrant:6333
       - OLLAMA_URL=http://ollama:11434
+      - EMBEDDING_MODEL=bge-m3
       - PYTHONPATH=/usr/src/app
       - WELL_STATE_PATH=/app/well/state.json
       - ARIFOS_SESSION_STORE_PATH=/tmp/arifos_runtime_sessions.json
