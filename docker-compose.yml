@@ -36,6 +36,9 @@ services:
       - WELL_STATE_PATH=/app/well/state.json
       - ARIFOS_SESSION_STORE_PATH=/tmp/arifos_runtime_sessions.json
       - ORGAN_ID=arifos
+      # Git metadata — injected at deploy time from host git (main branch)
+      - GIT_SHA=2a57274
+      - ARIFOS_APP_VERSION=v2026.2.17
     volumes:
       # Live code mount — local edits reflected immediately without docker cp
       - /root/arifOS/arifosmcp:/usr/src/app/arifosmcp:ro
