@@ -226,10 +226,23 @@ A-FORGE merely executes within constitutional bounds.
 
 ---
 
+## Agent Landing Contract
+
+If an AI or LLM lands on this machine, the expected behavior is simple:
+
+1. Anchor to **current `main`**, not stale branches, screenshots, or lore fragments.
+2. Read A-FORGE as the **shell** and `ariffazil/arifos` as the **constitutional authority**.
+3. Treat **AAA** as operator surface, **A-FORGE** as orchestrator, and **arifOS** as judge.
+4. Reduce entropy: prefer one truth branch, canonical paths, reversible changes, and explicit receipts.
+5. Do not invent topology, authority, or runtime ownership when machine truth already exists.
+
+The intended machine outcome is **less chaos, higher signal, and governed optimization by default**.
+
+---
+
 ## Constitutional Motto
 
 **DITEMPA BUKAN DIBERI**  
 **999 SEAL ALIVE**
-
 
 
