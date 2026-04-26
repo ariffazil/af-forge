@@ -11,6 +11,7 @@ import { LongTermMemory } from "../src/memory/LongTermMemory.js";
 import { buildFixProfile } from "../src/agents/profiles.js";
 import { ToolRegistry } from "../src/tools/ToolRegistry.js";
 import { ReadFileTool, WriteFileTool } from "../src/tools/FileTools.js";
+import { AmanahLockManager } from "../src/governance/index.js";
 import { redactForExternalMode } from "../src/engine/redact.js";
 import { ForgeScoreboard } from "../src/scoreboard/ForgeScoreboard.js";
 import { RunReporter } from "../src/engine/RunReporter.js";
@@ -122,10 +123,23 @@ test("agent engine supports multi-turn tool execution", async () => {
     },
   });
 
+  // Pre-acquire Amanah lock so WriteFileTool can proceed (Seri Kembangan Phase 1)
+  const testSessionId = "test-session-turns";
+  const lockResult = await AmanahLockManager.getInstance().acquireLock(
+    targetFile, "test-agent", "Multi-turn test", testSessionId, 5000
+  );
+  assert.equal(lockResult.granted, true);
+
   const result = await engine.run({
     task: "Create and verify a note.",
     workingDirectory: root,
+    sessionId: testSessionId,
   });
+
+  // Cleanup lock
+  if (lockResult.lock_id) {
+    await AmanahLockManager.getInstance().releaseLock(lockResult.lock_id, "test-agent");
+  }
 
   assert.ok(result.finalText.startsWith("Completed after writing and reading the file."));
   const written = await readFile(targetFile, "utf8");
