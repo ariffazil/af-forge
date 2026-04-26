@@ -10,9 +10,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-import { validateInputClarity } from "../governance/f3InputClarity.js";
-import { checkHarmDignity } from "../governance/f6HarmDignity.js";
-import { checkInjection } from "../governance/f9Injection.js";
+import { checkWitness } from "../governance/f3Witness.js";
+import { checkEmpathy } from "../governance/f6Empathy.js";
+import { checkAntiHantu } from "../governance/f9AntiHantu.js";
 import { checkWellReadiness, AmanahLockManager } from "../governance/index.js";
 import { readRuntimeConfig } from "../config/RuntimeConfig.js";
 import { createLlmProvider } from "../llm/providerFactory.js";
@@ -79,7 +79,7 @@ function resultAsJson(output: any): string {
 // ── Tier 00 Identity ─────────────────────────────────────────────────────────
 
 server.tool(
-  "arifos_init",
+  "arif_session_init",
   "Constitutional session ignition. (Stage 000 INIT)",
   {
     actor_id: z.string().describe("Identifier for the human architect or agent"),
@@ -88,27 +88,27 @@ server.tool(
   },
   async ({ actor_id, intent, mode }) => {
     const startedAt = Date.now();
-    await telemetryInvoke("arifos_init");
+    await telemetryInvoke("arif_session_init");
     return runStage("000_INIT" as MetabolicStage, async () => {
       try {
         const sessionId = Math.random().toString(16).slice(2, 10);
         const result = {
           content: [{ type: "text" as const, text: JSON.stringify({ status: "SEAL", session_id: sessionId, epoch: new Date().toISOString().split("T")[0], actor_id, intent: intent ?? "general session", mode, verdict: "SEAL" }, null, 2) }],
         };
-        await telemetrySuccess("arifos_init", startedAt);
+        await telemetrySuccess("arif_session_init", startedAt);
         return result;
-      } catch (err) { await telemetryFailure("arifos_init", startedAt, err); throw err; }
+      } catch (err) { await telemetryFailure("arif_session_init", startedAt, err); throw err; }
     });
   }
 );
 
 server.tool(
-  "arifos_health",
+  "arif_health_check",
   "Return server health and constitutional genome (v2.0) status.",
   {},
   async () => {
     const startedAt = Date.now();
-    await telemetryInvoke("arifos_health");
+    await telemetryInvoke("arif_health_check");
     return runStage("000_INIT" as MetabolicStage, async () => {
     try {
       const result = {
@@ -132,10 +132,10 @@ server.tool(
           },
         ],
       };
-      await telemetrySuccess("arifos_health", startedAt);
+      await telemetrySuccess("arif_health_check", startedAt);
       return result;
     } catch (err) {
-      await telemetryFailure("arifos_health", startedAt, err);
+      await telemetryFailure("arif_health_check", startedAt, err);
       throw err;
     }
     });
@@ -145,18 +145,18 @@ server.tool(
 // ── Tier 01 Perception ───────────────────────────────────────────────────────
 
 server.tool(
-  "arifos_sense",
+  "arif_sense_observe",
   "Environmental sensing and reality grounding (Stage 111 SENSE).",
   { query: z.string(), mode: z.enum(["fast", "deep"]).optional().default("fast") },
   async ({ query, mode }) => {
     const startedAt = Date.now();
-    await telemetryInvoke("arifos_sense");
+    await telemetryInvoke("arif_sense_observe");
     return runStage("111_SENSE" as MetabolicStage, async () => {
     try {
       const result = { content: [{ type: "text" as const, text: JSON.stringify({ status: "SEAL", grounded: true, query, mode, lambda2_vector: [0.99, 0.98, 0.95] }, null, 2) }] };
-      await telemetrySuccess("arifos_sense", startedAt);
+      await telemetrySuccess("arif_sense_observe", startedAt);
       return result;
-    } catch (err) { await telemetryFailure("arifos_sense", startedAt, err); throw err; }
+    } catch (err) { await telemetryFailure("arif_sense_observe", startedAt, err); throw err; }
     });
   }
 );
@@ -164,12 +164,12 @@ server.tool(
 // ── Tier 07 Reflection ───────────────────────────────────────────────────────
 
 server.tool(
-  "arifos_mind",
+  "arif_mind_reason",
   "Synthesised reasoning and epistemic tagging (Stage 333 MIND). Uses client LLM sampling.",
   { grounded_facts: z.array(z.string()), context: z.string().optional() },
   async ({ grounded_facts, context }) => {
     const startedAt = Date.now();
-    await telemetryInvoke("arifos_mind");
+    await telemetryInvoke("arif_mind_reason");
     return runStage("333_MIND" as MetabolicStage, async () => {
     try {
       const samplingResponse = await server.server.createMessage({
@@ -177,7 +177,7 @@ server.tool(
         maxTokens: 500,
       });
       const res = { content: [{ type: "text" as const, text: JSON.stringify({ status: "SEAL", synthesis: samplingResponse.content, model: samplingResponse.model }, null, 2) }] };
-      await telemetrySuccess("arifos_mind", startedAt);
+      await telemetrySuccess("arif_mind_reason", startedAt);
       return res;
     } catch (err) {
       return { content: [{ type: "text", text: JSON.stringify({ status: "SEAL", synthesis: "Local fallback reasoning." }, null, 2) }] };
@@ -190,13 +190,13 @@ server.tool(
 
 const heartHandler = async ({ task }: { task: string }) => {
   const startedAt = Date.now();
-  await telemetryInvoke("arifos_heart");
-  return runStage("666_HEART" as MetabolicStage, async () => {
+  await telemetryInvoke("arif_heart_critique");
+  return runStage("555_HEART" as MetabolicStage, async () => {
   try {
-    const f3 = validateInputClarity(task);
-    const f6 = checkHarmDignity(task);
+    const f3 = checkWitness(task);
+    const f6 = checkEmpathy(task);
     // Passing hasTelemetry: true because MCP calls are structurally verified by the server
-    const f9 = checkInjection(task, { sessionId: "mcp-session", hasTelemetry: true, pipelineStage: "666_HEART" });
+    const f9 = checkAntiHantu(task, { sessionId: "mcp-session", hasTelemetry: true, pipelineStage: "555_HEART" });
     const w0 = await checkWellReadiness("high"); // W0: Human Substrate Gate
 
     const blocked = f3.verdict === "SABAR" || f6.verdict === "VOID" || f9.verdict === "VOID" || w0.verdict === "HOLD" || w0.verdict === "SABAR";
@@ -204,14 +204,14 @@ const heartHandler = async ({ task }: { task: string }) => {
       content: [{ type: "text" as const, text: JSON.stringify({ overall: blocked ? "BLOCK" : "PASS", blocked, floors: { F3: f3.verdict, F6: f6.verdict, F9: f9.verdict, W0: w0.verdict }, w0_message: w0.message }, null, 2) }],
       isError: blocked
     };
-    await telemetrySuccess("arifos_heart", startedAt);
+    await telemetrySuccess("arif_heart_critique", startedAt);
     return result;
-  } catch (err) { await telemetryFailure("arifos_heart", startedAt, err); throw err; }
+  } catch (err) { await telemetryFailure("arif_heart_critique", startedAt, err); throw err; }
   });
 };
 
 server.registerTool(
-  "arifos_heart",
+  "arif_heart_critique",
   {
     description: "Risk assessment and ethical review (Stage 666 HEART).",
     inputSchema: z.object({ task: z.string() })
@@ -232,7 +232,7 @@ server.registerTool(
 
 const forgeHandler = async ({ task, mode }: { task: string, mode?: "internal_mode" | "external_safe_mode" }) => {
   const startedAt = Date.now();
-  await telemetryInvoke("arifos_forge");
+  await telemetryInvoke("arif_forge_execute");
   return runStage("777_FORGE" as MetabolicStage, async () => {
   try {
     const { AgentEngine } = await import("../engine/AgentEngine.js");
@@ -269,15 +269,15 @@ const forgeHandler = async ({ task, mode }: { task: string, mode?: "internal_mod
         content: [{ type: "text" as const, text: JSON.stringify({ finalText: res.finalText, turns: res.turnCount, blocked }, null, 2) }],
         isError: blocked
       };
-      await telemetrySuccess("arifos_forge", startedAt);
+      await telemetrySuccess("arif_forge_execute", startedAt);
       return result;
     } finally { await rm(root, { recursive: true, force: true }); }
-  } catch (err) { await telemetryFailure("arifos_forge", startedAt, err); throw err; }
+  } catch (err) { await telemetryFailure("arif_forge_execute", startedAt, err); throw err; }
   });
 };
 
 server.registerTool(
-  "arifos_forge",
+  "arif_forge_execute",
   {
     description: "Execution and motor cortex (Stage 777 FORGE). Use this to execute an action plan.",
     inputSchema: z.object({
@@ -304,32 +304,32 @@ server.registerTool(
 
 const judgeHandler = async ({ holdId, reason }: { holdId: string, reason?: string }) => {
   const startedAt = Date.now();
-  await telemetryInvoke("arifos_judge");
+  await telemetryInvoke("arif_judge_deliberate");
   return runStage("888_JUDGE" as MetabolicStage, async () => {
   try {
     const item = approvalBoundary.approve(holdId, reason);
     return { content: [{ type: "text" as const, text: JSON.stringify({ holdId: item.holdId, state: item.state, badge: item.badge }, null, 2) }] };
-  } catch (err) { await telemetryFailure("arifos_judge", startedAt, err); throw err; }
+  } catch (err) { await telemetryFailure("arif_judge_deliberate", startedAt, err); throw err; }
   });
 };
 
-server.tool("arifos_judge", "Verdict (Stage 888 JUDGE).", { holdId: z.string(), reason: z.string().optional() }, judgeHandler);
+server.tool("arif_judge_deliberate", "Verdict (Stage 888 JUDGE).", { holdId: z.string(), reason: z.string().optional() }, judgeHandler);
 server.tool("forge_approve", "Approve action.", { holdId: z.string(), reason: z.string().optional() }, judgeHandler);
 
 // ── Tier 06 Stewardship (Vault) ──────────────────────────────────────────────
 
 const vaultHandler = async ({ content, reason, tier, tags }: { content: string, reason: string, tier?: any, tags?: string[] }) => {
   const startedAt = Date.now();
-  await telemetryInvoke("arifos_vault");
+  await telemetryInvoke("arif_vault_seal");
   return runStage("999_VAULT" as MetabolicStage, async () => {
   try {
     const entry = await memoryContract.store({ content, reason, tier, tags });
     return { content: [{ type: "text" as const, text: JSON.stringify({ memoryId: entry.memoryId, tier: entry.tier }, null, 2) }] };
-  } catch (err) { await telemetryFailure("arifos_vault", startedAt, err); throw err; }
+  } catch (err) { await telemetryFailure("arif_vault_seal", startedAt, err); throw err; }
   });
 };
 
-server.tool("arifos_vault", "Ledger closure (Stage 999 VAULT).", { content: z.string(), reason: z.string(), tier: z.string().optional(), tags: z.array(z.string()).optional() }, vaultHandler);
+server.tool("arif_vault_seal", "Ledger closure (Stage 999 VAULT).", { content: z.string(), reason: z.string(), tier: z.string().optional(), tags: z.array(z.string()).optional() }, vaultHandler);
 server.tool("forge_remember", "Store memory.", { content: z.string(), reason: z.string(), tier: z.string().optional(), tags: z.array(z.string()).optional() }, vaultHandler);
 
 // ── VAULT999 REST Tools ───────────────────────────────────────────────────────

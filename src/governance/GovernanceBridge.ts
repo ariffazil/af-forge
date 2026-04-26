@@ -42,25 +42,24 @@ export interface GovernanceBridgeOptions {
 /** Local heuristic mirror of Python risk_tiers.py TOOL_RISK_MAP + SCOPE_ESCALATIONS */
 const LOCAL_TOOL_RISK_MAP: Record<string, RiskTier> = {
   // T0 INERT — read-only
-  arifos_init: "T0_INERT",
-  arifos_sense: "T0_INERT",
-  arifos_heart: "T0_INERT",
-  arifos_ops: "T0_INERT",
-  arifos_mind: "T0_INERT",
-  arifos_memory: "T0_INERT",
-  arifos_probe: "T0_INERT",
-  arifos_reply: "T0_INERT",
-  arifos_repo_read: "T0_INERT",
+  arif_session_init: "T0_INERT",
+  arif_sense_observe: "T0_INERT",
+  arif_heart_critique: "T0_INERT",
+  arif_ops_measure: "T0_INERT",
+  arif_mind_reason: "T0_INERT",
+  arif_memory_recall: "T0_INERT",
+  arif_reply_compose: "T0_INERT",
+  arif_repo_read: "T0_INERT",
   // T1 REVERSIBLE
-  arifos_vault: "T1_REVERSIBLE",
-  arifos_forge: "T1_REVERSIBLE",
-  arifos_gateway: "T1_REVERSIBLE",
-  arifos_kernel: "T1_REVERSIBLE",
-  arifos_judge: "T1_REVERSIBLE",
-  arifos_plan: "T1_REVERSIBLE",
-  arifos_repo_seal: "T1_REVERSIBLE",
+  arif_vault_seal: "T1_REVERSIBLE",
+  arif_forge_execute: "T1_REVERSIBLE",
+  arif_gateway_connect: "T1_REVERSIBLE",
+  arif_kernel_route: "T1_REVERSIBLE",
+  arif_judge_deliberate: "T1_REVERSIBLE",
+  arif_plan_create: "T1_REVERSIBLE",
+  arif_repo_seal: "T1_REVERSIBLE",
   // T2 CONTROLLED
-  arifos_diag_substrate: "T2_CONTROLLED",
+  arif_diag_substrate: "T2_CONTROLLED",
   wealth_brent_score: "T2_CONTROLLED",
   wealth_npv_reward: "T2_CONTROLLED",
   wealth_irr_yield: "T2_CONTROLLED",
@@ -208,16 +207,16 @@ export class GovernanceBridge {
 
   private _deriveToolName(script: string): string {
     const lowered = script.toLowerCase();
-    if (lowered.includes("writefile") || lowered.includes("fs.write")) return "arifos_forge";
+    if (lowered.includes("writefile") || lowered.includes("fs.write")) return "arif_forge_execute";
     if (lowered.includes("exec(") || lowered.includes("shell") || lowered.includes("spawn")) {
-      return "arifos_diag_substrate";
+      return "arif_diag_substrate";
     }
     if (lowered.includes("fetch(") || lowered.includes("post(") || lowered.includes("http")) {
-      return "arifos_gateway";
+      return "arif_gateway_connect";
     }
     if (lowered.includes("memory") && (lowered.includes("write") || lowered.includes("store"))) {
-      return "arifos_memory";
+      return "arif_memory_recall";
     }
-    return "arifos_sense";
+    return "arif_sense_observe";
   }
 }

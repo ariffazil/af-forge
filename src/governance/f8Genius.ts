@@ -1,17 +1,17 @@
 /**
- * F8: Grounding / GENIUS (Systemic Health)
+ * F8: Genius / SYSTEMIC HEALTH
  *
  * UPGRADE: Add evidence requirement.
  * If no evidence and action not trivial → HOLD
  *
- * @module governance/f8Grounding
+ * @module governance/f8Genius
  * @constitutional F8 GENIUS — κ_r > 0.9 (systemic health)
  */
 
-export type GroundingVerdict = "PASS" | "HOLD";
+export type GeniusVerdict = "PASS" | "HOLD";
 
-export interface GroundingResult {
-  verdict: GroundingVerdict;
+export interface GeniusResult {
+  verdict: GeniusVerdict;
   evidenceCount: number;
   gStar: number; // grounding score
   reason?: string;
@@ -22,18 +22,18 @@ export interface GroundingResult {
 const TRIVIAL_TOOLS = new Set(["list_files", "read_file", "grep_text"]);
 
 /**
- * Check grounding before consequential operations.
+ * Check genius before consequential operations.
  * Requires evidence for non-trivial actions.
- * 
+ *
  * NOTE: First tool call in a session is allowed without prior evidence
  * (bootstrapping problem). Subsequent calls need grounding.
  */
-export function checkGrounding(
+export function checkGenius(
   toolName: string,
   evidenceCount: number,
   memoryHits: number,
   isFirstCall: boolean = false,
-): GroundingResult {
+): GeniusResult {
   // Trivial operations pass regardless
   if (TRIVIAL_TOOLS.has(toolName)) {
     return {

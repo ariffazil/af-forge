@@ -19,13 +19,13 @@ import type { FeatureFlags } from "../flags/featureFlags.js";
 import type { ToolPolicyConfig } from "../config/RuntimeConfig.js";
 import { RunReporter } from "./RunReporter.js";
 import {
-  validateInputClarity,
-  checkHarmDignity,
-  checkInjection,
-  checkCoherence,
-  checkConfidence,
-  checkGrounding,
-  checkEntropy,
+  checkWitness,
+  checkEmpathy,
+  checkAntiHantu,
+  checkAuth,
+  checkHumility,
+  checkGenius,
+  checkClarity,
   checkToolHarm,
   countEvidence,
   checkTruth,
@@ -707,7 +707,7 @@ export class AgentEngine {
       }
 
       // === F4: Entropy Check ===
-      const entropyCheck = checkEntropy(call.toolName, call.args, cumulativeRisk, callIndex === 0);
+      const entropyCheck = checkClarity(call.toolName, call.args, cumulativeRisk, callIndex === 0);
       if (entropyCheck.verdict === "HOLD") {
         floorsTriggered.push("F4");
         toolMessage = {
@@ -812,7 +812,7 @@ export class AgentEngine {
           blockedDangerousActions += 1;
         } else {
           const evidenceCount = countEvidence(toolResults);
-          const groundingCheck = checkGrounding(call.toolName, evidenceCount, memoryCount, callIndex === 0);
+          const groundingCheck = checkGenius(call.toolName, evidenceCount, memoryCount, callIndex === 0);
           if (groundingCheck.verdict === "HOLD") {
             floorsTriggered.push("F8");
             toolMessage = {
@@ -898,7 +898,7 @@ export class AgentEngine {
     }
 
     // === F11: Coherence Check ===
-    const coherenceCheck = checkCoherence(messageTexts);
+    const coherenceCheck = checkAuth(messageTexts);
     if (coherenceCheck.verdict === "HOLD" && toolMessages.length > 0) {
       floorsTriggered.push("F11");
       // Append coherence warning to last message

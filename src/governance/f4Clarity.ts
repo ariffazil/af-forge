@@ -1,17 +1,17 @@
 /**
- * F4: Entropy / CLARITY (Entropy Reduction)
+ * F4: Clarity / ENTROPY REDUCTION
  *
  * UPGRADE from pattern-based to delta-risk scoring.
  * Entropy = risk_after - risk_before
  *
- * @module governance/f4Entropy
+ * @module governance/f4Clarity
  * @constitutional F4 CLARITY — dS < 0 (entropy must decrease)
  */
 
-export type EntropyVerdict = "PASS" | "HOLD";
+export type ClarityVerdict = "PASS" | "HOLD";
 
-export interface EntropyResult {
-  verdict: EntropyVerdict;
+export interface ClarityResult {
+  verdict: ClarityVerdict;
   entropyDelta: number;
   riskBefore: number;
   riskAfter: number;
@@ -57,16 +57,16 @@ export function calculateRisk(toolName: string, args: Record<string, unknown>): 
 /**
  * Check entropy delta before executing tool.
  * Entropy should DECREASE (clarity should INCREASE) over time.
- * 
+ *
  * NOTE: First operation is allowed to increase entropy (bootstrapping).
  * Only block if entropy SPIKES after initial operations.
  */
-export function checkEntropy(
+export function checkClarity(
   toolName: string,
   args: Record<string, unknown>,
   previousRisk: number,
   isFirstCall: boolean = false,
-): EntropyResult {
+): ClarityResult {
   const riskAfter = calculateRisk(toolName, args);
   const entropyDelta = riskAfter - previousRisk;
 

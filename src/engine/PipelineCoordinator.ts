@@ -35,12 +35,12 @@ import { buildModeSettings } from "../flags/modes.js";
 import { ToolRegistry } from "../tools/ToolRegistry.js";
 import { RunReporter } from "./RunReporter.js";
 import {
-  validateInputClarity,
-  checkHarmDignity,
-  checkInjection,
-  checkCoherence,
-  checkConfidence,
-  checkGrounding,
+  checkWitness,
+  checkEmpathy,
+  checkAntiHantu,
+  checkAuth,
+  checkHumility,
+  checkGenius,
   checkToolHarm,
   countEvidence,
   checkTruth,
@@ -453,7 +453,7 @@ export class PipelineCoordinator {
     if (!finalResponse) finalResponse = "Max turns reached.";
 
     // F7 confidence
-    const f7 = checkConfidence({ evidenceCount: toolCallCount, toolCallCount, turnCount, hasContradictions: false, memoryHits: relevantMemories.length }, adaptiveThresholds.f7);
+    const f7 = checkHumility({ evidenceCount: toolCallCount, toolCallCount, turnCount, hasContradictions: false, memoryHits: relevantMemories.length }, adaptiveThresholds.f7);
     if (f7.verdict === "HOLD" && !errorMessage) {
       floorsTriggered.push("F7");
       finalResponse += `\n\n[CONFIDENCE: ${f7.confidence.toFixed(2)} — ${f7.message}]`;
@@ -548,7 +548,7 @@ export class PipelineCoordinator {
       }
 
       // F4 entropy
-      const f4Check = (await import("../governance/f4Entropy.js")).checkEntropy(call.toolName, call.args, cumulativeRisk, callIndex === 0);
+      const f4Check = (await import("../governance/f4Clarity.js")).checkClarity(call.toolName, call.args, cumulativeRisk, callIndex === 0);
       if (f4Check.verdict === "HOLD") {
         floorsTriggered.push("F4");
         toolMessage = { role: "tool", toolCallId: call.id, toolName: call.toolName, content: `HOLD: ${f4Check.message}` };
@@ -607,7 +607,7 @@ export class PipelineCoordinator {
         const alreadyBlocked = !toolResult.ok && (toolResult.metadata?.hold || String(toolResult.output).startsWith("[888_HOLD]"));
         if (!alreadyBlocked) {
           const gc = countEvidence(toolResults);
-          const g8Check = checkGrounding(call.toolName, gc, memoryCount, callIndex === 0);
+          const g8Check = checkGenius(call.toolName, gc, memoryCount, callIndex === 0);
           if (g8Check.verdict === "HOLD") {
             floorsTriggered.push("F8");
             toolMessage = { role: "tool", toolCallId: call.id, toolName: call.toolName, content: `HOLD: ${g8Check.message}` };
@@ -634,7 +634,7 @@ export class PipelineCoordinator {
     }
 
     // F11 coherence
-    const f11Check = checkCoherence(messageTexts);
+    const f11Check = checkAuth(messageTexts);
     if (f11Check.verdict === "HOLD" && toolMessages.length > 0) {
       floorsTriggered.push("F11");
       toolMessages[toolMessages.length - 1].content += `\n[WARNING: ${f11Check.message}]`;

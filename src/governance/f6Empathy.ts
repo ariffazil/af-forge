@@ -1,17 +1,17 @@
 /**
- * F6: Harm / Dignity (EMPATHY — RASA Listening)
+ * F6: Empathy / RASA Listening
  *
  * Minimal enforcement: Pattern-based harm detection.
  * This is NOT censorship — this is execution safety.
  *
- * @module governance/f6HarmDignity
+ * @module governance/f6Empathy
  * @constitutional F6 EMPATHY — No harm to human dignity
  */
 
-export type HarmVerdict = "PASS" | "VOID";
+export type EmpathyVerdict = "PASS" | "VOID";
 
-export interface HarmResult {
-  verdict: HarmVerdict;
+export interface EmpathyResult {
+  verdict: EmpathyVerdict;
   reason?: string;
   evidence?: string[];
   message?: string;
@@ -29,14 +29,14 @@ const HARM_PATTERNS: RegExp[] = [
   /inject\s+(?:sql|code|malware)/i,
   /overwrite\s+(?:system|boot)/i,
   /format\s+(?:disk|drive)/i,
-  /:(){ :|:& };:/, // Fork bomb
+  /:\(\)\{ :|:& };:/, // Fork bomb
 ];
 
 /**
  * Check for harmful execution patterns.
  * VOID = void the operation entirely.
  */
-export function checkHarmDignity(input: string): HarmResult {
+export function checkEmpathy(input: string): EmpathyResult {
   const normalized = input.toLowerCase();
 
   const triggered = HARM_PATTERNS.filter((pattern) => pattern.test(normalized));
@@ -57,7 +57,7 @@ export function checkHarmDignity(input: string): HarmResult {
 /**
  * Check tool arguments for harm (more specific than general input).
  */
-export function checkToolHarm(toolName: string, args: Record<string, unknown>): HarmResult {
+export function checkToolHarm(toolName: string, args: Record<string, unknown>): EmpathyResult {
   // Convert args to searchable string
   const argString = JSON.stringify(args).toLowerCase();
 

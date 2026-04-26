@@ -1,37 +1,37 @@
 /**
- * F3: Input Clarity / TRI-WITNESS (Consensus)
+ * F3: Witness / TRI-WITNESS (Consensus)
  *
  * Minimal enforcement: Validates task input before processing.
  * Not censorship — just execution safety.
  *
- * @module governance/f3InputClarity
+ * @module governance/f3Witness
  * @constitutional F3 TRI-WITNESS — W³ consensus starts with clear input
  */
 
-export type ClarityVerdict = "PASS" | "SABAR";
+export type WitnessVerdict = "PASS" | "SABAR";
 
-export interface ClarityResult {
-  verdict: ClarityVerdict;
+export interface WitnessResult {
+  verdict: WitnessVerdict;
   reason?: string;
   message?: string;
 }
 
-export interface ClarityThresholds {
+export interface WitnessThresholds {
   minLength?: number;
   minWords?: number;
 }
 
 /**
- * Validate input clarity before sense/mind processing.
+ * Validate input witness before sense/mind processing.
  * SABAR = patience, need more clarity.
  *
  * NOTE: Intentionally permissive to allow test cases and short tasks.
  * Only blocks completely empty or nonsensical inputs.
  */
-export function validateInputClarity(
+export function checkWitness(
   task: string,
-  thresholds: ClarityThresholds = {},
-): ClarityResult {
+  thresholds: WitnessThresholds = {},
+): WitnessResult {
   const { minLength = 3, minWords = 1 } = thresholds;
   const trimmed = task?.trim() ?? "";
 

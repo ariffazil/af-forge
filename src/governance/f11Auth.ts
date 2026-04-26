@@ -1,17 +1,17 @@
 /**
- * F11: Coherence / AUDITABILITY (Transparent Logs)
+ * F11: Auth / AUDITABILITY (Transparent Logs)
  *
  * Contradiction detection across tool calls and responses.
  * Simple heuristics unlock real reasoning integrity.
  *
- * @module governance/f11Coherence
- * @constitutional F11 AUDITABILITY — No contradictions
+ * @module governance/f11Auth
+ * @constitutional F11 AUTH — No contradictions
  */
 
-export type CoherenceVerdict = "PASS" | "HOLD";
+export type AuthVerdict = "PASS" | "HOLD";
 
-export interface CoherenceResult {
-  verdict: CoherenceVerdict;
+export interface AuthResult {
+  verdict: AuthVerdict;
   contradictions?: string[];
   reason?: string;
   message?: string;
@@ -30,7 +30,7 @@ const CONTRADICTION_PATTERNS = [
 /**
  * Check for contradictions between messages.
  */
-export function checkCoherence(messages: string[]): CoherenceResult {
+export function checkAuth(messages: string[]): AuthResult {
   const contradictions: string[] = [];
 
   // Check recent message pairs
@@ -81,6 +81,6 @@ export function checkCoherence(messages: string[]): CoherenceResult {
 /**
  * Check if a new response contradicts previous context.
  */
-export function checkResponseCoherence(previousContext: string[], newResponse: string): CoherenceResult {
-  return checkCoherence([...previousContext, newResponse]);
+export function checkResponseAuth(previousContext: string[], newResponse: string): AuthResult {
+  return checkAuth([...previousContext, newResponse]);
 }

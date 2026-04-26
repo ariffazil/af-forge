@@ -6,10 +6,10 @@ Connects to arifOS MCP server via StreamableHTTP and demonstrates
 real tool execution vs sembang generative (stateless text-in/out).
 
 This proves agentic behavior through:
-  - Stateful session initialization (arifos_init)
-  - Constitutional reality sensing (arifos_sense)
+  - Stateful session initialization (arif_session_init)
+  - Constitutional reality sensing (arif_sense_observe)
   - Tool execution with governance gates
-  - Verdict sealing (arifos_judge)
+  - Verdict sealing (arif_judge_deliberate)
 
 DITEMPA BUKAN DIBERI — Forged, Not Given
 """
@@ -189,7 +189,7 @@ class ArifOSAgent:
         self, actor_id: str, intent: str, mode: str = "probe"
     ) -> ConstitutionalVerdict:
         """
-        arifos_init — Constitutional session ignition.
+        arif_session_init — Constitutional session ignition.
         This is the 000_INIT stage that establishes identity binding.
 
         Args:
@@ -200,7 +200,7 @@ class ArifOSAgent:
         start = time.perf_counter()
 
         print(f"\n{'=' * 60}")
-        print(f"000 INIT — arifos_init")
+        print(f"000 INIT — arif_session_init")
         print(f"   Actor: {actor_id}")
         print(f"   Intent: {intent}")
         print(f"   Mode: {mode}")
@@ -209,7 +209,7 @@ class ArifOSAgent:
         try:
             run_result = await self._mistral.beta.conversations.run_async(
                 run_ctx=self._run_ctx,
-                inputs=f"Call arifos_init with actor_id='{actor_id}', intent='{intent}', mode='{mode}'",
+                inputs=f"Call arif_session_init with actor_id='{actor_id}', intent='{intent}', mode='{mode}'",
             )
 
             latency_ms = (time.perf_counter() - start) * 1000
@@ -230,7 +230,7 @@ class ArifOSAgent:
             self.session_id = session_id_out or "unknown"
 
             verdict = ConstitutionalVerdict(
-                tool="arifos_init",
+                tool="arif_session_init",
                 verdict=verdict_text or "HOLD",
                 latency_ms=latency_ms,
                 floors_passed=["F11", "F12", "F13"],
@@ -242,7 +242,7 @@ class ArifOSAgent:
             self._proof.actions.append(
                 {
                     "stage": "000_INIT",
-                    "tool": "arifos_init",
+                    "tool": "arif_session_init",
                     "actor_id": actor_id,
                     "intent": intent,
                     "mode": mode,
@@ -250,7 +250,7 @@ class ArifOSAgent:
                     "latency_ms": latency_ms,
                 }
             )
-            self._proof.tools_executed.append("arifos_init")
+            self._proof.tools_executed.append("arif_session_init")
             self._proof.verdicts.append(verdict)
 
             print(verdict)
@@ -259,20 +259,20 @@ class ArifOSAgent:
         except Exception as e:
             latency_ms = (time.perf_counter() - start) * 1000
             verdict = ConstitutionalVerdict(
-                tool="arifos_init",
+                tool="arif_session_init",
                 verdict="HOLD",
                 latency_ms=latency_ms,
                 floors_failed=["F11"],
                 proof=f"Connection error: {str(e)[:100]}",
             )
-            print(f"   ❌ arifos_init failed: {e}")
+            print(f"   ❌ arif_session_init failed: {e}")
             return verdict
 
     async def sense_reality(
         self, query: str, mode: str = "governed"
     ) -> ConstitutionalVerdict:
         """
-        arifos_sense — 111 THINK. Physics reality grounding.
+        arif_sense_observe — 111 THINK. Physics reality grounding.
 
         8-stage constitutional sensing: PARSE → CLASSIFY → DECIDE → PLAN →
         RETRIEVE → NORMALIZE → GATE → HANDOFF
@@ -280,7 +280,7 @@ class ArifOSAgent:
         start = time.perf_counter()
 
         print(f"\n{'=' * 60}")
-        print(f"111 THINK — arifos_sense")
+        print(f"111 THINK — arif_sense_observe")
         print(f"   Query: {query}")
         print(f"   Mode: {mode}")
         print(f"{'=' * 60}")
@@ -288,7 +288,7 @@ class ArifOSAgent:
         try:
             run_result = await self._mistral.beta.conversations.run_async(
                 run_ctx=self._run_ctx,
-                inputs=f"Call arifos_sense with query='{query}', mode='{mode}'",
+                inputs=f"Call arif_sense_observe with query='{query}', mode='{mode}'",
             )
 
             latency_ms = (time.perf_counter() - start) * 1000
@@ -302,7 +302,7 @@ class ArifOSAgent:
                     verdict_text = "VOID"
 
             verdict = ConstitutionalVerdict(
-                tool="arifos_sense",
+                tool="arif_sense_observe",
                 verdict=verdict_text,
                 latency_ms=latency_ms,
                 floors_passed=["F2", "F3", "F4", "F10"],
@@ -313,14 +313,14 @@ class ArifOSAgent:
             self._proof.actions.append(
                 {
                     "stage": "111_THINK",
-                    "tool": "arifos_sense",
+                    "tool": "arif_sense_observe",
                     "query": query,
                     "mode": mode,
                     "verdict": verdict.verdict,
                     "latency_ms": latency_ms,
                 }
             )
-            self._proof.tools_executed.append("arifos_sense")
+            self._proof.tools_executed.append("arif_sense_observe")
             self._proof.verdicts.append(verdict)
 
             print(verdict)
@@ -329,20 +329,20 @@ class ArifOSAgent:
         except Exception as e:
             latency_ms = (time.perf_counter() - start) * 1000
             verdict = ConstitutionalVerdict(
-                tool="arifos_sense",
+                tool="arif_sense_observe",
                 verdict="HOLD",
                 latency_ms=latency_ms,
                 floors_failed=["F3"],
                 proof=f"Sensing error: {str(e)[:100]}",
             )
-            print(f"   ❌ arifos_sense failed: {e}")
+            print(f"   ❌ arif_sense_observe failed: {e}")
             return verdict
 
     async def judge(
         self, query: str, risk_tier: str = "medium"
     ) -> ConstitutionalVerdict:
         """
-        arifos_judge — 888 JUDGE. Final constitutional verdict.
+        arif_judge_deliberate — 888 JUDGE. Final constitutional verdict.
 
         Produces: SEAL | PARTIAL | VOID | HOLD
         Enforces F1, F2, F3, F9, F10, F12, F13
@@ -350,7 +350,7 @@ class ArifOSAgent:
         start = time.perf_counter()
 
         print(f"\n{'=' * 60}")
-        print(f"888 JUDGE — arifos_judge")
+        print(f"888 JUDGE — arif_judge_deliberate")
         print(f"   Query: {query}")
         print(f"   Risk tier: {risk_tier}")
         print(f"{'=' * 60}")
@@ -358,7 +358,7 @@ class ArifOSAgent:
         try:
             run_result = await self._mistral.beta.conversations.run_async(
                 run_ctx=self._run_ctx,
-                inputs=f"Call arifos_judge with query='{query}', risk_tier='{risk_tier}'",
+                inputs=f"Call arif_judge_deliberate with query='{query}', risk_tier='{risk_tier}'",
             )
 
             latency_ms = (time.perf_counter() - start) * 1000
@@ -374,7 +374,7 @@ class ArifOSAgent:
                     verdict_text = "PARTIAL"
 
             verdict = ConstitutionalVerdict(
-                tool="arifos_judge",
+                tool="arif_judge_deliberate",
                 verdict=verdict_text,
                 latency_ms=latency_ms,
                 floors_passed=["F1", "F2", "F3", "F9", "F13"]
@@ -388,14 +388,14 @@ class ArifOSAgent:
             self._proof.actions.append(
                 {
                     "stage": "888_JUDGE",
-                    "tool": "arifos_judge",
+                    "tool": "arif_judge_deliberate",
                     "query": query,
                     "risk_tier": risk_tier,
                     "verdict": verdict.verdict,
                     "latency_ms": latency_ms,
                 }
             )
-            self._proof.tools_executed.append("arifos_judge")
+            self._proof.tools_executed.append("arif_judge_deliberate")
             self._proof.verdicts.append(verdict)
 
             print(verdict)
@@ -404,12 +404,12 @@ class ArifOSAgent:
         except Exception as e:
             latency_ms = (time.perf_counter() - start) * 1000
             verdict = ConstitutionalVerdict(
-                tool="arifos_judge",
+                tool="arif_judge_deliberate",
                 verdict="HOLD",
                 latency_ms=latency_ms,
                 proof=f"Judge error: {str(e)[:100]}",
             )
-            print(f"   ❌ arifos_judge failed: {e}")
+            print(f"   ❌ arif_judge_deliberate failed: {e}")
             return verdict
 
     async def run_full_demo(self, actor_id: str = "arif-mcp-demo") -> AgenticProof:
@@ -472,7 +472,7 @@ Agentic (arifOS MCP tools):
   - Constitutional floor enforcement (F1-F13)
   - Verdict-driven execution (SEAL/HOLD/VOID)
   - Immutable audit trail
-  - Example: arifos_init → arifos_sense → arifos_judge → VAULT999
+  - Example: arif_session_init → arif_sense_observe → arif_judge_deliberate → VAULT999
         """)
 
         return self._proof

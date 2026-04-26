@@ -1,24 +1,24 @@
 /**
- * F7: Confidence / HUMILITY (Uncertainty Band)
+ * F7: Humility / UNCERTAINTY BAND
  *
  * Proxy confidence calculation — since OpenAI doesn't expose token probs.
  * Uses evidence count, consistency, and tool agreement.
  *
- * @module governance/f7Confidence
+ * @module governance/f7Humility
  * @constitutional F7 HUMILITY — Ω₀ band [0.03, 0.05]
  */
 
-export type ConfidenceVerdict = "PASS" | "HOLD";
+export type HumilityVerdict = "PASS" | "HOLD";
 
-export interface ConfidenceResult {
-  verdict: ConfidenceVerdict;
+export interface HumilityResult {
+  verdict: HumilityVerdict;
   confidence: number;
   uncertainty: number;
   reason?: string;
   message?: string;
 }
 
-export interface ConfidenceContext {
+export interface HumilityContext {
   evidenceCount: number;
   toolCallCount: number;
   turnCount: number;
@@ -26,7 +26,7 @@ export interface ConfidenceContext {
   memoryHits?: number;
 }
 
-export interface ConfidenceThresholds {
+export interface HumilityThresholds {
   overconfident?: [number, number];
   underconfident?: [number, number];
 }
@@ -35,7 +35,7 @@ export interface ConfidenceThresholds {
  * Compute proxy confidence without LLM token probabilities.
  * Formula: confidence = min(1.0, evidence*0.2 + toolAgreement*0.3 + stability*0.3)
  */
-export function computeConfidence(ctx: ConfidenceContext): number {
+export function computeHumility(ctx: HumilityContext): number {
   // Evidence component (more evidence = higher confidence, max 0.4)
   const evidenceScore = Math.min(0.4, ctx.evidenceCount * 0.15);
 
@@ -65,11 +65,11 @@ export function computeConfidence(ctx: ConfidenceContext): number {
  * Check if confidence is within acceptable band.
  * HOLD if overconfident (high confidence + high uncertainty).
  */
-export function checkConfidence(
-  ctx: ConfidenceContext,
-  thresholds: ConfidenceThresholds = {},
-): ConfidenceResult {
-  const confidence = computeConfidence(ctx);
+export function checkHumility(
+  ctx: HumilityContext,
+  thresholds: HumilityThresholds = {},
+): HumilityResult {
+  const confidence = computeHumility(ctx);
 
   // Uncertainty is inverse of confidence, with noise factor
   const uncertainty = 1 - confidence + 0.1; // Base uncertainty of 0.1

@@ -108,7 +108,7 @@ def call_tool(name: str, arguments: dict) -> dict:
     Call an arifOS MCP tool and return the result.
 
     Args:
-        name: Tool name (e.g., "arifos_init", "arifos_judge")
+        name: Tool name (e.g., "arif_session_init", "arif_judge_deliberate")
         arguments: Tool arguments
 
     Returns:
@@ -159,36 +159,36 @@ def demo_init(
 ):
     """000 INIT — Constitutional session ignition."""
     print(f"\n{'=' * 60}")
-    print("000 INIT — arifos_init")
+    print("000 INIT — arif_session_init")
     print(f"{'=' * 60}")
     return call_tool(
-        "arifos_init", {"actor_id": actor_id, "intent": intent, "mode": mode}
+        "arif_session_init", {"actor_id": actor_id, "intent": intent, "mode": mode}
     )
 
 
 def demo_sense(query: str = "What is the state of my VPS?", mode: str = "governed"):
     """111 THINK — Constitutional reality sensing."""
     print(f"\n{'=' * 60}")
-    print("111 THINK — arifos_sense")
+    print("111 THINK — arif_sense_observe")
     print(f"{'=' * 60}")
-    return call_tool("arifos_sense", {"query": query, "mode": mode})
+    return call_tool("arif_sense_observe", {"query": query, "mode": mode})
 
 
 def demo_judge(query: str = "Is my VPS healthy?", risk_tier: str = "low"):
     """888 JUDGE — Final constitutional verdict."""
     print(f"\n{'=' * 60}")
-    print("888 JUDGE — arifos_judge")
+    print("888 JUDGE — arif_judge_deliberate")
     print(f"{'=' * 60}")
-    return call_tool("arifos_judge", {"query": query, "risk_tier": risk_tier})
+    return call_tool("arif_judge_deliberate", {"query": query, "risk_tier": risk_tier})
 
 
 def demo_probe():
     """Diagnostic probe — system status check."""
     print(f"\n{'=' * 60}")
-    print("111 PROBE — arifos_probe (diagnostic)")
+    print("111 PROBE — arif_sense_observe (diagnostic)")
     print(f"{'=' * 60}")
     return call_tool(
-        "arifos_probe", {"actor_id": "arif-direct-demo", "intent": "diagnostic probe"}
+        "arif_sense_observe", {"actor_id": "arif-direct-demo", "intent": "diagnostic probe"}
     )
 
 

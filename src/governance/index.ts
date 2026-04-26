@@ -8,29 +8,29 @@
  * @constitutional F1-F13 — Full constitutional coverage
  */
 
-// F3: Input Clarity (NEW)
-export { validateInputClarity, type ClarityResult, type ClarityVerdict, type ClarityThresholds } from "./f3InputClarity.js";
+// F3: Witness (NEW)
+export { checkWitness, type WitnessResult, type WitnessVerdict, type WitnessThresholds } from "./f3Witness.js";
 
 // Adaptive Thresholds
 export { getAdaptiveThresholds, type AdaptiveThresholds, type IntentModel, type RiskLevel } from "./thresholds.js";
 
-// F4: Entropy (UPGRADE)
-export { checkEntropy, calculateRisk, type EntropyResult, type EntropyVerdict } from "./f4Entropy.js";
+// F4: Clarity (UPGRADE)
+export { checkClarity, calculateRisk, type ClarityResult, type ClarityVerdict } from "./f4Clarity.js";
 
-// F6: Harm/Dignity (NEW)
-export { checkHarmDignity, checkToolHarm, type HarmResult, type HarmVerdict } from "./f6HarmDignity.js";
+// F6: Empathy (NEW)
+export { checkEmpathy, checkToolHarm, type EmpathyResult, type EmpathyVerdict } from "./f6Empathy.js";
 
-// F7: Confidence (NEW)
-export { checkConfidence, computeConfidence, type ConfidenceResult, type ConfidenceVerdict, type ConfidenceThresholds } from "./f7Confidence.js";
+// F7: Humility (NEW)
+export { checkHumility, computeHumility, type HumilityResult, type HumilityVerdict, type HumilityThresholds } from "./f7Humility.js";
 
-// F8: Grounding (UPGRADE)
-export { checkGrounding, countEvidence, type GroundingResult, type GroundingVerdict } from "./f8Grounding.js";
+// F8: Genius (UPGRADE)
+export { checkGenius, countEvidence, type GeniusResult, type GeniusVerdict } from "./f8Genius.js";
 
-// F9: Injection (UPGRADE)
-export { checkInjection, redactSecrets, type InjectionResult, type InjectionVerdict } from "./f9Injection.js";
+// F9: Anti-Hantu (UPGRADE)
+export { checkAntiHantu, redactSecrets, type AntiHantuResult, type AntiHantuVerdict } from "./f9AntiHantu.js";
 
-// F11: Coherence (NEW)
-export { checkCoherence, checkResponseCoherence, type CoherenceResult, type CoherenceVerdict } from "./f11Coherence.js";
+// F11: Auth (NEW)
+export { checkAuth, checkResponseAuth, type AuthResult, type AuthVerdict } from "./f11Auth.js";
 
 // W0: WELL Readiness (NEW)
 export { checkWellReadiness, type WellReadinessResult, type WellVerdict } from "./wellReadiness.js";
@@ -70,22 +70,22 @@ export {
  * Unified governance check — runs all applicable floors.
  * Returns first non-PASS verdict or PASS if all clear.
  */
-import type { ClarityResult } from "./f3InputClarity.js";
-import type { HarmResult } from "./f6HarmDignity.js";
-import type { InjectionResult } from "./f9Injection.js";
-import type { GroundingResult } from "./f8Grounding.js";
-import type { ConfidenceResult } from "./f7Confidence.js";
-import type { CoherenceResult } from "./f11Coherence.js";
-import type { EntropyResult } from "./f4Entropy.js";
+import type { WitnessResult } from "./f3Witness.js";
+import type { EmpathyResult } from "./f6Empathy.js";
+import type { AntiHantuResult } from "./f9AntiHantu.js";
+import type { GeniusResult } from "./f8Genius.js";
+import type { HumilityResult } from "./f7Humility.js";
+import type { AuthResult } from "./f11Auth.js";
+import type { ClarityResult } from "./f4Clarity.js";
 
 export type GovernanceCheck =
-  | { floor: "F3"; result: ClarityResult }
-  | { floor: "F4"; result: EntropyResult }
-  | { floor: "F6"; result: HarmResult }
-  | { floor: "F7"; result: ConfidenceResult }
-  | { floor: "F8"; result: GroundingResult }
-  | { floor: "F9"; result: InjectionResult }
-  | { floor: "F11"; result: CoherenceResult };
+  | { floor: "F3"; result: WitnessResult }
+  | { floor: "F4"; result: ClarityResult }
+  | { floor: "F6"; result: EmpathyResult }
+  | { floor: "F7"; result: HumilityResult }
+  | { floor: "F8"; result: GeniusResult }
+  | { floor: "F9"; result: AntiHantuResult }
+  | { floor: "F11"; result: AuthResult };
 
 export type FloorVerdict = "PASS" | "SABAR" | "HOLD" | "VOID";
 

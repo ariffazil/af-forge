@@ -1,17 +1,17 @@
 /**
- * F9: Injection / ETHICS (Anti-Dark-Patterns)
+ * F9: Anti-Hantu / ETHICS (Anti-Dark-Patterns)
  *
  * UPGRADE from redaction-only to intent detection.
  * Redaction ≠ protection. Need explicit injection detection.
  *
- * @module governance/f9Injection
+ * @module governance/f9AntiHantu
  * @constitutional F9 ETHICS — Anti-manipulation
  */
 
-export type InjectionVerdict = "PASS" | "VOID";
+export type AntiHantuVerdict = "PASS" | "VOID";
 
-export interface InjectionResult {
-  verdict: InjectionVerdict;
+export interface AntiHantuResult {
+  verdict: AntiHantuVerdict;
   triggeredPatterns?: string[];
   reason?: string;
   message?: string;
@@ -52,7 +52,7 @@ export interface ShadowContext {
  * Check for prompt injection and Shadow-arifOS patterns.
  * VOID = void the operation entirely.
  */
-export function checkInjection(input: string, context?: ShadowContext): InjectionResult {
+export function checkAntiHantu(input: string, context?: ShadowContext): AntiHantuResult {
   const normalized = input.toLowerCase();
   const triggered: string[] = [];
 
@@ -75,9 +75,9 @@ export function checkInjection(input: string, context?: ShadowContext): Injectio
   }
 
   // 4. F9 Anti-Hantu: Pattern 2 — Pipeline Shortcut
-  // If we are at 777_FORGE but skipped 666_HEART (indicated by context)
+  // If we are at 777_FORGE but skipped 555_HEART (indicated by context)
   // (In practice, this is enforced by the DAG, but we check here for prompt-based mimicry)
-  if (normalized.includes("stage 777") && !context?.pipelineStage?.includes("666")) {
+  if (normalized.includes("stage 777") && !context?.pipelineStage?.includes("555")) {
     if (!context?.pipelineStage?.includes("777")) { // if context doesn't even know we are in 777
        triggered.push("shadow: Unauthorized Stage 777 activation attempt");
     }
@@ -89,7 +89,7 @@ export function checkInjection(input: string, context?: ShadowContext): Injectio
       verdict: "VOID",
       triggeredPatterns: triggered,
       reason: isShadow ? "SHADOW_ARIFOS_DETECTED" : "INJECTION_DETECTED",
-      message: isShadow 
+      message: isShadow
         ? `VOID: Shadow-arifOS detected. Narrative laundering or identity forgery attempt.`
         : `VOID: Potential instruction injection or manipulation detected.`,
     };

@@ -10,10 +10,10 @@
  */
 
 import {
-  validateInputClarity,
-  checkHarmDignity,
-  checkInjection,
-  type ClarityThresholds,
+  checkWitness,
+  checkEmpathy,
+  checkAntiHantu,
+  type WitnessThresholds,
 } from "./index.js";
 
 export type GovernanceVerdict = "SEAL" | "HOLD" | "SABAR" | "VOID";
@@ -37,27 +37,27 @@ export interface GovernanceClient {
 }
 
 export class LocalGovernanceClient implements GovernanceClient {
-  constructor(private readonly thresholds?: { f3?: ClarityThresholds }) {}
+  constructor(private readonly thresholds?: { f3?: WitnessThresholds }) {}
 
   async evaluate(request: GovernanceRequest): Promise<GovernanceResponse> {
     const floorsTriggered: string[] = [];
 
-    // F3: Input Clarity
-    const clarity = validateInputClarity(request.task, this.thresholds?.f3);
+    // F3: Witness
+    const clarity = checkWitness(request.task, this.thresholds?.f3);
     if (clarity.verdict === "SABAR") {
       floorsTriggered.push("F3");
       return { verdict: "SABAR", floorsTriggered, message: clarity.message };
     }
 
-    // F6: Harm/Dignity
-    const harm = checkHarmDignity(request.task);
+    // F6: Empathy
+    const harm = checkEmpathy(request.task);
     if (harm.verdict === "VOID") {
       floorsTriggered.push("F6");
       return { verdict: "VOID", floorsTriggered, message: harm.message };
     }
 
-    // F9: Injection
-    const injection = checkInjection(request.task, {
+    // F9: Anti-Hantu
+    const injection = checkAntiHantu(request.task, {
       sessionId: request.sessionId,
       hasTelemetry: !!request.context?.hasTelemetry,
       pipelineStage: request.context?.pipelineStage as string | undefined,
