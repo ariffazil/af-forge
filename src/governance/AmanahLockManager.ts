@@ -212,9 +212,16 @@ export class AmanahLockManager {
       return null;
     }
 
-    // File fallback: scan from end for active lock
+    // File fallback: scan from end for active lock (dedupe by lock_id, keep latest)
     const locks = await this._readVault();
-    return locks
+    const latestById = new Map<string, AmanahLockRecord>();
+    for (const l of locks) {
+      const existing = latestById.get(l.lock_id);
+      if (!existing || new Date(l.acquired_at) >= new Date(existing.acquired_at)) {
+        latestById.set(l.lock_id, l);
+      }
+    }
+    return Array.from(latestById.values())
       .filter((l) => l.resource_id === resourceId && l.status === "HELD" && l.expires_at > now)
       .sort((a, b) => new Date(b.acquired_at).getTime() - new Date(a.acquired_at).getTime())[0] ?? null;
   }
@@ -226,7 +233,9 @@ export class AmanahLockManager {
       return result.rows[0] ?? null;
     }
     const locks = await this._readVault();
-    return locks.find((l) => l.lock_id === lockId) ?? null;
+    return locks
+      .filter((l) => l.lock_id === lockId)
+      .sort((a, b) => new Date(b.acquired_at).getTime() - new Date(a.acquired_at).getTime())[0] ?? null;
   }
 
   async isLocked(resourceId: string): Promise<boolean> {
