@@ -238,7 +238,8 @@ const forgeHandler = async ({ task, mode }: { task: string, mode?: "internal_mod
     const { AgentEngine } = await import("../engine/AgentEngine.js");
     const { LongTermMemory } = await import("../memory/LongTermMemory.js");
     const { ToolRegistry } = await import("../tools/ToolRegistry.js");
-    const { ReadFileTool, ListFilesTool } = await import("../tools/FileTools.js");
+    const { ReadFileTool, WriteFileTool, ListFilesTool } = await import("../tools/FileTools.js");
+    const { ApplyPatchesTool } = await import("../tools/EditorTools.js");
     const { GrepTextTool } = await import("../tools/SearchTools.js");
     const { buildExploreProfile } = await import("../agents/profiles.js");
     const { tmpdir } = await import("node:os");
@@ -250,6 +251,8 @@ const forgeHandler = async ({ task, mode }: { task: string, mode?: "internal_mod
       const runtimeConfig = readRuntimeConfig();
       const registry = new ToolRegistry();
       registry.register(new ReadFileTool());
+      registry.register(new WriteFileTool());
+      registry.register(new ApplyPatchesTool());
       registry.register(new ListFilesTool());
       registry.register(new GrepTextTool());
       for (const T of WEALTH_TOOLS) registry.register(new T());
