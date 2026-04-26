@@ -3,6 +3,7 @@ import { runCliCommand } from "./cli/commands.js";
 import { parseArgs } from "./cli/parseArgs.js";
 import { ToolRegistry } from "./tools/ToolRegistry.js";
 import { ReadFileTool, WriteFileTool, ListFilesTool } from "./tools/FileTools.js";
+import { ApplyPatchesTool } from "./tools/EditorTools.js";
 import { GrepTextTool } from "./tools/SearchTools.js";
 import { RunCommandTool, RunTestsTool } from "./tools/ShellTools.js";
 import { WEALTH_TOOLS } from "./tools/WealthTools.js";
@@ -26,6 +27,7 @@ function buildToolRegistry(): ToolRegistry {
   const registry = new ToolRegistry();
   registry.register(new ReadFileTool());
   registry.register(new WriteFileTool());
+  registry.register(new ApplyPatchesTool());
   registry.register(new ListFilesTool());
   registry.register(new GrepTextTool());
   registry.register(new RunTestsTool());
