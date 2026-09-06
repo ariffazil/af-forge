@@ -127,24 +127,29 @@ function matchScarsByKeywords(command: string): ScarHit[] {
       scar_pressure?: number;
       constraint_imposed?: string;
     }>;
-    const tokens = command.toLowerCase().split(/[\s,;:|&()]+/).filter(t => t.length >= 4);
-    if (tokens.length === 0) return [];
+    // Split command into primary tokens and sub-tokens (splitting across delimiters including . - _ /)
+    const rawTokens = command.toLowerCase().split(/[\s,;:|&()]+/).filter(t => t.length >= 3);
+    const subTokens = command.toLowerCase().split(/[\s,;:|&().\-_/]+/).filter(t => t.length >= 4);
+    const allTokens = Array.from(new Set([...rawTokens, ...subTokens]));
+    if (allTokens.length === 0) return [];
 
     const hits: ScarHit[] = [];
     for (const [id, scar] of Object.entries(scars)) {
       const text = `${scar.failure_mode || ""} ${scar.constraint_imposed || ""}`.toLowerCase();
       let matchCount = 0;
-      for (const token of tokens) {
+      for (const token of allTokens) {
         if (text.includes(token)) {
           matchCount++;
         }
       }
-      if (matchCount >= 2 || (matchCount >= 1 && tokens.some(t => t.length >= 8 && text.includes(t)))) {
+      const isCritical = (scar.severity || "").toUpperCase() === "CRITICAL";
+      const hasSpecificHit = allTokens.some(t => t.length >= 5 && text.includes(t));
+      if (matchCount >= 2 || (isCritical && matchCount >= 1) || (matchCount >= 1 && hasSpecificHit)) {
         hits.push({
           scar_id: scar.scar_id || id,
           failure_mode: scar.failure_mode || "",
           severity: scar.severity || "MEDIUM",
-          scar_pressure: scar.scar_pressure || 0.5,
+          scar_pressure: typeof scar.scar_pressure === "number" ? scar.scar_pressure : 0.5,
           constraint_imposed: scar.constraint_imposed || "",
         });
       }
@@ -1273,6 +1278,23 @@ export function registerShellTools(server: McpServer): void {
       // Step 1: ArifJudge (still gate even dry-run — safety)
       const judge = classifyCommand(command);
 
+      // Step 1.5: Scar Reflex Gate in dry-run
+      const scarHits = matchScarsByKeywords(command);
+      let scarNotice: string | null = null;
+      if (scarHits.length > 0) {
+        const top = scarHits[0];
+        scarNotice =
+          `888_HOLD: SCAR_REFLEX — matches sealed scar "${top.failure_mode.slice(0, 120)}" ` +
+          `(pressure=${top.scar_pressure}, severity=${top.severity}). ` +
+          `Constraint: ${top.constraint_imposed.slice(0, 200)}`;
+        if (judge.decision === "allow") {
+          judge.decision = "gate";
+          judge.reason = scarNotice;
+          judge.matchedPattern = `scar_reflex:${top.scar_id}`;
+          judge.actionClass = "EXECUTE_HIGH_IMPACT";
+        }
+      }
+
       if (judge.decision === "deny") {
         return {
           content: [{
@@ -1294,7 +1316,10 @@ export function registerShellTools(server: McpServer): void {
       // what WOULD execute (program, args, redirects, pipes) without running.
       // For actual execution, use forge_shell.
       const parsed = parseShellCommand(command);
-      const risk = classifyShellCommandRisk(command);
+      let risk = classifyShellCommandRisk(command);
+      if (scarHits.length > 0) {
+        risk = (scarHits[0].severity === "CRITICAL") ? "IRREVERSIBLE" : "MUTATION_GOVERN";
+      }
       const previewText = parsed.segments.map(s => {
         const redirects = s.redirects.map(r => `  ${r.fd}${r.op}${r.target}`).join("\n");
         return `  ${s.program} ${s.args.join(" ")}${redirects ? "\n" + redirects : ""}`;
@@ -1303,16 +1328,23 @@ export function registerShellTools(server: McpServer): void {
         content: [{
           type: "text" as const,
           text: JSON.stringify({
-            status: "SEAL",
+            status: scarHits.length > 0 && scarHits[0].severity === "CRITICAL" ? "HOLD" : "SEAL",
             dry_run: true,
             command,
             parsed,
             risk,
+            scar_reflex: scarHits.length > 0 ? {
+              matched: true,
+              top_scar: scarHits[0],
+              all_hits_count: scarHits.length,
+              notice: scarNotice,
+            } : { matched: false },
             exit_code: 0,
             output: "[DRY-RUN: NOT EXECUTED] Command would proceed as follows:\n" + previewText,
             governance: {
               judge: judge.decision,
               action_class: judge.actionClass,
+              reason: judge.reason,
             },
             note: "TRUE DRY-RUN: command parsed but NOT executed. " +
                    "No side effects, no network calls, no file mutations. " +
