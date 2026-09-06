@@ -9,7 +9,7 @@
  * STATUS: TEMPLATE (staging-ready, not deployed)
  */
 
-import { MCP_VERSION, SUPPORTED_VERSIONS, withCacheEnvelope } from '../src/compat/mcp-kit/index';
+import { MCP_VERSION, SUPPORTED_VERSIONS, withCacheEnvelope } from './index.js';
 
 interface DiscoverResponse {
   jsonrpc: '2.0';

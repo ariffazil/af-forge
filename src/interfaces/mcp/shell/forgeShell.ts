@@ -24,6 +24,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { readFileSync, existsSync } from "node:fs";
 import { appendFile, mkdir } from "node:fs/promises";
 import { classifyCommand, type JudgeResult } from "./arifJudge.js";
 import { getDefaultArifSeal } from "./arifSeal.js";
@@ -102,6 +103,56 @@ export interface SealEnvelope {
 // ── SHA256 Helper ────────────────────────────────────────────────────────────
 function SHA256(data: string): string {
   return createHash("sha256").update(data).digest("hex");
+}
+
+// ── Scar Reflex Keyword Matcher (EUREKA-Q10) ────────────────────────────────
+interface ScarHit {
+  scar_id: string;
+  failure_mode: string;
+  severity: string;
+  scar_pressure: number;
+  constraint_imposed: string;
+}
+
+const SCAR_RUNTIME_INDEX = "/root/A-FORGE/.runtime/scars/index.json";
+
+function matchScarsByKeywords(command: string): ScarHit[] {
+  try {
+    if (!existsSync(SCAR_RUNTIME_INDEX)) return [];
+    const content = readFileSync(SCAR_RUNTIME_INDEX, "utf-8");
+    const scars = JSON.parse(content) as Record<string, {
+      scar_id?: string;
+      failure_mode?: string;
+      severity?: string;
+      scar_pressure?: number;
+      constraint_imposed?: string;
+    }>;
+    const tokens = command.toLowerCase().split(/[\s,;:|&()]+/).filter(t => t.length >= 4);
+    if (tokens.length === 0) return [];
+
+    const hits: ScarHit[] = [];
+    for (const [id, scar] of Object.entries(scars)) {
+      const text = `${scar.failure_mode || ""} ${scar.constraint_imposed || ""}`.toLowerCase();
+      let matchCount = 0;
+      for (const token of tokens) {
+        if (text.includes(token)) {
+          matchCount++;
+        }
+      }
+      if (matchCount >= 2 || (matchCount >= 1 && tokens.some(t => t.length >= 8 && text.includes(t)))) {
+        hits.push({
+          scar_id: scar.scar_id || id,
+          failure_mode: scar.failure_mode || "",
+          severity: scar.severity || "MEDIUM",
+          scar_pressure: scar.scar_pressure || 0.5,
+          constraint_imposed: scar.constraint_imposed || "",
+        });
+      }
+    }
+    return hits.sort((a, b) => b.scar_pressure - a.scar_pressure);
+  } catch {
+    return [];
+  }
 }
 
 // ── SAFE FILESYSTEM ZONES ─────────────────────────────────────────────────
@@ -947,6 +998,25 @@ export function registerShellTools(server: McpServer): void {
 
       // ── Step 1: ArifJudge classification ──
       const judge: JudgeResult = classifyCommand(command, cwd);
+
+      // ── Step 1.5: Scar Reflex Gate (SCAR→CONSTRAINT, EUREKA-Q10) ──
+      // "Memory preserves consequences. Governance re-imposes them."
+      // Witness without actuation is historical only — so keyword-match
+      // every command against sealed scar failure modes. A strong hit
+      // upgrades ALLOW→GATE and annotates GATE/DENY with the scar that
+      // already paid for this lesson.
+      const scarHits = matchScarsByKeywords(command);
+      const scarAnnotated = scarHits.length > 0;
+      if (scarAnnotated && judge.decision === "allow") {
+        const top = scarHits[0];
+        judge.decision = "gate";
+        judge.reason =
+          `888_HOLD: SCAR_REFLEX — matches sealed scar "${top.failure_mode.slice(0, 120)}" ` +
+          `(pressure=${top.scar_pressure}, severity=${top.severity}). ` +
+          `Constraint: ${top.constraint_imposed.slice(0, 200)}`;
+        judge.matchedPattern = `scar_reflex:${top.scar_id}`;
+        judge.actionClass = "EXECUTE_HIGH_IMPACT";
+      }
 
       if (judge.decision === "deny") {
         fireAlert({
