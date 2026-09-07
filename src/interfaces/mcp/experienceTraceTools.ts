@@ -109,6 +109,111 @@ async function loadTraces(): Promise<ExperienceTrace[]> {
 
 // ── Registration ────────────────────────────────────────────────────────────
 
+/**
+ * Record an experience trace — shared helper for both the MCP handler
+ * (forge_experience_trace tool) and internal auto-fire hooks
+ * (e.g., forgeExecute post-execution wire-up, P0 ratified 2026-09-08).
+ *
+ * Single source of truth for chain state. Both call sites update the same
+ * tracePrevHash / traceSeq, so the JSONL ledger stays hash-chained end-to-end.
+ *
+ * Returns the sealed trace entry. Failures are caught and logged —
+ * trace recording MUST NOT block upstream execution (constitutional: F1 AMANAH
+ * preserves the executing path, trace is observational).
+ */
+export async function recordExperienceTrace(params: {
+  session_id: string;
+  agent_id: string;
+  tool: string;
+  input_summary: string;
+  output_summary: string;
+  success: boolean;
+  feedback_self?: string;
+  feedback_environmental?: string;
+  feedback_constitutional?: string;
+  capability_change?: number;
+  confidence_change?: number;
+  new_scar?: string;
+  new_skill?: string;
+}): Promise<ExperienceTrace | { error: string }> {
+  try {
+    const seq = ++traceSeq;
+    const traceId = `exp-${Date.now()}-${seq}`;
+    const ts = new Date().toISOString();
+
+    const inputHash = hashContent(params.input_summary);
+    const outputHash = hashContent(params.output_summary);
+
+    const record: Omit<ExperienceTrace, "hash"> = {
+      trace_id: traceId,
+      seq,
+      ts,
+      session_id: params.session_id,
+      agent_id: params.agent_id,
+      action: {
+        tool: params.tool,
+        input_hash: inputHash,
+      },
+      observation: {
+        output_hash: outputHash,
+        success: params.success,
+      },
+      feedback: {
+        self: params.feedback_self,
+        environmental: params.feedback_environmental,
+        constitutional: params.feedback_constitutional,
+      },
+      experience_delta: {
+        capability_change: params.capability_change,
+        confidence_change: params.confidence_change,
+        new_scar: params.new_scar ?? null,
+        new_skill: params.new_skill ?? null,
+      },
+      prev_hash: tracePrevHash,
+    };
+
+    const hash = createHash("sha256")
+      .update(JSON.stringify(record))
+      .digest("hex");
+
+    const entry: ExperienceTrace = { ...record, hash };
+
+    // Append to JSONL ledger
+    await appendFile(EXPERIENCE_TRACE_LOG, JSON.stringify(entry) + "\n", "utf-8");
+
+    // Update chain head
+    tracePrevHash = hash;
+
+    // Forward to arifLOW telemetry — fire-and-forget
+    fetch("http://127.0.0.1:7073/telemetry/log", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        band: "OPERATIONAL",
+        organ: "A-FORGE",
+        tool_name: `experience_trace:${params.tool}`,
+        success: params.success,
+        metadata: {
+          trace_id: traceId,
+          agent_id: params.agent_id,
+          capability_change: params.capability_change,
+          confidence_change: params.confidence_change,
+          has_self_feedback: !!params.feedback_self,
+          has_env_feedback: !!params.feedback_environmental,
+          has_const_feedback: !!params.feedback_constitutional,
+        },
+      }),
+      signal: AbortSignal.timeout(2000),
+    }).catch(() => { });
+
+    return entry;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn("[recordExperienceTrace] failed:", msg);
+    return { error: msg };
+  }
+}
+
 export function registerExperienceTraceTools(server: McpServer): void {
   // ── forge_experience_trace ──
   server.tool(
@@ -133,95 +238,42 @@ export function registerExperienceTraceTools(server: McpServer): void {
       new_skill: z.string().optional().describe("If this trace produced a new skill, its identifier"),
     },
     async (params) => {
-      const seq = ++traceSeq;
-      const traceId = `exp-${Date.now()}-${seq}`;
-      const ts = new Date().toISOString();
+      // Delegate to shared helper (single source of truth for chain state).
+      // Refactored 2026-09-08 to enable P0 auto-fire from forgeExecute.
+      const entry = await recordExperienceTrace(params);
 
-      const inputHash = hashContent(params.input_summary);
-      const outputHash = hashContent(params.output_summary);
-
-      const record: Omit<ExperienceTrace, "hash"> = {
-        trace_id: traceId,
-        seq,
-        ts,
-        session_id: params.session_id,
-        agent_id: params.agent_id,
-        action: {
-          tool: params.tool,
-          input_hash: inputHash,
-        },
-        observation: {
-          output_hash: outputHash,
-          success: params.success,
-        },
-        feedback: {
-          self: params.feedback_self,
-          environmental: params.feedback_environmental,
-          constitutional: params.feedback_constitutional,
-        },
-        experience_delta: {
-          capability_change: params.capability_change,
-          confidence_change: params.confidence_change,
-          new_scar: params.new_scar ?? null,
-          new_skill: params.new_skill ?? null,
-        },
-        prev_hash: tracePrevHash,
-      };
-
-      const hash = createHash("sha256")
-        .update(JSON.stringify(record))
-        .digest("hex");
-
-      const entry: ExperienceTrace = { ...record, hash };
-
-      // Append to JSONL ledger
-      await appendFile(EXPERIENCE_TRACE_LOG, JSON.stringify(entry) + "\n", "utf-8");
-
-      // Update chain head
-      tracePrevHash = hash;
-
-      // Forward to arifLOW telemetry — fire-and-forget
-      fetch("http://127.0.0.1:7073/telemetry/log", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          band: "OPERATIONAL",
-          organ: "A-FORGE",
-          tool_name: `experience_trace:${params.tool}`,
-          success: params.success,
-          metadata: {
-            trace_id: traceId,
-            agent_id: params.agent_id,
-            capability_change: params.capability_change,
-            confidence_change: params.confidence_change,
-            has_self_feedback: !!params.feedback_self,
-            has_env_feedback: !!params.feedback_environmental,
-            has_const_feedback: !!params.feedback_constitutional,
-          },
-        }),
-        signal: AbortSignal.timeout(2000),
-      }).catch(() => {});
+      if ("error" in entry) {
+        return {
+          content: [{
+            type: "text" as const,
+            text: JSON.stringify({
+              status: "HOLD",
+              error: entry.error,
+            }),
+          }],
+        };
+      }
 
       return {
         content: [{
           type: "text" as const,
           text: JSON.stringify({
             status: "SEAL",
-            trace_id: traceId,
-            seq,
-            ts,
-            tool: params.tool,
-            agent_id: params.agent_id,
-            success: params.success,
+            trace_id: entry.trace_id,
+            seq: entry.seq,
+            ts: entry.ts,
+            tool: entry.action.tool,
+            agent_id: entry.agent_id,
+            success: entry.observation.success,
             feedback_channels: {
-              self: !!params.feedback_self,
-              environmental: !!params.feedback_environmental,
-              constitutional: !!params.feedback_constitutional,
+              self: !!entry.feedback.self,
+              environmental: !!entry.feedback.environmental,
+              constitutional: !!entry.feedback.constitutional,
             },
             experience_delta: entry.experience_delta,
             chain: {
-              prev_hash: tracePrevHash.slice(0, 16) + "...",
-              hash: hash.slice(0, 16) + "...",
+              prev_hash: entry.prev_hash.slice(0, 16) + "...",
+              hash: entry.hash.slice(0, 16) + "...",
             },
             _epistemic: {
               evidence_layer: "OBS",

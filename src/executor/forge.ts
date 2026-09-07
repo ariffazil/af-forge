@@ -18,6 +18,7 @@ import {
   type ActionResult,
   type ExecutionReport,
 } from "./types.js";
+import { recordExperienceTrace } from "../interfaces/mcp/experienceTraceTools.js";
 
 // ── Tool Registry ────────────────────────────
 
@@ -281,6 +282,31 @@ export async function forgeExecute(
   const succeeded = results.filter((r) => r.status === "SUCCESS").length;
   const failed = results.filter((r) => r.status === "FAILURE").length;
 
+  const summaryVerdict =
+    failed === 0 ? "SUCCESS" :
+    succeeded === 0 ? "FAILURE" :
+    "PARTIAL";
+
+  // ── P0: Auto-fire experience trace (F13-ratified 2026-09-08) ──
+  // Constitutional territory: each forgeExecute invocation leaves a
+  // Chain-of-Experience trace so the experience loop auto-fires without
+  // agent decision. Fire-and-forget (void); never block execution path
+  // on trace failure (F1 AMANAH: trace is observational, not gating).
+  void recordExperienceTrace({
+    session_id: (receipt as unknown as { session_id?: string }).session_id ?? "unknown",
+    agent_id: (receipt as unknown as { actor_id?: string }).actor_id ?? "aforge-auto",
+    tool: "forge_execute",
+    input_summary: `forgeExecute actions=[${actions.join(",")}] blastRadius=${receipt.bounds?.blastRadius ?? "?"} reversible=${receipt.bounds?.reversible ?? "?"}`,
+    output_summary: `verdict=${summaryVerdict} succeeded=${succeeded} failed=${failed} duration_ms=${totalDuration}`,
+    success: failed === 0,
+    feedback_constitutional: receipt.verdict === "SEAL" || receipt.verdict === "SABAR" ? `PASS (kernel verdict ${receipt.verdict})` : "UNKNOWN",
+    feedback_environmental: `actions_executed=${actions.length} max_tools=${receipt.bounds?.maxTools ?? "?"}`,
+  }).catch((err: unknown) => {
+    // Fail-soft: log but never break forgeExecute.
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn("[forgeExecute] auto-fire trace failed:", msg);
+  });
+
   return {
     receipt,
     results,
@@ -289,10 +315,7 @@ export async function forgeExecute(
       succeeded,
       failed,
       totalDurationMs: totalDuration,
-      verdict:
-        failed === 0 ? "SUCCESS" :
-        succeeded === 0 ? "FAILURE" :
-        "PARTIAL",
+      verdict: summaryVerdict,
     },
     timestamp: new Date().toISOString(),
   };
