@@ -362,7 +362,10 @@ def _call_fed_route(
     }
     body = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
-        f"{FED_URL}/fed/route",
+        # FI-008 2026-09-07: was {FED_URL}/fed/route — dead path (HTTP 404, the
+        # FED server only exposes /health, /mcp, /report, /route). Fixed to the
+        # plain-JSON advisory route endpoint added in FED v3.3.
+        f"{FED_URL}/route",
         data=body,
         headers={"Content-Type": "application/json", "Accept": "application/json"},
     )
@@ -611,6 +614,8 @@ class FedAwareMiddleware(BaseHTTPRequestHandler):
                             forward_body, self.headers, resolved_model, resolved_provider, model
                         )
                         return
+                    import time as _time
+                    _t0 = _time.time()
                     status, hdrs, resp_body = _proxy_to(
                         base_url.rstrip("/") + "/chat/completions",
                         forward_body,
@@ -627,6 +632,35 @@ class FedAwareMiddleware(BaseHTTPRequestHandler):
                         },
                         provider_api_key,
                     )
+                    _latency_ms = round((_time.time() - _t0) * 1000, 1)
+
+                    def _report_telemetry():
+                        # FI-008 2026-09-07 (Phase 0 fix #3): close the telemetry
+                        # loop — fed_report_latency had ZERO callers. Best-effort,
+                        # daemon thread, never blocks the response.
+                        try:
+                            _rb = json.dumps(
+                                {
+                                    "provider": resolved_provider,
+                                    "model": resolved_model,
+                                    "latency_ms": _latency_ms,
+                                    "status_code": status,
+                                    "agent_id": "fed-aware-middleware",
+                                    "hcsvog_fingerprint": hcsvog_fp_preview,
+                                }
+                            ).encode("utf-8")
+                            _rq = urllib.request.Request(
+                                f"{FED_URL}/report",
+                                data=_rb,
+                                headers={"Content-Type": "application/json"},
+                            )
+                            urllib.request.urlopen(_rq, timeout=2).read()
+                        except Exception:  # noqa: BLE001 — telemetry must never break proxying
+                            pass
+
+                    hcsvog_fp_preview = (result or {}).get("meta", {}).get("hcsvog", {}).get("h_fingerprint", "")
+                    import threading as _threading
+                    _threading.Thread(target=_report_telemetry, daemon=True).start()
                     self.send_response(status)
                     for k, v in hdrs.items():
                         if k.lower() not in (

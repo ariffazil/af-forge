@@ -287,59 +287,37 @@ initWorldModelLogger().catch((err) => {
 
 // ── P1-5n/o: Forward to arifFLOW ────────────────────────────────────────────
 
-/**
- * P1-5n: Forward WM trajectory to arifFLOW :7073/telemetry/log.
- */
-async function _forwardTrajectoryToArifFlow(entry: TrajectoryLogEntry): Promise<void> {
-  try {
-    await fetch("http://127.0.0.1:7073/telemetry/log", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        band: "OPERATIONAL",
-        organ: "A-FORGE",
-        tool_name: `wm:${entry.tool}`,
-        success: (entry.exit_code ?? 0) === 0,
-        metadata: {
-          action_hash: entry.action_hash,
-          observation_hash: entry.observation_hash,
-          wm_priority: entry.wm_priority,
-          surprise_score: entry.surprise_score,
-          prediction_gap: entry.prediction_gap,
-          evidence_gap: entry.evidence_gap,
-          agent_confidence: entry.agent_confidence,
-          seq: entry.seq,
-        },
-      }),
-      signal: AbortSignal.timeout(2000),
-    });
-  } catch { /* silent */ }
+// HOLD-888 (2026-09-07 FI-008 contrast audit): the live arifFlow daemon
+// exposes NO /telemetry/log route (live routes: /health /ingest /vector
+// /check /release /enforce /flow). Both forwards below 404'd silently on
+// every WM trajectory + prediction since P1-5n/o shipped. Adding the route
+// requires a Rust daemon rebuild + metabolism-plane restart — queued for
+// 888 decision. Until then: warn once, skip the send; data stays in local
+// WM logs (trajectory + prediction JSONL).
+
+let wmTelemetryWarned = false;
+function warnWmTelemetryDead(): void {
+  if (wmTelemetryWarned) return;
+  wmTelemetryWarned = true;
+  console.error(
+    "[worldModelLogger] arifFlow /telemetry/log route does not exist — WM forwards disabled pending daemon route (HOLD-888, see AUDIT-CONTRAST-2026-09-07)",
+  );
 }
 
 /**
- * P1-5o: Forward WM prediction to arifFLOW :7073/telemetry/log.
+ * P1-5n: Forward WM trajectory to arifFLOW — DISABLED (no daemon route).
+ */
+async function _forwardTrajectoryToArifFlow(entry: TrajectoryLogEntry): Promise<void> {
+  warnWmTelemetryDead();
+  void entry;
+}
+
+/**
+ * P1-5o: Forward WM prediction to arifFLOW — DISABLED (no daemon route).
  */
 async function _forwardPredictionToArifFlow(
   entry: PredictionRecord & { seq: number; hash: string },
 ): Promise<void> {
-  try {
-    await fetch("http://127.0.0.1:7073/telemetry/log", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        band: "OPERATIONAL",
-        organ: "A-FORGE",
-        tool_name: `wm-predict:${entry.tool}`,
-        success: true,
-        metadata: {
-          gap_score: entry.gap_score,
-          predicted_hash: entry.predicted_hash,
-          actual_hash: entry.actual_hash,
-          action_hash: entry.action_hash,
-          seq: entry.seq,
-        },
-      }),
-      signal: AbortSignal.timeout(2000),
-    });
-  } catch { /* silent */ }
+  warnWmTelemetryDead();
+  void entry;
 }

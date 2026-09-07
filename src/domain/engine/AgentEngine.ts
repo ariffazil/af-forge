@@ -1130,9 +1130,11 @@ export class AgentEngine {
   }
 
   /**
-   * P1-5f: Forward AgentEngine execution receipt to arifFLOW :7073/receipt/emit.
-   * Fire-and-forget — failure is silent, local ledger + seal are primary.
-   * DEPRECATED P1-7: will be replaced by arifFLOW client import post-extraction.
+   * P1-5f (FIXED 2026-09-07, FI-008 contrast audit): forward AgentEngine
+   * execution receipt to arifFLOW POST /ingest (canonical FlowReceipt).
+   * The old /receipt/emit endpoint never existed on the live daemon —
+   * every call 404'd silently since P1-5f shipped. Fire-and-forget
+   * remains: local ledger + seal are primary sinks.
    */
   private async _forwardToArifFlow(
     result: AgentRunResult,
@@ -1141,20 +1143,25 @@ export class AgentEngine {
     floorsTriggered: string[],
   ): Promise<void> {
     try {
-      await fetch("http://127.0.0.1:7073/receipt/emit", {
+      await fetch("http://127.0.0.1:7073/ingest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          organ: "A-FORGE",
-          producer: "AgentEngine",
-          action: this.profile.name,
-          scope: `session:${result.sessionId.slice(0, 12)}`,
-          risk: metrics.blockedDangerousActions > 0 ? "CONSEQUENTIAL" : "OPERATIONAL",
-          epistemic_label: "OBS",
-          confidence: 0.90,
+          receipt_id: randomUUID(),
           actor_id: this.profile.name,
-          verdict: metrics.completion ? "SEAL" : "HOLD",
-          metadata: {
+          session_id: result.sessionId,
+          step_type: "Execute",
+          epistemic_label: "Observation",
+          cost_ns: 0,
+          step_number: Math.max(1, result.turnCount),
+          created_at: new Date().toISOString(),
+          floor_verdict: metrics.completion ? "Pass" : "Hold",
+          payload: {
+            organ: "A-FORGE",
+            producer: "AgentEngine",
+            action: this.profile.name,
+            risk: metrics.blockedDangerousActions > 0 ? "CONSEQUENTIAL" : "OPERATIONAL",
+            verdict: metrics.completion ? "SEAL" : "HOLD",
             turn_count: result.turnCount,
             total_tokens: result.totalEstimatedTokens,
             profile: this.profile.name,
