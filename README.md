@@ -7,7 +7,7 @@ forge_port: 7072 (healthy)
 tools_live: 116+ (live-witnessed via :7072/tools/list — beats any static count in prose)
 authority_ceiling: 777_FORGE (execution only — never adjudicate)
 act_ingress: HMAC-SHA256 verified, FI alias map complete
-infra_organs: arifFlow:7073 METABOLISM, FED:7074 ADVISORY, FLAME:18901 ADVISORY, FRAME:frame-organ OBSERVE
+infra_organs: arifFlow:7073 METABOLISM, FED:7074 ADVISORY, FRAME:frame-organ OBSERVE (FLAME:18901 decommissioned 2026-09-04)
 truth_rule: MCP tools/list on :7072 beats any static count in prose
 -->
 

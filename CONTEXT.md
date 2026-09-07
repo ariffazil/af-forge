@@ -10,7 +10,7 @@ See daily memory logs in `/root/memory/YYYY-MM-DD.md`.
 See forge work artifacts in `/root/A-FORGE/forge_work/`.
 
 ## Blockers
-None currently. Check `/root/AAA/docs/AAA_HOLDS.md` for sovereign holds.
+None currently. Sovereign holds: `/root/AAA/terminal/holds.txt` (legacy `/root/AAA/docs/AAA_HOLDS.md` removed).
 
 ## Recent Decisions
 Refer to VAULT999 seal chain for immutable record.
