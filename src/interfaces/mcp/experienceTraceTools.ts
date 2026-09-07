@@ -20,7 +20,8 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createHash } from "node:crypto";
-import { appendFile, mkdir, readFile, stat } from "node:fs/promises";
+import { appendFile, mkdir, readFile, stat, open, unlink, writeFile } from "node:fs/promises";
+import type { FileHandle } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { existsSync } from "node:fs";
 
@@ -28,6 +29,11 @@ import { existsSync } from "node:fs";
 
 const EXPERIENCE_TRACE_LOG = "/root/.local/share/arifos/world-model/experience_traces.jsonl";
 const SKILL_SELECTION_LOG = "/root/.local/share/arifos/skill-selection/selections.jsonl";
+// Lock file for multi-process serialization. Path option A (per-write re-read + locking).
+// Node v22 lacks FileHandle.flock / fs.flock — fallback to lockfile pattern with wx exclusive create.
+const EXPERIENCE_TRACE_LOCK = "/root/.local/share/arifos/world-model/experience_traces.lock";
+const LOCK_RETRY_DELAY_MS = 25;
+const LOCK_MAX_RETRIES = 800; // 20s budget at 25ms intervals
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -83,10 +89,22 @@ async function initTraceChain(): Promise<void> {
   }
 }
 
-// Initialize on import
-initTraceChain().catch((err) => {
+// Initialize on import — STORE the promise so callers can await.
+// Fixes scar_p0_race_init_chain: fresh Node process + immediate
+// recordExperienceTrace call previously raced the fire-and-forget init.
+const initPromise: Promise<void> = initTraceChain().catch((err) => {
   console.error("[experienceTraceTools] Init failed:", err.message);
 });
+
+/**
+ * Ensure the trace chain has been initialized from disk.
+ * Idempotent — safe to call repeatedly. Returns immediately if init
+ * already completed. Fixes scar_p0_race_init_chain by guaranteeing
+ * chain state is loaded before any recordExperienceTrace read.
+ */
+export function ensureInit(): Promise<void> {
+  return initPromise;
+}
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -136,7 +154,43 @@ export async function recordExperienceTrace(params: {
   new_scar?: string;
   new_skill?: string;
 }): Promise<ExperienceTrace | { error: string }> {
+  // Fix scar_p0_race_init_chain: wait for chain state to load from disk
+  // before reading traceSeq / tracePrevHash. Idempotent; safe even if init
+  // already completed (returns immediately).
+  await ensureInit();
+
+  // Option A (Sovereign 2026-09-08): per-write re-read + lockfile serialization.
+  // Node v22 lacks fs.flock — use wx exclusive create on a sidecar lockfile.
+  // Scoped lock = prevents multi-process stale-state races.
+  let lockHandle: FileHandle | null = null;
+  let fileHandle: FileHandle | null = null;
   try {
+    // 1. Acquire lock (lockfile pattern)
+    lockHandle = await acquireTraceLock();
+
+    // 2. Open data file for append + re-read
+    fileHandle = await open(EXPERIENCE_TRACE_LOG, "a+");
+    const fileStat = await fileHandle.stat();
+    if (fileStat.size > 0) {
+      // Re-read tail to handle multi-process stale state
+      const readSize = Math.min(Number(fileStat.size), 16384); // 16KB tail
+      const buf = Buffer.alloc(readSize);
+      await fileHandle.read(buf, 0, readSize, Number(fileStat.size) - readSize);
+      const tail = buf.toString("utf-8");
+      const lines = tail.trim().split("\n").filter(Boolean);
+      if (lines.length > 0) {
+        try {
+          const last = JSON.parse(lines[lines.length - 1]) as ExperienceTrace;
+          if (last.seq !== undefined && last.hash) {
+            traceSeq = last.seq;
+            tracePrevHash = last.hash;
+          }
+        } catch {
+          // Last line unparseable — keep current in-memory state
+        }
+      }
+    }
+
     const seq = ++traceSeq;
     const traceId = `exp-${Date.now()}-${seq}`;
     const ts = new Date().toISOString();
@@ -178,13 +232,13 @@ export async function recordExperienceTrace(params: {
 
     const entry: ExperienceTrace = { ...record, hash };
 
-    // Append to JSONL ledger
-    await appendFile(EXPERIENCE_TRACE_LOG, JSON.stringify(entry) + "\n", "utf-8");
+    // Append to JSONL ledger (under lock — atomic at OS append level)
+    await fileHandle.appendFile(JSON.stringify(entry) + "\n", "utf-8");
 
-    // Update chain head
+    // Update chain head in-memory
     tracePrevHash = hash;
 
-    // Forward to arifLOW telemetry — fire-and-forget
+    // Forward to arifLOW telemetry — fire-and-forget (do NOT hold lock during network I/O)
     fetch("http://127.0.0.1:7073/telemetry/log", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -206,11 +260,159 @@ export async function recordExperienceTrace(params: {
       signal: AbortSignal.timeout(2000),
     }).catch(() => { });
 
+    // ── P2: Experience → Skill Writeback trigger ──
+    // Fire AFTER release of any in-flight telemetry. fail-soft — never block.
+    void maybeProposeSkillWriteback(entry).then((res) => {
+      if (res.proposed) {
+        console.log(
+          `[recordExperienceTrace] P2 proposal ${res.proposal_id} for tool=${entry.action.tool}`,
+        );
+      }
+    }).catch(() => {});
+
     return entry;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.warn("[recordExperienceTrace] failed:", msg);
     return { error: msg };
+  } finally {
+    // 3. Release lock + close handles (always, even on error)
+    if (fileHandle) {
+      try { await fileHandle.close(); } catch {}
+    }
+    if (lockHandle) {
+      try { await lockHandle.close(); } catch {}
+      try { await unlink(EXPERIENCE_TRACE_LOCK); } catch {}
+    }
+  }
+}
+
+/**
+ * Acquire the trace-write lock via lockfile pattern.
+ * Node v22 lacks fs.flock — fall back to wx exclusive create on sidecar file.
+ * Retries with backoff if held by another writer.
+ */
+async function acquireTraceLock(): Promise<FileHandle> {
+  // Ensure directory exists
+  await mkdir(dirname(EXPERIENCE_TRACE_LOCK), { recursive: true });
+  for (let i = 0; i < LOCK_MAX_RETRIES; i++) {
+    try {
+      // wx = create exclusively — fails with EEXIST if file exists
+      const handle = await open(EXPERIENCE_TRACE_LOCK, "wx");
+      return handle;
+    } catch (err: unknown) {
+      const code = (err as NodeJS.ErrnoException).code;
+      if (code !== "EEXIST") throw err;
+      // Lock held by another writer — wait + retry
+      await new Promise((r) => setTimeout(r, LOCK_RETRY_DELAY_MS));
+    }
+  }
+  throw new Error(
+    `[acquireTraceLock] failed after ${LOCK_MAX_RETRIES} retries (${LOCK_MAX_RETRIES * LOCK_RETRY_DELAY_MS}ms)`,
+  );
+}
+
+// ── P2: Experience → Skill Writeback (F13-ratified 2026-09-08) ──────────────
+
+const SKILL_PROPOSALS_DIR = "/root/.local/share/arifos/skill-proposals";
+const P2_WINDOW = 10;        // Look at last N traces for pattern
+const P2_THRESHOLD = 3;      // Trigger when same tool appears >= N times
+const P2_PROPOSAL_COOLDOWN_MS = 60_000; // Avoid re-proposing same tool within 60s
+
+/**
+ * P2 helper — detect patterns across recent traces; if a tool appears
+ * P2_THRESHOLD+ times in P2_WINDOW recent traces, write a structured
+ * proposal to SKILL_PROPOSALS_DIR. F13 ratifies via external signal —
+ * NEVER auto-applies. Constitutional: feedback-f13-sovereignty-visibility-
+ * prerequisite mandates visibility before any skill modification.
+ *
+ * Fail-soft: proposal write failures must never break recordExperienceTrace.
+ */
+async function maybeProposeSkillWriteback(
+  recordedTrace: ExperienceTrace,
+): Promise<{ proposed: boolean; proposal_id?: string; error?: string }> {
+  try {
+    const tool = recordedTrace.action.tool;
+    if (!tool || tool === "forge_experience_trace") {
+      return { proposed: false }; // Don't propose about the trace tool itself
+    }
+
+    // Cooldown: don't re-propose same tool within 60s
+    const cooldownPath = `${SKILL_PROPOSALS_DIR}/.cooldown-${tool}.txt`;
+    try {
+      const cooldownStat = await stat(cooldownPath);
+      if (Date.now() - cooldownStat.mtimeMs < P2_PROPOSAL_COOLDOWN_MS) {
+        return { proposed: false };
+      }
+    } catch {
+      // No cooldown file — proceed
+    }
+
+    // Read last N traces (already locked by caller via recordExperienceTrace)
+    const recentTraces = await loadTraces();
+    const window = recentTraces.slice(-P2_WINDOW);
+    const sameToolTraces = window.filter(
+      (t) => t.action.tool === tool && t.trace_id !== recordedTrace.trace_id,
+    );
+
+    if (sameToolTraces.length + 1 < P2_THRESHOLD) {
+      return { proposed: false };
+    }
+
+    // Detect pattern
+    const allTraces = [...sameToolTraces, recordedTrace];
+    const successCount = allTraces.filter((t) => t.observation.success).length;
+    const successRate = Number((successCount / allTraces.length).toFixed(2));
+    const diffSignatures = allTraces
+      .map((t) => t.feedback.environmental?.match(/diffs=\[(.*?)\]/)?.[1] ?? "")
+      .filter(Boolean);
+
+    let patternKind: "high_failure_rate" | "diff_volatility" | "ok_repetitive" = "ok_repetitive";
+    if (successRate < 0.5) {
+      patternKind = "high_failure_rate";
+    } else if (diffSignatures.length >= 2 && new Set(diffSignatures).size > 1) {
+      patternKind = "diff_volatility";
+    }
+
+    const proposalId = `prop-${Date.now()}-${tool}`;
+    const proposal = {
+      proposal_id: proposalId,
+      created_at: new Date().toISOString(),
+      tool,
+      pattern: {
+        kind: patternKind,
+        occurrences: allTraces.length,
+        window: P2_WINDOW,
+        success_rate: successRate,
+        diff_signature_count: new Set(diffSignatures).size,
+      },
+      suggested_skill: {
+        name: `${tool}-${patternKind}-guard`,
+        description:
+          patternKind === "high_failure_rate"
+            ? `Auto-suggested: frequent failures for ${tool}. Consider adding pre-flight check or guard skill.`
+            : patternKind === "diff_volatility"
+              ? `Auto-suggested: high diff volatility for ${tool}. Consider adding expected_output scaffolding or calibration skill.`
+              : `Auto-suggested: repetitive ${tool} usage. Consider caching or specializing.`,
+        content_hint: "Patch via skill_manage after F13 ratification.",
+      },
+      evidence_trace_ids: allTraces.map((t) => t.trace_id),
+      f13_status: "PENDING_RATIFICATION",
+      ratification_path: 'awaiting F13 signal "ratify" or "reject"',
+    };
+
+    // Ensure dir + write proposal (fail-soft)
+    await mkdir(SKILL_PROPOSALS_DIR, { recursive: true });
+    const proposalPath = `${SKILL_PROPOSALS_DIR}/${proposalId}.json`;
+    await writeFile(proposalPath, JSON.stringify(proposal, null, 2), "utf-8");
+    // Update cooldown
+    await writeFile(cooldownPath, new Date().toISOString(), "utf-8");
+
+    return { proposed: true, proposal_id: proposalId };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn("[maybeProposeSkillWriteback] failed:", msg);
+    return { proposed: false, error: msg };
   }
 }
 

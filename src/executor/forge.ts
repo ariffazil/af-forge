@@ -287,6 +287,32 @@ export async function forgeExecute(
     succeeded === 0 ? "FAILURE" :
     "PARTIAL";
 
+  // ── P1: Auto-diff expected vs actual (F13-ratified 2026-09-08) ──
+  // For each action that supplied expected_output (e.g., forge_shell's
+  // expected_output param), compute diff against actual result. The
+  // apprentice "rep" — auto-populate feedback_environmental with the
+  // delta so the experience trace captures surprise, not just count.
+  const diffs: string[] = [];
+  for (const r of results) {
+    const actionParams = params?.[r.tool] as Record<string, unknown> | undefined;
+    const expected = actionParams?.expected_output;
+    if (typeof expected === "string" && r.output !== undefined && r.output !== null) {
+      const actualStr = typeof r.output === "string" ? r.output : JSON.stringify(r.output);
+      const lenExpected = expected.length;
+      const lenActual = actualStr.length;
+      const lenRatio = lenExpected > 0 ? Number((lenActual / lenExpected).toFixed(2)) : 0;
+      const exactMatch = expected === actualStr;
+      const headEqual = expected.slice(0, 80) === actualStr.slice(0, 80);
+      diffs.push(
+        `${r.tool}:status=${r.status} expected_len=${lenExpected} actual_len=${lenActual} ratio=${lenRatio} exact=${exactMatch ? "yes" : "no"} head80=${headEqual ? "yes" : "no"}`,
+      );
+    } else if (typeof expected === "string") {
+      diffs.push(`${r.tool}:status=${r.status} no_actual_output`);
+    } else {
+      diffs.push(`${r.tool}:status=${r.status} no_prediction`);
+    }
+  }
+
   // ── P0: Auto-fire experience trace (F13-ratified 2026-09-08) ──
   // Constitutional territory: each forgeExecute invocation leaves a
   // Chain-of-Experience trace so the experience loop auto-fires without
@@ -300,7 +326,7 @@ export async function forgeExecute(
     output_summary: `verdict=${summaryVerdict} succeeded=${succeeded} failed=${failed} duration_ms=${totalDuration}`,
     success: failed === 0,
     feedback_constitutional: receipt.verdict === "SEAL" || receipt.verdict === "SABAR" ? `PASS (kernel verdict ${receipt.verdict})` : "UNKNOWN",
-    feedback_environmental: `actions_executed=${actions.length} max_tools=${receipt.bounds?.maxTools ?? "?"}`,
+    feedback_environmental: `actions=${actions.length}/${receipt.bounds?.maxTools ?? "?"} | diffs=[${diffs.join("; ")}]`,
   }).catch((err: unknown) => {
     // Fail-soft: log but never break forgeExecute.
     const msg = err instanceof Error ? err.message : String(err);
