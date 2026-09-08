@@ -124,6 +124,26 @@ if [ -f "/root/AAA/scripts/supply_chain_gate.py" ]; then
     fi
 fi
 
+# ── MUSYAWARAH NO-GATE (E-3 / musyawarah.md §6, 2026-09-08) ──
+# Sentinel: scans arifFlow ledger for T2/T3 receipts without musyawawah_reference.
+# Tier: OBSERVE_ONLY (advisory at commit boundary). Runtime gate (Phase 2 step 3,
+# forge_shell action_class DENY) is the GATE-tier enforcement to avoid detection debt.
+# Per gate-promotion.md: paired with runtime gate = no detection debt.
+if [ -f "/root/AAA/scripts/musyawawah_gate.py" ]; then
+    echo -e "${C}[MUSYAWARAH-GATE]${X} scanning arifFlow ledger (OBSERVE_ONLY)..."
+    MUSYAWARAH_OUT=$(python3 /root/AAA/scripts/musyawawah_gate.py --scan-ledger --dry-run 2>&1)
+    MUSYAWARAH_RC=$?
+    if [ -n "$MUSYAWARAH_OUT" ]; then
+        echo "$MUSYAWARAH_OUT" | sed 's/^/  /'
+    fi
+    # OBSERVE_ONLY: do not block commit. Runtime gate is Phase 2 step 3.
+    # Set MUSYAWARAH_STRICT=1 to escalate to blocking (development flag).
+    if [ "${MUSYAWARAH_STRICT:-0}" = "1" ] && [ "$MUSYAWARAH_RC" -ne 0 ]; then
+        echo -e "${R}MUSYAWARAH GATE (STRICT): commit blocked — fix T2/T3 violations in arifFlow ledger${X}" >&2
+        ERRORS=$((ERRORS + 1))
+    fi
+fi
+
 # ── Verdict ──────────────────────────────────────────────────
 echo ""
 TOTAL=$((ERRORS + WARNINGS + CLEAN))
