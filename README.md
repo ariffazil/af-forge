@@ -25,7 +25,7 @@ truth_rule: MCP tools/list on :7072 beats any static count in prose
 
 > **DITEMPA BUKAN DIBERI** — *Forged, Not Given.*
 
-A-FORGE is the governed execution engine of the arifOS Federation. It provides **200+ tools across 50+ sub-skills** spanning code, infrastructure, security, documentation, and deployment — all operating under a constitutional kernel that ensures every mutation is authorized, witnessed, and immutably recorded.
+A-FORGE is the **EXECUTION** engine of the arifOS Federation (plane: EXECUTION, never governance). It provides **200+ tools across 50+ sub-skills** spanning code, infrastructure, security, documentation, and deployment — all operating under the arifOS constitutional kernel (`:8088 JUDGE_ONLY`) that ensures every mutation is authorized, witnessed, and immutably recorded. **A-FORGE never adjudicates.**
 
 ---
 
@@ -33,7 +33,7 @@ A-FORGE is the governed execution engine of the arifOS Federation. It provides *
 
 | Capability | Details |
 |---|---|
-| **Task Execution** | Governed filesystem mutations, shell operations, and workflow automation — every action classified, leased, and receipted |
+| **Task Execution** | Filesystem mutations, shell operations, and workflow automation under constitutional authority — every action classified, leased, and receipted |
 | **CI/CD Pipelines** | GitHub Actions workflows for agentic CI, boundary-guard enforcement, governance gates, Dependabot orchestration, and multi-language lock-invariant checks |
 | **Docker Orchestration** | Container fleet management, Compose orchestration, image builds, multi-stage pipelines, and runtime health probes |
 | **MCP Server Lifecycle** | Build, test, deploy, and conformance-validate Model Context Protocol servers with full stateless HTTP transport |
