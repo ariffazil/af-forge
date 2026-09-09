@@ -11,8 +11,6 @@ import { homedir } from "node:os";
 import { resolve, dirname } from "node:path";
 import { appendFile, mkdir } from "node:fs/promises";
 
-const ARIFLOW_TELEMETRY = "http://127.0.0.1:7073/telemetry/log";
-
 export type AuditEventAction =
   | "invoke"
   | "success"
@@ -134,7 +132,11 @@ class McpTelemetry {
     }
     const line = JSON.stringify(safeEvent) + "\n";
     await appendFile(this.auditPath, line, "utf-8");
-    // P1-6: Forward to arifFLOW telemetry (fire-and-forget, silent on failure)
+    // P1-6 (FIXED 2026-09-09): forward as FlowReceipt to arifFLOW /ingest.
+    // Was: POST /telemetry/log — endpoint no longer exists on the live Rust
+    // daemon (404 since daemon rewrite; "verified 2026-07-26" comment was
+    // stale). Now emits real receipts (chain-start; daemon VAULT999-seals
+    // each ingest). Failure → local fallback JSONL, never silent.
     this._forwardToArifFlow(safeEvent).catch(() => {});
     // P1-AB (2026-08-02): Forward to arifOS kernel (constitutional witness)
     // Both forwarders fire — operational telemetry + constitutional record.
@@ -157,39 +159,47 @@ class McpTelemetry {
   }
 
   /**
-   * P1-6 VERIFIED: Forward telemetry event to arifFLOW :7073/telemetry/log.
-   * Proven live 2026-07-26 via batch_0a canary. Pipe accepted, timestamp returned.
-   * Fire-and-forget — failure is silent, local JSONL + journald are primary sinks.
+   * P1-6 (FIXED 2026-09-09, F13 "go"): Forward telemetry event to arifFLOW
+   * :7073/ingest as a real FlowReceipt (Execute step, actor a-forge).
+   * The old /telemetry/log pipe died with the daemon rewrite — every event
+   * was silently 404ing. Now: daemon chain-validates + VAULT999-seals each
+   * accepted receipt; local audit JSONL + journald remain primary sinks;
+   * ingest failures land in the flowEmit fallback JSONL (no silent drop).
    */
   private async _forwardToArifFlow(event: AuditEvent): Promise<void> {
     try {
-      await fetch(ARIFLOW_TELEMETRY, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          band: event.verdict === "HOLD" || event.verdict === "VOID" ? "GOVERNANCE" : "OPERATIONAL",
-          organ: "A-FORGE",
-          agent_id: event.session_id ? `aforge:${event.session_id.slice(0, 8)}` : undefined,
-          session_id: event.session_id,
-          tool_name: event.tool,
-          latency_ms: event.metadata?.durationMs as number | undefined,
-          success: event.action !== "failure",
-          error_message: event.outcome,
-          metadata: {
-            action: event.action,
-            pipeline_stage: event.pipeline_stage,
-            dS: event.dS,
-            peace2: event.peace2,
-            omega: event.omega,
-            w3: event.w3,
-            verdict: event.verdict,
-            agent_geometry: event.agent_geometry,
-          },
-        }),
-        signal: AbortSignal.timeout(3000),
+      const { emitAForgeReceipt } = await import(
+        "../../infrastructure/receipts/flowEmit.js"
+      );
+      await emitAForgeReceipt({
+        actor_id: "a-forge",
+        session_id: event.session_id ?? `aforge-mcp-${new Date().toISOString().slice(0, 10)}`,
+        step_type: "Execute",
+        summary: `${event.tool}:${event.action}`,
+        epistemic_label: "OBS",
+        floor_verdict:
+          event.action === "failure" || event.verdict === "HOLD" || event.verdict === "VOID"
+            ? "HOLD"
+            : "PASS",
+        cost_ns:
+          typeof event.metadata?.durationMs === "number"
+            ? (event.metadata.durationMs as number) * 1_000_000
+            : 0,
+        details: {
+          action: event.action,
+          pipeline_stage: event.pipeline_stage,
+          dS: event.dS,
+          peace2: event.peace2,
+          omega: event.omega,
+          w3: event.w3,
+          verdict: event.verdict,
+          agent_geometry: event.agent_geometry,
+          error: event.outcome,
+        },
       });
     } catch {
-      // arifFLOW unreachable — local JSONL + journald are primary sinks
+      // arifFLOW unreachable — local JSONL + journald are primary sinks;
+      // flowEmit already wrote the fallback line.
     }
   }
 

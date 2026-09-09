@@ -4,7 +4,7 @@
 // Hardcoded: forge_face_embed + forge_face_match primitives
 // Floor: F1 AMANAH (rented data) · F3 WITNESS · F6 MARUAH · F11 AUDIT · F13 SOVEREIGN
 
-import type { ToolDeclaration, IdentityWitnessSpec } from "./types";
+import type { ToolDeclaration, IdentityWitnessSpec } from "./types.js";
 
 export const FORGE_FACE_TOOLS: ToolDeclaration[] = [
   {
