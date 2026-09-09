@@ -62,6 +62,44 @@ export function createScarLedger(indexPath = PRODUCTION_SCAR_INDEX): ScarLedger 
     await fs.writeFile(indexPath, JSON.stringify(Object.fromEntries(cache), null, 2));
   }
 
+  /**
+   * Arrow 1 wire — emit a cross-organ scar event so arifOS Arrow1Queue
+   * auto-queues a re-examination task. File-based event bus is the
+   * minimal-touch bridge between A-FORGE (TS) and arifOS (Python).
+   *
+   * F1 AMANAH: emit only AFTER persist() succeeds (no orphan events).
+   * F11 AUDIT: every event leaves a JSONL trace.
+   * F2 TRUTH: event carries raw scar fields; arifOS derives capability_name.
+   *
+   * @see /root/arifOS/arifosmcp/runtime/capability_ledger.py::replay_scar_events
+   */
+  const ARROW1_EVENT_LOG = "/root/.local/share/arifos/scar_events.jsonl";
+
+  async function emit_arrow1_event(scar: ScarRecord): Promise<void> {
+    try {
+      await fs.mkdir(dirname(ARROW1_EVENT_LOG), { recursive: true });
+      const event = {
+        event_kind: "scar_sealed",
+        event_id: `arrow1_evt_${Date.now()}_${crypto.randomBytes(3).toString("hex")}`,
+        emitted_at: new Date().toISOString(),
+        scar_id: scar.scar_id,
+        scar_fingerprint: scar.fingerprint,
+        severity: scar.severity,
+        failure_mode: scar.failure_mode,
+        domain: scar.domain,
+        scar_pressure: scar.scar_pressure,
+        sealed_by: scar.sealed_by,
+        source: "aforge_forge_scar",
+      };
+      await fs.appendFile(ARROW1_EVENT_LOG, JSON.stringify(event) + "\n", "utf-8");
+    } catch (err) {
+      // F1 AMANAH: scar is already sealed; Arrow 1 wire failure must not
+      // throw back into the seal path (would orphan the scar). Log and
+      // continue — re-execution can replay the scar_events.jsonl file.
+      console.warn("[forge_scar] arrow1 event emission failed (non-fatal):", err);
+    }
+  }
+
   async function sealFailure(params: SealFailureParams): Promise<ScarRecord> {
     const scars = await ensureLoaded();
     const fingerprint = crypto
@@ -85,6 +123,9 @@ export function createScarLedger(indexPath = PRODUCTION_SCAR_INDEX): ScarLedger 
     };
     scars.set(scar.scar_id, scar);
     await persist();
+    // Arrow 1 wire — fire AFTER persist so we never emit an event for
+    // a scar that didn't actually seal.
+    await emit_arrow1_event(scar);
     return scar;
   }
 
