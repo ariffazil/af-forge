@@ -159,3 +159,9 @@ deploy/rollback/
 .aider.chat.history.md
 _backups/
 vendor/
+
+# === test output / regenerable (2026-09-11 BIJAKSANA sweep) ===
+
+# === test output / regenerable (2026-09-11 BIJAKSANA sweep) ===
+tests/mcp-conformance/results/conformance-*.json
+artifacts/alpha-zen-daily/
